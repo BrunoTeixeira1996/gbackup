@@ -4,6 +4,8 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/internal"
 )
 
+// Function that dumps databases in postgresql server
+// and then backups up to external hard drive
 func backupPostgresqlToExternal(cfg internal.Config) error {
 	cmd := "pg_dump waiw > waiw.sql && pg_dump leaks > leaks.sql"
 
@@ -20,6 +22,8 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 	return nil
 }
 
+// Function that copies previous database dump to
+// HDD present in proxmox instance
 func backupPostgresqlToHDD(cfg internal.Config) error {
 	c := []string{"/tmp/l/waiw.sql", "/tmp/l/leaks.sql", "/tmp/a"}
 	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
@@ -30,6 +34,7 @@ func backupPostgresqlToHDD(cfg internal.Config) error {
 	return nil
 }
 
+// Function that handles both backups
 func ExecutePostgreSQLBackup(cfg internal.Config) error {
 	if err := backupPostgresqlToExternal(cfg); err != nil {
 		return err
