@@ -21,7 +21,11 @@ func main() {
 	// 	log.Println(err)
 	// }
 
-	if err := targets.ExecuteGokrPermBackup(cfg); err != nil {
+	// if err := targets.ExecuteGokrPermBackup(cfg); err != nil {
+	// 	log.Println(err)
+	// }
+
+	if err := targets.ExecuteSyncthingBackup(cfg); err != nil {
 		log.Println(err)
 	}
 }
