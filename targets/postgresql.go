@@ -1,5 +1,7 @@
 package targets
 
+import "github.com/BrunoTeixeira1996/gbackup/internal"
+
 const (
 	host     = "192.168.30.171"
 	keypath  = "/home/brun0/.ssh/id_ed25519_postgresql"
@@ -9,13 +11,13 @@ const (
 func backupPostgresqlToExternal() error {
 	cmd := "pg_dump waiw > waiw.sql && pg_dump leaks > leaks.sql"
 
-	err := executeCmdSSH(cmd, host, keypath)
+	err := internal.ExecuteCmdSSH(cmd, host, keypath)
 	if err != nil {
 		return err
 	}
 
 	rCmd := []string{"bot:/root/*.sql", "/tmp/l"}
-	if err := execCmdToProm("rsync", rCmd, "rsync", instance); err != nil {
+	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", instance); err != nil {
 		return err
 	}
 
@@ -23,8 +25,8 @@ func backupPostgresqlToExternal() error {
 }
 
 func backupPostgresqlToHDD() error {
-	c := []string{"/tmp/l/waiws.sql", "/tmp/l/leaks.sql", "/tmp/a"}
-	err := execCmdToProm("cp", c, "cmd", instance)
+	c := []string{"/tmp/l/waiw.sql", "/tmp/l/leaks.sql", "/tmp/a"}
+	err := internal.ExecCmdToProm("cp", c, "cmd", instance)
 	if err != nil {
 		return err
 	}
