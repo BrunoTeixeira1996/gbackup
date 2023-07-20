@@ -3,11 +3,21 @@ package main
 import (
 	"log"
 
+	"github.com/BrunoTeixeira1996/gbackup/internal"
 	"github.com/BrunoTeixeira1996/gbackup/targets"
 )
 
 func main() {
-	if err := targets.ExecutePostgreSQLBackup(); err != nil {
+	var (
+		cfg internal.Config
+		err error
+	)
+
+	if cfg, err = internal.ReadTomlFile(); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := targets.ExecutePostgreSQLBackup(cfg); err != nil {
 		log.Fatal(err)
 	}
 }

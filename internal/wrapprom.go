@@ -17,7 +17,7 @@ import (
 // stolen from https://github.com/stapelberg/rsyncprom
 // Function that executes command and gather and gather metrics to prometheus
 // i've modified a little bit this to make it usefull for my use case
-func ExecCmdToProm(name string, command []string, commandType string, instance string) error {
+func ExecCmdToProm(name string, command []string, commandType string, instance string, pg string) error {
 	var (
 		c          *exec.Cmd
 		stdoutPipe io.ReadCloser
@@ -61,7 +61,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 	switch commandType {
 	case "rsync":
 		params := rsyncprom.WrapParams{
-			Pushgateway: "http://192.168.30.77:9091",
+			Pushgateway: pg,
 			Instance:    instance,
 			Job:         "rsync",
 		}
@@ -70,7 +70,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 
 	case "cmd":
 		params := rsyncprom.WrapParams{
-			Pushgateway: "http://192.168.30.77:9091",
+			Pushgateway: pg,
 			Instance:    instance,
 			Job:         "cmd",
 		}

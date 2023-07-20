@@ -1,0 +1,20 @@
+[pushgateway]
+host = "http://192.168.30.77:9091"
+
+[[targets]]
+name = "postgresql"
+host = "192.168.30.171"
+keypath = "/home/brun0/.ssh/id_ed25519_postgresql"
+instance = "brun0:postgresql"
+
+[[targets]]
+name = "syncthing"
+host = "192.168.30.36"
+keypath = "/home/brun0/.ssh/id_ed25519_syncthing"
+instance = "brun0:syncthing"
+
+[[targets]]
+name = "leaks"
+host = "192.168.30.3"
+keypath = "/home/brun0/.ssh/id_ed25519_proxmox"
+instance = "brun0:leaks"

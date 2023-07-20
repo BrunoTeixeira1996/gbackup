@@ -1,32 +1,28 @@
 package targets
 
-import "github.com/BrunoTeixeira1996/gbackup/internal"
-
-const (
-	host     = "192.168.30.171"
-	keypath  = "/home/brun0/.ssh/id_ed25519_postgresql"
-	instance = "brun0:test123"
+import (
+	"github.com/BrunoTeixeira1996/gbackup/internal"
 )
 
-func backupPostgresqlToExternal() error {
+func backupPostgresqlToExternal(cfg internal.Config) error {
 	cmd := "pg_dump waiw > waiw.sql && pg_dump leaks > leaks.sql"
 
-	err := internal.ExecuteCmdSSH(cmd, host, keypath)
+	err := internal.ExecuteCmdSSH(cmd, cfg.Targets[0].Host, cfg.Targets[0].Keypath)
 	if err != nil {
 		return err
 	}
 
 	rCmd := []string{"bot:/root/*.sql", "/tmp/l"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", instance); err != nil {
+	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[0].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func backupPostgresqlToHDD() error {
+func backupPostgresqlToHDD(cfg internal.Config) error {
 	c := []string{"/tmp/l/waiw.sql", "/tmp/l/leaks.sql", "/tmp/a"}
-	err := internal.ExecCmdToProm("cp", c, "cmd", instance)
+	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}
@@ -34,12 +30,12 @@ func backupPostgresqlToHDD() error {
 	return nil
 }
 
-func ExecutePostgreSQLBackup() error {
-	if err := backupPostgresqlToExternal(); err != nil {
+func ExecutePostgreSQLBackup(cfg internal.Config) error {
+	if err := backupPostgresqlToExternal(cfg); err != nil {
 		return err
 	}
 
-	if err := backupPostgresqlToHDD(); err != nil {
+	if err := backupPostgresqlToHDD(cfg); err != nil {
 		return err
 	}
 
