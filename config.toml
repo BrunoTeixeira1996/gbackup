@@ -8,6 +8,11 @@ keypath = "/home/brun0/.ssh/id_ed25519_postgresql"
 instance = "brun0:postgresql"
 
 [[targets]]
+name = "gokr_perm"
+instance = "brun0:gokr_perm"
+
+
+[[targets]]
 name = "syncthing"
 host = "192.168.30.36"
 keypath = "/home/brun0/.ssh/id_ed25519_syncthing"

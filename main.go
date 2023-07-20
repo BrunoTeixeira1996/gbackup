@@ -17,7 +17,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := targets.ExecutePostgreSQLBackup(cfg); err != nil {
-		log.Fatal(err)
+	// if err := targets.ExecutePostgreSQLBackup(cfg); err != nil {
+	// 	log.Println(err)
+	// }
+
+	if err := targets.ExecuteGokrPermBackup(cfg); err != nil {
+		log.Println(err)
 	}
 }
