@@ -14,7 +14,7 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 		return err
 	}
 
-	rCmd := []string{"bot:/root/*.sql", "/tmp/l"}
+	rCmd := []string{"bot:/root/*.sql", "/mnt/pve/external/postgresql_backup"}
 	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[0].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
@@ -25,7 +25,8 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 // Function that copies previous database dump to
 // HDD present in proxmox instance
 func backupPostgresqlToHDD(cfg internal.Config) error {
-	c := []string{"/tmp/l/waiw.sql", "/tmp/l/leaks.sql", "/tmp/a"}
+	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/mnt/pve/external/postgresql_backup/leaks.sql", "/storagepool/backups/postgresql_backup"}
+
 	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
