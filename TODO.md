@@ -3,7 +3,7 @@
 - Create rsyncs and cronjobs
   - [x] Create postgresql
   - [x] Create gokr_backup_perm
-  - [] Create syncthing_backup
+  - [x] Create syncthing_backup
   - [] Create backup for gokrazy config files that are present in my laptop
   - [] Create leak_backup
 	- Fix leak_backup cronjob architecture

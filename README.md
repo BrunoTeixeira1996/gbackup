@@ -37,7 +37,7 @@ cp -r /mnt/pve/external/leaks_backup/leak-$DT.tar.gz /storagepool/backups/leaks_
 ## syncthing_backup
 
 ``` console
-rsync -Pav -e syncthing:/root/config/Sync /mnt/pve/external/syncthing_backup
+rsync -av -e syncthing:/root/config/Sync /mnt/pve/external/syncthing_backup
 ```
 
 ### Cronjob
