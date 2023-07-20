@@ -4,7 +4,9 @@
   - [x] Create postgresql
   - [x] Create gokr_backup_perm
   - [x] Create syncthing_backup
-  - [] Create backup for gokrazy config files that are present in my laptop
+  - [x] Create backup for gokrazy config files that are present in my laptop
+	- my laptop has a running cronjob that sends the gokrazy folder
+	- and then proxmox backups that to storagepool
   - [] Create leak_backup
 	- Fix leak_backup cronjob architecture
   - [] Create backup for grafana and prometheus conf files
