@@ -29,7 +29,11 @@ func main() {
 	// 	log.Println(err)
 	// }
 
-	if err := targets.ExecuteGokrConfBackup(cfg); err != nil {
+	// if err := targets.ExecuteGokrConfBackup(cfg); err != nil {
+	// 	log.Println(err)
+	// }
+
+	if err := targets.ExecuteLeaksBackup(cfg); err != nil {
 		log.Println(err)
 	}
 }

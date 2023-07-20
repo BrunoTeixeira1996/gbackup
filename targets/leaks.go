@@ -1,6 +1,14 @@
 package targets
 
-import "github.com/BrunoTeixeira1996/gbackup/internal"
+import (
+	"io/ioutil"
+	"os"
+	"os/exec"
+	"strings"
+	"time"
+
+	"github.com/BrunoTeixeira1996/gbackup/internal"
+)
 
 /*
    Here I only tar the folder that is already present in the external hard drive
@@ -9,33 +17,103 @@ import "github.com/BrunoTeixeira1996/gbackup/internal"
    and from the hdd that is on proxmox
 */
 
-/*
-   get current date in format d/mm/yyyy
-   tar folder /mnt/pve/external/leaks with the date
-   copy the tar to /storagepool/backups/leaks_backup
-   delete archives that are 15 days old from external hard drive and hdd
-*/
+// Returns number of days from the current time
+// to the modificationTime
+func getDateDiff(modificationTime string) int {
+	timeFormat := "2006-01-02"
+	t, _ := time.Parse(timeFormat, modificationTime)
+	duration := time.Now().Sub(t)
+
+	return int(duration.Hours() / 24)
+}
 
 // Function that compresses folder to a tar
-// format with the current date
-func compressFolder() {
+// format with the current date (yy/mm/dd)
+// and returns the current location
+func compressFolder() (string, error) {
+	timeNow := time.Now()
+	timeNowCorrectFormat := timeNow.Format("2006-01-02")
+
+	// TODO: make sure this is working in proxmox
+	tarN := "/mnt/pve/external/leaks_backup/leak-" + timeNowCorrectFormat + ".tar"
+
+	// TODO: make sure this is working in proxmox
+	cmd := exec.Command("tar", "-cvf", tarN, "/mnt/pve/external/leaks_backup")
+
+	if err := cmd.Run(); err != nil {
+		return "", err
+	}
+
+	return tarN, nil
 }
 
 // Function that deletes archives older than 15 days
 // in external hard drive and in HDD that reside on proxmox
-func clean() {
+func clean(directoryToClean string) error {
+	files, err := ioutil.ReadDir(directoryToClean)
+	if err != nil {
+		return err
+	}
 
+	for _, file := range files {
+
+		// TODO: make sure this is working in proxmox
+		p := directoryToClean + file.Name()
+
+		// gather info from file
+		fileInfo, err := os.Stat(p)
+		if err != nil {
+			return err
+		}
+
+		modificationTime := strings.Split(fileInfo.ModTime().String(), " ")[0]
+
+		daysDiff := getDateDiff(modificationTime)
+
+		// delete all files that are older than 15 days
+		if daysDiff >= 15 {
+			if err := os.Remove(p); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // Function that copies tar file to the
 // HDD located in proxmox
 func backupLeaksToHDD(cfg internal.Config) error {
+	var (
+		externalLocation string
+		err              error
+	)
+
+	// tar in external hard drive
+	if externalLocation, err = compressFolder(); err != nil {
+		return err
+	}
+
+	// TODO: make sure this is working in proxmox
+	c := []string{externalLocation, "/storagepool/backups/leaks_backup"}
+	if err = internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[3].Instance, cfg.Pushgateway.Host); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func ExecuteLeaksBackup(cfg internal.Config) error {
 	if err := backupLeaksToHDD(cfg); err != nil {
 		return err
+	}
+
+	// cleaning files older than 15 days
+	dirsToBeCleaned := []string{"/storagepool/backups/leaks_backup", "/mnt/pve/external/leaks_backup/"}
+	for _, d := range dirsToBeCleaned {
+		if err := clean(d); err != nil {
+			return err
+		}
 	}
 	return nil
 }
