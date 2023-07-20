@@ -15,7 +15,7 @@ import (
 )
 
 // stolen from https://github.com/stapelberg/rsyncprom
-// Function that executes command and gather and gather metrics to prometheus
+// Function that executes command and gather metrics to prometheus
 // i've modified a little bit this to make it usefull for my use case
 func ExecCmdToProm(name string, command []string, commandType string, instance string, pg string) error {
 	var (
@@ -81,11 +81,10 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 	return err
 }
 
-// TODO
-// write log to a log file maybe?
+// stolen from https://github.com/stapelberg/rsyncprom/blob/main/rsyncprom.go
+// Function that wraps unix commands collecting metrics to prometheus
 // the only thing that matters here is the start and end time and then
 // the exit code of the command
-// stolen from https://github.com/stapelberg/rsyncprom/blob/main/rsyncprom.go
 func wrapCmd(ctx context.Context, params *rsyncprom.WrapParams, args []string, start func(context.Context, []string) (io.Reader, error), wait func() int) error {
 	log.Printf("push gateway: %q", params.Pushgateway)
 
