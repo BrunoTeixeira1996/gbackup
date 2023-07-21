@@ -56,3 +56,7 @@ name = "monitoring"
 host = "192.168.30.77"
 keypath = "/root/.ssh/id_ed25519_monitoring"
 instance = "brun0:monitoring"
+
+[[targets]]
+name = "gokr_config"
+instance = "brun0:gokr_config"

@@ -16,7 +16,7 @@ import (
 // to HDD present in proxmox
 func backupGokrConfToHDD(cfg internal.Config) error {
 	c := []string{"-r", "/mnt/pve/external/gokrazy_backup/brun0-pi", "/storagepool/backups/gokrazy_backup/brun0-pi"}
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[1].Instance, cfg.Pushgateway.Host)
+	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[5].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}
