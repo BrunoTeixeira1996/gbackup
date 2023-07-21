@@ -13,7 +13,7 @@
 	- proxmox will download conf files from prometheus and grafana lxc
 	- then it will save in the external hard drive and then copy to storagepool
   - [] Add cronjobs for functions in main
-
-- Add Alert Manager when all backups are created
-  - This is done but I need to create a rule for the cmd jobs
-- Document (properly) what every rsync and cronjobs do
+  - [] Add rule in AlertManager for cronjobs
+  - [] Create total written graph in grafana for rsync and cmd commands
+  - [] Make rsync commands delete in destination if file/folder is not present in source
+  - []Document (properly) what every rsync and cronjobs do
