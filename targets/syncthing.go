@@ -6,7 +6,7 @@ import "github.com/BrunoTeixeira1996/gbackup/internal"
 // to external hard drive
 func backupSyncthingToExternal(cfg internal.Config) error {
 	rCmd := []string{"-av", "-e", "syncthing:/root/config/Sync", "/mnt/pve/external/syncthing_backup"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
+	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[2].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
@@ -17,7 +17,7 @@ func backupSyncthingToExternal(cfg internal.Config) error {
 // HDD present in proxmox instance
 func backupSyncthingToHDD(cfg internal.Config) error {
 	c := []string{"-r", "/mnt/pve/external/syncthing_backup/Sync", "/storagepool/backups/syncthing_backup"}
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[1].Instance, cfg.Pushgateway.Host)
+	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[2].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}

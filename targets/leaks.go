@@ -34,10 +34,8 @@ func compressFolder() (string, error) {
 	timeNow := time.Now()
 	timeNowCorrectFormat := timeNow.Format("2006-01-02")
 
-	// TODO: make sure this is working in proxmox
 	tarN := "/mnt/pve/external/leaks_backup/leak-" + timeNowCorrectFormat + ".tar"
 
-	// TODO: make sure this is working in proxmox
 	cmd := exec.Command("tar", "-cvf", tarN, "/mnt/pve/external/leaks_backup")
 
 	if err := cmd.Run(); err != nil {
@@ -57,7 +55,6 @@ func clean(directoryToClean string) error {
 
 	for _, file := range files {
 
-		// TODO: make sure this is working in proxmox
 		p := directoryToClean + file.Name()
 
 		// gather info from file
@@ -94,8 +91,7 @@ func backupLeaksToHDD(cfg internal.Config) error {
 		return err
 	}
 
-	// TODO: make sure this is working in proxmox
-	c := []string{externalLocation, "/storagepool/backups/leaks_backup"}
+	c := []string{externalLocation, "/storagepool/backups/leaks_backup/"}
 	if err = internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[3].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
@@ -109,7 +105,7 @@ func ExecuteLeaksBackup(cfg internal.Config) error {
 	}
 
 	// cleaning files older than 15 days
-	dirsToBeCleaned := []string{"/storagepool/backups/leaks_backup", "/mnt/pve/external/leaks_backup/"}
+	dirsToBeCleaned := []string{"/storagepool/backups/leaks_backup/", "/mnt/pve/external/leaks_backup/"}
 	for _, d := range dirsToBeCleaned {
 		if err := clean(d); err != nil {
 			return err

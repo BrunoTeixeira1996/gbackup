@@ -9,11 +9,11 @@
 	- and then proxmox backups that to storagepool
   - [x] Create leak_backup (needs testing in proxmox)
 	- Fix leak_backup cronjob architecture
-  - [] Create backup for grafana and prometheus conf files
+  - [x] Create backup for grafana and prometheus conf files
 	- proxmox will download conf files from prometheus and grafana lxc
 	- then it will save in the external hard drive and then copy to storagepool
   - [] Add cronjobs for functions in main
 
-- Fix paths to correct ones since right now I am using debug paths
 - Add Alert Manager when all backups are created
+  - This is done but I need to create a rule for the cmd jobs
 - Document (properly) what every rsync and cronjobs do

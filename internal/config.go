@@ -25,7 +25,8 @@ type Config struct {
 func ReadTomlFile() (Config, error) {
 	var cfg Config
 
-	input, err := ioutil.ReadFile("/home/brun0/Desktop/personal/gbackup/config.toml")
+	//input, err := ioutil.ReadFile("/home/brun0/Desktop/personal/gbackup/config.toml")
+	input, err := ioutil.ReadFile("/root/config.toml")
 	if err != nil {
 		return Config{}, err
 	}
