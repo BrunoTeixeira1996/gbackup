@@ -12,8 +12,9 @@
   - [x] Create backup for grafana and prometheus conf files
 	- proxmox will download conf files from prometheus and grafana lxc
 	- then it will save in the external hard drive and then copy to storagepool
-  - [] Add cronjobs for functions in main
-  - [] Add rule in AlertManager for cronjobs
+  - [] Add cronjobs for functions in main (maybe I could just use the binary in the crontab)
+  - [x] Add rule in AlertManager for cronjobs
+  - [] Write to log file
+  - [x] Create Make file for uploading this to proxmox
   - [] Create total written graph in grafana for rsync and cmd commands
-  - [] Make rsync commands delete in destination if file/folder is not present in source
   - []Document (properly) what every rsync and cronjobs do
