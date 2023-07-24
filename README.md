@@ -1,9 +1,7 @@
-# README
-
 gbackup is a go tool to help me backup useful information from various systems I am running.
-This could be something private but maybe this will help anyone or give an idea on how to backup stuff usyng go.
+This could be something private but maybe this will help someone or give an idea on how to backup stuff using go.
 
-The current backup plan is shown below but basicaly I backup the following:
+The current backup plan is shown below but I backup the following:
 - gokrazy perm partion (resides in gokrazy)
 - gokrazy data folder (resides in my personal laptop)
 - postgresql databases (resides in a LXC in proxmox)
@@ -15,5 +13,10 @@ The current backup plan is shown below but basicaly I backup the following:
 **It is important to note that I first use `rsync` to backup everything to an external hard drive plugged in my proxmox instance and then I perform a `cp` to the storagepool that is a HDD that resides inside the proxmox and is used only for backups.**
 
 
-
 ![backup_nobackground](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/907964c6-ebb4-48be-8654-eb01dcdf130f)
+
+Then I monitor the `rsync` and `cp` commands using Prometheus as shown bellow.
+
+**This is a simple dashboard as I am new to Grafana but the main thing I use is the AlertManager in case something is wrong**
+
+![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/0905a2fb-33da-47ba-9f6f-beec1d4a9eb6)
