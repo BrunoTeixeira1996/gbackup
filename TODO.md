@@ -16,5 +16,4 @@
   - [x] Setup crontab in proxmox
   - [x] Create Make file for uploading this to proxmox
   - [] Write to log file
-  - [] Create total written graph in grafana for rsync and cmd commands
   - []Document (properly) what every rsync and cronjobs do
