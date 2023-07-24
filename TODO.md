@@ -13,8 +13,8 @@
 	- proxmox will download conf files from prometheus and grafana lxc
 	- then it will save in the external hard drive and then copy to storagepool
   - [x] Add rule in AlertManager for cronjobs
-  - [] Write to log file
-  - [] Add cronjobs for functions in main (I will use crontab but I need to configure the cronjob in proxmox)
+  - [x] Setup crontab in proxmox
   - [x] Create Make file for uploading this to proxmox
+  - [] Write to log file
   - [] Create total written graph in grafana for rsync and cmd commands
   - []Document (properly) what every rsync and cronjobs do
