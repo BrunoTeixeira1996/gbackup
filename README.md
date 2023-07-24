@@ -27,4 +27,4 @@ Then I monitor the `rsync` and `cp` commands using Prometheus as shown bellow.
 
 **This is a simple dashboard as I am new to Grafana but the main thing I use is the AlertManager in case something is wrong**
 
-![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/0905a2fb-33da-47ba-9f6f-beec1d4a9eb6)
+![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/210c3976-f776-42a8-a215-f691ff21af45)
