@@ -15,6 +15,13 @@ The current backup plan is shown below but I backup the following:
 
 ![backup_nobackground](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/907964c6-ebb4-48be-8654-eb01dcdf130f)
 
+Inside the proxmox instance I run the following cronjob
+
+``` bash
+0 0 * * FRI /root/gbackup/gbackup > /root/gbackup/logstdout 2> /root/gbackup/logstderr
+```
+
+
 Then I monitor the `rsync` and `cp` commands using Prometheus as shown bellow.
 
 **This is a simple dashboard as I am new to Grafana but the main thing I use is the AlertManager in case something is wrong**
