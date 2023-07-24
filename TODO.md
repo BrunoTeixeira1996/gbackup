@@ -15,5 +15,6 @@
   - [x] Add rule in AlertManager for cronjobs
   - [x] Setup crontab in proxmox
   - [x] Create Make file for uploading this to proxmox
+  - [] Setup AlertManager to send alert when cronjob is running even when is not failing
   - [] Write to log file
   - []Document (properly) what every rsync and cronjobs do
