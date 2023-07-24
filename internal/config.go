@@ -26,7 +26,7 @@ func ReadTomlFile() (Config, error) {
 	var cfg Config
 
 	//input, err := ioutil.ReadFile("/home/brun0/Desktop/personal/gbackup/config.toml")
-	input, err := ioutil.ReadFile("/root/config.toml")
+	input, err := ioutil.ReadFile("/root/gbackup/config.toml")
 	if err != nil {
 		return Config{}, err
 	}
