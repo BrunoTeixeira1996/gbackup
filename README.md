@@ -13,7 +13,8 @@ The current backup plan is shown below but I backup the following:
 **It is important to note that I first use `rsync` to backup everything to an external hard drive plugged in my proxmox instance and then I perform a `cp` to the storagepool that is a HDD that resides inside the proxmox and is used only for backups.**
 
 
-![backup_nobackground](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/907964c6-ebb4-48be-8654-eb01dcdf130f)
+![backup_nobackground](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/0f969773-237f-456c-9868-3d99f5c8ed98)
+
 
 Inside the proxmox instance I run the following cronjob
 
