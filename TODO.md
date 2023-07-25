@@ -15,6 +15,8 @@
   - [x] Add rule in AlertManager for cronjobs
   - [x] Setup crontab in proxmox
   - [x] Create Make file for uploading this to proxmox
+  - [] Implement goroutines for a faster backup
+	- Every block of backup can run in a goroutine since the data that is shared is from rsync and cmd
   - [] Setup AlertManager to send alert when cronjob is running even when is not failing
   - [] Write to log file
   - []Document (properly) what every rsync and cronjobs do
