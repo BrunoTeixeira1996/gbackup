@@ -36,7 +36,7 @@ func compressFolder() (string, error) {
 
 	tarN := "/mnt/pve/external/leaks_backup/leak-" + timeNowCorrectFormat + ".tar"
 
-	cmd := exec.Command("tar", "-cvf", tarN, "/mnt/pve/external/leaks_backup")
+	cmd := exec.Command("tar", "-cvf", tarN, "/mnt/pve/external/leaks")
 
 	if err := cmd.Run(); err != nil {
 		return "", err
