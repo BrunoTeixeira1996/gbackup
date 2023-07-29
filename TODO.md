@@ -18,6 +18,7 @@
   - [x] Implement goroutines for a faster backup
 	- Every block of backup can run in a goroutine since the data that is shared is from rsync and cmd
 	- [x] There's a bug in the log since it prints randomly
-  - [] Setup AlertManager to send alert when cronjob is running even when is not failing
+  - [] Setup Email alert when script finishes (this is easier than seting up AlertManager to send alert when event is not failing)
+  - [] Add temp control for the raspberry pi (node_hwmon_temp_celsius{instance="brun0-pi:9100"}) - create alert for temp high than 60
   - [] Write to log file
   - []Document (properly) what every rsync and cronjobs do
