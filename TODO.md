@@ -21,4 +21,4 @@
   - [] Setup Email alert when script finishes (this is easier than seting up AlertManager to send alert when event is not failing)
   - [] Add temp control for the raspberry pi (node_hwmon_temp_celsius{instance="brun0-pi:9100"}) - create alert for temp high than 60
   - [] Write to log file
-  - []Document (properly) what every rsync and cronjobs do
+  - [x] Document (properly) what every rsync and cronjobs do
