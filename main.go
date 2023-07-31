@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"sync"
@@ -54,8 +55,8 @@ func getExecutionFunction(target string, cfg internal.Config) error {
 	return nil
 }
 
-func main() {
-	// discard log output from other packages
+func logic() error {
+	// // discard log output from other packages
 	log.SetOutput(ioutil.Discard)
 
 	var (
@@ -83,5 +84,19 @@ func main() {
 	}
 	wg.Wait()
 
-	internal.Logger.Printf("Total backups: %d\nTotal backups completed successfully: %d\n\n", len(supportedTargets), success)
+	res := fmt.Sprintf("Total backups: %d\nTotal backup completed successfully: %d\n\n", len(supportedTargets), success)
+
+	if err := internal.SendEmail(res); err != nil {
+		internal.Logger.Printf(err.Error())
+	}
+
+	internal.Logger.Printf(res)
+
+	return nil
+}
+
+func main() {
+	if err := logic(); err != nil {
+		internal.Logger.Printf(err.Error())
+	}
 }
