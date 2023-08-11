@@ -4,6 +4,7 @@ This could be something private but maybe this will help someone or give an idea
 The current backup plan is shown below but I backup the following:
 - gokrazy perm partion (resides in gokrazy)
 - gokrazy data folder (resides in my personal laptop)
+  - `00 11 * * FRI /home/brun0/Desktop/personal/dotfiles/backup_scripts/gokr_backup_config.sh`
 - postgresql databases (resides in a LXC in proxmox)
   - currently I am only doing the backup for the waiw and leak databases
 - syncthing folder (resides in a LXC in proxmox)
