@@ -2,8 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
-	"log"
 	"sync"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal"
@@ -56,8 +54,6 @@ func getExecutionFunction(target string, cfg internal.Config) error {
 }
 
 func logic() error {
-	// // discard log output from other packages
-	log.SetOutput(ioutil.Discard)
 
 	var (
 		cfg     internal.Config
