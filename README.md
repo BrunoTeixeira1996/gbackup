@@ -18,6 +18,7 @@ The current backup plan is shown below but I backup the following:
 
 
 Inside the proxmox instance I run the following cronjob
+- Note that I do have the necessary env vars so cronjob knows whats the email and password for sending emails
 
 ``` bash
 0 0 * * FRI /root/gbackup/gbackup > /root/gbackup/logstdout 2> /root/gbackup/logstderr
