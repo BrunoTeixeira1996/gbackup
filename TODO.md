@@ -20,7 +20,7 @@
 	- [x] There's a bug in the log since it prints randomly
   - [x] Setup Email alert when script finishes (this is easier than seting up AlertManager to send alert when event is not failing)
   - [] Format output as json so its better to read and send current output as attachment
-  - [] Add more stuff when sending Email
+  - [x] Add more stuff when sending Email
 	- Timestamp
 	- Log
 	- Number of backups and number of well executed backups

@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"sync"
+	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal"
 	"github.com/BrunoTeixeira1996/gbackup/targets"
@@ -54,7 +56,6 @@ func getExecutionFunction(target string, cfg internal.Config) error {
 }
 
 func logic() error {
-
 	var (
 		cfg     internal.Config
 		err     error
@@ -69,24 +70,29 @@ func logic() error {
 	for _, t := range supportedTargets {
 		wg.Add(1)
 		go func(t string) {
-			defer wg.Done()
 			internal.Logger.Printf("Starting %s\n\n", t)
 			if err := getExecutionFunction(t, cfg); err != nil {
 				internal.Logger.Println(err)
 			} else {
 				success += 1
 			}
+			wg.Done()
 		}(t)
 	}
 	wg.Wait()
 
-	res := fmt.Sprintf("Total backups: %d\nTotal backup completed successfully: %d\n\n", len(supportedTargets), success)
+	finalResult := fmt.Sprintf("%s\n\nTotal backups:%d\nTotal backup with success:%d\n\n", time.Now(), len(supportedTargets), success)
 
-	if err := internal.SendEmail(res); err != nil {
-		internal.Logger.Printf(err.Error())
+	logstdoutFile, err := os.ReadFile("/root/gbackup/logstdout")
+	if err != nil {
+		internal.Logger.Println("Error while opening logstdout file:", err)
 	}
 
-	internal.Logger.Printf(res)
+	finalResult = fmt.Sprintf("%s\n%s", finalResult, string(logstdoutFile))
+
+	if err := internal.SendEmail(finalResult); err != nil {
+		internal.Logger.Printf(err.Error())
+	}
 
 	return nil
 }
