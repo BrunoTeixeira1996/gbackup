@@ -19,7 +19,7 @@
 	- Every block of backup can run in a goroutine since the data that is shared is from rsync and cmd
 	- [x] There's a bug in the log since it prints randomly
   - [x] Setup Email alert when script finishes (this is easier than seting up AlertManager to send alert when event is not failing)
-  - [] Format output as html template so its better to read
+  - [x] Format output as html template so its better to read
   - [x] Add more stuff when sending Email
 	- Timestamp
 	- Log
