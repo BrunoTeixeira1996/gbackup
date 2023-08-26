@@ -1,4 +1,4 @@
-FILES = gbackup config.toml
+FILES = gbackup config.toml email_template.html
 
 deploy:
 	CGO_ENABLED=0 go build .

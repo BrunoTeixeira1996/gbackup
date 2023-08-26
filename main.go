@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"sync"
 	"time"
 
@@ -81,14 +79,11 @@ func logic() error {
 	}
 	wg.Wait()
 
-	finalResult := fmt.Sprintf("%s\n\nTotal backups:%d\nTotal backup with success:%d\n\n", time.Now(), len(supportedTargets), success)
-
-	logstdoutFile, err := os.ReadFile("/root/gbackup/logstdout")
-	if err != nil {
-		internal.Logger.Println("Error while opening logstdout file:", err)
+	finalResult := &internal.EmailTemplate{
+		Timestamp:          time.Now().String(),
+		Totalbackups:       len(supportedTargets),
+		Totalbackupsuccess: success,
 	}
-
-	finalResult = fmt.Sprintf("%s\n%s", finalResult, string(logstdoutFile))
 
 	if err := internal.SendEmail(finalResult); err != nil {
 		internal.Logger.Printf(err.Error())

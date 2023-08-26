@@ -1,10 +1,20 @@
 package internal
 
 import (
+	"bytes"
 	"fmt"
 	"net/smtp"
 	"os"
+	"strings"
+	"text/template"
 )
+
+type EmailTemplate struct {
+	Timestamp          string
+	Totalbackups       int
+	Totalbackupsuccess int
+	Content            string
+}
 
 type Smtp struct {
 	Host    string
@@ -25,7 +35,34 @@ func getEnvs() (string, string) {
 	return senderEmail, senderPass
 }
 
-func SendEmail(body string) error {
+func buildEmail(e *EmailTemplate) (string, error) {
+	logstdoutFile, err := os.ReadFile("/root/gbackup/logstdout")
+	if err != nil {
+		return "", err
+	}
+
+	buf := bytes.NewBuffer(logstdoutFile)
+
+	for _, s := range strings.Split(buf.String(), "\n") {
+		if strings.Contains(s, "Starting") || strings.Contains(s, "Executing") {
+			e.Content += fmt.Sprintf("%s<br><br>", s)
+		}
+	}
+
+	templ, err := template.New("email_template.html").ParseFiles("/root/gbackup/email_template.html")
+	if err != nil {
+		return "", err
+	}
+
+	var outTemp bytes.Buffer
+	if err := templ.Execute(&outTemp, e); err != nil {
+		return "", err
+	}
+
+	return outTemp.String(), nil
+}
+
+func SendEmail(body *EmailTemplate) error {
 	senderEmail, senderPass := getEnvs()
 	if senderEmail == "" || senderPass == "" {
 		return fmt.Errorf("Please setup the SENDEREMAIL and SENDERPASS env vars")
@@ -35,11 +72,18 @@ func SendEmail(body string) error {
 	s.setSmtpValues()
 
 	recipientEmail := "brunoalexandre3@hotmail.com"
+	headers := "Content-Type: text/html; charset=ISO-8859-1\r\n" // used to send HTML
 
 	from := fmt.Sprintf("From: <%s>\r\n", senderEmail)
 	to := fmt.Sprintf("To: <%s>\r\n", recipientEmail)
 	subject := "Subject: Backup executed\r\n"
-	msg := from + to + subject + "\r\n" + body + "\r\n"
+
+	finalBody, err := buildEmail(body)
+	if err != nil {
+		return fmt.Errorf("Error while building email template: %w", err)
+	}
+
+	msg := headers + from + to + subject + "\r\n" + finalBody + "\r\n"
 
 	auth := smtp.PlainAuth("", senderEmail, senderPass, s.Host)
 
