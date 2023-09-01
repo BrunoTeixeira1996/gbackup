@@ -83,6 +83,7 @@ func logic() error {
 		Timestamp:          time.Now().String(),
 		Totalbackups:       len(supportedTargets),
 		Totalbackupsuccess: success,
+		PiTemp:             internal.GetPiTemp(),
 	}
 
 	if err := internal.SendEmail(finalResult); err != nil {

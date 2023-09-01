@@ -24,5 +24,5 @@
 	- Timestamp
 	- Log
 	- Number of backups and number of well executed backups
-  - [] Add temp control for the raspberry pi (node_hwmon_temp_celsius{instance="brun0-pi:9100"}) - create alert for temp high than 60
+  - [x] Add temp control for the raspberry pi (node_hwmon_temp_celsius{instance="brun0-pi:9100"}) - create alert for temp high than 60
   - [x] Document (properly) what every rsync and cronjobs do

@@ -13,6 +13,7 @@ type EmailTemplate struct {
 	Timestamp          string
 	Totalbackups       int
 	Totalbackupsuccess int
+	PiTemp             string
 	Content            string
 }
 
