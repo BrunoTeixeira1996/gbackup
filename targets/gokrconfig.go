@@ -15,7 +15,7 @@ import (
 // that holds all useful information about brun0-pi instance
 // to HDD present in proxmox
 func backupGokrConfToHDD(cfg internal.Config) error {
-	c := []string{"-r", "/mnt/pve/external/gokrazy_backup/brun0-pi", "/storagepool/backups/gokrazy_backup/brun0-pi"}
+	c := []string{"-r", "/mnt/pve/external/gokrazy_backup/brun0-pi", "/storagepool/backups/gokrazy_backup"}
 	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[5].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
