@@ -2,14 +2,14 @@ package internal
 
 import (
 	"bytes"
-	"io/ioutil"
+	"os"
 
 	"golang.org/x/crypto/ssh"
 )
 
 // Function that reads an OpenSSH key and provides it as a ssh.ClientAuth.
 func openSSHClientAuth(path string) (ssh.AuthMethod, error) {
-	privateKey, err := ioutil.ReadFile(path)
+	privateKey, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
