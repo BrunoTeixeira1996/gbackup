@@ -30,4 +30,6 @@ instance = "brun0:monitoring"
 
 [[targets]]
 name = "gokr_config"
+host = "192.168.30.99"
+keypath = "/root/.ssh/id_ed25519_gkconfig"
 instance = "brun0:gokr_config"
