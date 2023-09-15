@@ -5,7 +5,7 @@ import "github.com/BrunoTeixeira1996/gbackup/internal"
 // Function that backups Syncthing folder
 // to external hard drive
 func backupSyncthingToExternal(cfg internal.Config) error {
-	rCmd := []string{"-av", "-e", "syncthing:/root/config/Sync", "/mnt/pve/external/syncthing_backup"}
+	rCmd := []string{"-av", "-e","ssh", "syncthing:/root/config/Sync", "/mnt/pve/external/syncthing_backup"}
 	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[2].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
