@@ -90,8 +90,8 @@ func backupLeaksToHDD(cfg internal.Config) error {
 		return err
 	}
 
-	c := []string{externalLocation, "/storagepool/backups/leaks_backup/"}
-	if err = internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[3].Instance, cfg.Pushgateway.Host); err != nil {
+	rCmd := []string{"-av", externalLocation, "/storagepool/backups/leaks_backup/"}
+	if err = internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[3].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
