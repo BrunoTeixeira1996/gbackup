@@ -1,7 +1,6 @@
 package targets
 
 import (
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -48,7 +47,7 @@ func compressFolder() (string, error) {
 // Function that deletes archives older than 15 days
 // in external hard drive and in HDD that reside on proxmox
 func clean(directoryToClean string) error {
-	files, err := ioutil.ReadDir(directoryToClean)
+	files, err := os.ReadDir(directoryToClean)
 	if err != nil {
 		return err
 	}
@@ -68,7 +67,7 @@ func clean(directoryToClean string) error {
 		daysDiff := getDateDiff(modificationTime)
 
 		// delete all files that are older than 15 days
-		if daysDiff >= 15 {
+		if daysDiff >= 14 {
 			if err := os.Remove(p); err != nil {
 				return err
 			}
