@@ -7,7 +7,7 @@ import (
 // Function that backups /perm partition in gokrazy
 // to external hard drive
 func backupGokrPermToExternal(cfg internal.Config) error {
-	rCmd := []string{"-av", "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/pve/external/gokrazy_backup/waiw_backup"}
+	rCmd := []string{"-av", "--delete" , "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/pve/external/gokrazy_backup/waiw_backup"}
 	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}

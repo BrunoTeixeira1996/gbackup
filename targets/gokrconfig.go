@@ -7,7 +7,7 @@ import (
 // Function that backups gokrazy config
 // to external hard drive
 func backupGokrConfToExternal(cfg internal.Config) error {
-	rCmd := []string{"-av", "-e", "ssh","gkconfig:/root/gokrazy/brun0-pi", "/mnt/pve/external/gokrazy_backup/"}
+	rCmd := []string{"-av", "--delete", "-e", "ssh","gkconfig:/root/gokrazy/brun0-pi", "/mnt/pve/external/gokrazy_backup/"}
 	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[5].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
