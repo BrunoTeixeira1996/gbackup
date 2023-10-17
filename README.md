@@ -4,12 +4,12 @@ This could be something private but maybe this will help someone or give an idea
 The current backup plan is shown below but I backup the following:
 - gokrazy perm partion (resides in gokrazy)
 - gokrazy data folder (resides in a LXC in proxmox)
-  - `00 11 * * THU /root/personal/dotfiles/backup_scripts/gokr_backup_config.sh`
 - postgresql databases (resides in a LXC in proxmox)
   - currently I am only doing the backup for the waiw and leak databases
 - syncthing folder (resides in a LXC in proxmox)
 - monitoring files (resides in a LXC in proxmox)
   - this is files from alertmanager, prometheus, grafana and pushgateway
+- work laptop
 
 **It is important to note that I first use `rsync` to backup everything to an external hard drive plugged in my proxmox instance and then I perform a `cp` to the storagepool that is a HDD that resides inside the proxmox and is used only for backups.**
 
@@ -20,7 +20,7 @@ Inside the proxmox instance I run the following cronjob
 - Note that I do have the necessary env vars so cronjob knows whats the email and password for sending emails
 
 ``` bash
-0 0 * * FRI /root/gbackup/gbackup > /root/gbackup/logstdout 2> /root/gbackup/logstderr
+0 17 * * FRI /root/gbackup/gbackup > /root/gbackup/logstdout 2> /root/gbackup/logstderr
 ```
 
 
