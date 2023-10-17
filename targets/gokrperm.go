@@ -7,8 +7,12 @@ import (
 // Function that backups /perm partition in gokrazy
 // to external hard drive
 func backupGokrPermToExternal(cfg internal.Config) error {
-	rCmd := []string{"-av", "--delete" , "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/pve/external/gokrazy_backup/waiw_backup"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
+	waiwCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/pve/external/gokrazy_backup/waiw_backup"}
+	if err := internal.ExecCmdToProm("rsync", waiwCmd, "rsync", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
+		return err
+	}
+	gmahCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://gmah-backup/gmah", "/mnt/pve/external/gokrazy_backup/gmah_backup"}
+	if err := internal.ExecCmdToProm("rsync", gmahCmd, "rsync", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
@@ -19,8 +23,12 @@ func backupGokrPermToExternal(cfg internal.Config) error {
 // HDD present in proxmox instance
 func backupGokrPermToHDD(cfg internal.Config) error {
 	c := []string{"-r", "/mnt/pve/external/gokrazy_backup/waiw_backup", "/storagepool/backups/gokrazy_backup/"}
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[1].Instance, cfg.Pushgateway.Host)
-	if err != nil {
+	if err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
+		return err
+	}
+
+	g := []string{"-r", "/mnt/pve/external/gokrazy_backup/gmah_backup", "/storagepool/backups/gokrazy_backup/"}
+	if err := internal.ExecCmdToProm("cp", g, "cmd", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 

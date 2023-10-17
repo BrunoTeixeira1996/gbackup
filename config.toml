@@ -9,7 +9,7 @@ instance = "brun0:postgresql"
 
 [[targets]]
 name = "gokr_perm"
-instance = "brun0:gokr_perm"
+instance = "brun0:gokr_perm_waiw"
 
 
 [[targets]]
@@ -40,3 +40,7 @@ host = "192.168.30.40"
 keypath = "/root/.ssh/id_ed25519_worklaptop"
 instance = "brun0:worklaptop"
 mac = "84:14:4d:f7:2a:c4"
+
+[[targets]]
+name = "gokr_perm"
+instance = "brun0:gokr_perm_gmah"
