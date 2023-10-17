@@ -33,3 +33,10 @@ name = "gokr_config"
 host = "192.168.30.99"
 keypath = "/root/.ssh/id_ed25519_gkconfig"
 instance = "brun0:gokr_config"
+
+[[targets]]
+name = "work_laptop"
+host = "192.168.30.40"
+keypath = "/root/.ssh/id_ed25519_worklaptop"
+instance = "brun0:worklaptop"
+mac = "84:14:4d:f7:2a:c4"

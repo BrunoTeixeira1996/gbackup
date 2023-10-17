@@ -11,6 +11,7 @@ type Target struct {
 	Host     string `toml:"host"`
 	Keypath  string `toml:"keypath"`
 	Instance string `toml:"instance"`
+	MAC      string `toml:"mac"`
 }
 
 type Pushgateway struct {
