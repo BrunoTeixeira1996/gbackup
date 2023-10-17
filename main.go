@@ -15,6 +15,7 @@ var supportedTargets = []string{
 	"gokr_config_backup",
 	"syncthing_backup",
 	"monitoring_backup",
+	"work_laptop",
 }
 
 // Function that executes backup based on target type
@@ -46,6 +47,10 @@ func getExecutionFunction(target string, cfg internal.Config) error {
 		}
 	case "leaks_backup":
 		if err := targets.ExecuteLeaksBackup(cfg); err != nil {
+			internal.Logger.Println(err)
+		}
+	case "work_laptop":
+		if err := targets.ExecuteWorkLaptopBackup(cfg); err != nil {
 			internal.Logger.Println(err)
 		}
 	}
