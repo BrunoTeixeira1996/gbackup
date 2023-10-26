@@ -15,7 +15,7 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 	}
 
 	rCmd := []string{"-av", "--delete", "-e", "ssh", "bot:/root/*.sql", "/mnt/pve/external/postgresql_backup"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[0].Instance, cfg.Pushgateway.Host); err != nil {
+	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[0].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
@@ -27,7 +27,7 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 func backupPostgresqlToHDD(cfg internal.Config) error {
 	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/mnt/pve/external/postgresql_backup/leaks.sql", "/storagepool/backups/postgresql_backup"}
 
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
+	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}

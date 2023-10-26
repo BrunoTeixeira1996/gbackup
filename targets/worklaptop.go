@@ -15,7 +15,7 @@ func backupWorkLaptopToExternal(cfg internal.Config) error {
 	for _, v := range locations {
 		// FIXME: This is a workaround for the issue https://github.com/stapelberg/rsyncprom/issues/1
 		//rCmd := []string{"-av", "--delete", "-e", "ssh", "worklaptop:/home/brun0/Desktop/{work,shared_folder}", "/mnt/pve/external/worklaptop_backup"}
-		if err := internal.ExecCmdToProm("rsync", v, "rsync", cfg.Targets[6].Instance, cfg.Pushgateway.Host); err != nil {
+		if err := internal.ExecCmdToProm("rsync", v, "toExternal", cfg.Targets[6].Instance, cfg.Pushgateway.Host); err != nil {
 			return err
 		}
 
@@ -25,8 +25,8 @@ func backupWorkLaptopToExternal(cfg internal.Config) error {
 }
 
 func backupWorkLaptopToHDD(cfg internal.Config) error {
-	c := []string{"-r", "/mnt/pve/external/worklaptop_backup/", "/storagepool/backups/"}
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[6].Instance, cfg.Pushgateway.Host)
+	c := []string{"-av", "--delete", "/mnt/pve/external/worklaptop_backup/", "/storagepool/backups/"}
+	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[6].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}

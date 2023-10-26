@@ -8,11 +8,11 @@ import (
 // to external hard drive
 func backupGokrPermToExternal(cfg internal.Config) error {
 	waiwCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/pve/external/gokrazy_backup/waiw_backup"}
-	if err := internal.ExecCmdToProm("rsync", waiwCmd, "rsync", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
+	if err := internal.ExecCmdToProm("rsync", waiwCmd, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 	gmahCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://gmah-backup/gmah", "/mnt/pve/external/gokrazy_backup/gmah_backup"}
-	if err := internal.ExecCmdToProm("rsync", gmahCmd, "rsync", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
+	if err := internal.ExecCmdToProm("rsync", gmahCmd, "toExternal", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
@@ -22,13 +22,13 @@ func backupGokrPermToExternal(cfg internal.Config) error {
 // Function that copies backed up /perm partition to
 // HDD present in proxmox instance
 func backupGokrPermToHDD(cfg internal.Config) error {
-	c := []string{"-r", "/mnt/pve/external/gokrazy_backup/waiw_backup", "/storagepool/backups/gokrazy_backup/"}
-	if err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
+	c := []string{"-av", "--delete", "/mnt/pve/external/gokrazy_backup/waiw_backup", "/storagepool/backups/gokrazy_backup/"}
+	if err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
-	g := []string{"-r", "/mnt/pve/external/gokrazy_backup/gmah_backup", "/storagepool/backups/gokrazy_backup/"}
-	if err := internal.ExecCmdToProm("cp", g, "cmd", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
+	g := []string{"-av", "--delete", "/mnt/pve/external/gokrazy_backup/gmah_backup", "/storagepool/backups/gokrazy_backup/"}
+	if err := internal.ExecCmdToProm("rsync", g, "toStoragePool", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 

@@ -38,7 +38,7 @@ func backupMonitoringToExternal(cfg internal.Config) error {
 	for _, v := range locations {
 		// FIXME: This is a workaround for the issue https://github.com/stapelberg/rsyncprom/issues/1
 		//rCmd := []string{"-av", "--delete", "-e", "ssh", "monitoring:{/etc/prometheus/rsync.rules.yml,/etc/prometheus/cmd.rules.yml,/etc/prometheus/prometheus.yml,/etc/systemd/system/prometheus.service,/etc/grafana/grafana.ini,/etc/systemd/system/alertmanager.service,/etc/alertmanager/alertmanager.yml,/etc/systemd/system/pushgateway.service}", "/mnt/pve/external/monitoring_backup"}
-		if err := internal.ExecCmdToProm("rsync", v, "rsync", cfg.Targets[4].Instance, cfg.Pushgateway.Host); err != nil {
+		if err := internal.ExecCmdToProm("rsync", v, "toExternal", cfg.Targets[4].Instance, cfg.Pushgateway.Host); err != nil {
 			return err
 		}
 	}
@@ -49,9 +49,9 @@ func backupMonitoringToExternal(cfg internal.Config) error {
 // Function that copies previous backup from external to
 // HDD present in proxmox instance
 func backupMonitoringToHDD(cfg internal.Config) error {
-	c := []string{"-r", "/mnt/pve/external/monitoring_backup", "/storagepool/backups"}
+	c := []string{"-av", "--delete", "/mnt/pve/external/monitoring_backup", "/storagepool/backups"}
 
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[4].Instance, cfg.Pushgateway.Host)
+	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[4].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}

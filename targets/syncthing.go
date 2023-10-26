@@ -5,8 +5,8 @@ import "github.com/BrunoTeixeira1996/gbackup/internal"
 // Function that backups Syncthing folder
 // to external hard drive
 func backupSyncthingToExternal(cfg internal.Config) error {
-	rCmd := []string{"-av", "--delete", "-e","ssh", "syncthing:/root/config/Sync", "/mnt/pve/external/syncthing_backup"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[2].Instance, cfg.Pushgateway.Host); err != nil {
+	rCmd := []string{"-av", "--delete", "-e", "ssh", "syncthing:/root/config/Sync", "/mnt/pve/external/syncthing_backup"}
+	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[2].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
@@ -16,8 +16,8 @@ func backupSyncthingToExternal(cfg internal.Config) error {
 // Function that copies backed up Syncthing folder
 // HDD present in proxmox instance
 func backupSyncthingToHDD(cfg internal.Config) error {
-	c := []string{"-r", "/mnt/pve/external/syncthing_backup/Sync", "/storagepool/backups/syncthing_backup"}
-	err := internal.ExecCmdToProm("cp", c, "cmd", cfg.Targets[2].Instance, cfg.Pushgateway.Host)
+	c := []string{"-av", "--delete", "/mnt/pve/external/syncthing_backup/Sync", "/storagepool/backups/syncthing_backup"}
+	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[2].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
 	}

@@ -58,15 +58,25 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 	}
 
 	switch commandType {
-	case "rsync":
+	case "toExternal":
 		params := rsyncprom.WrapParams{
 			Pushgateway: pg,
 			Instance:    instance,
-			Job:         "rsync",
+			Job:         "toExternal",
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
 
+	case "toStoragePool":
+		params := rsyncprom.WrapParams{
+			Pushgateway: pg,
+			Instance:    instance,
+			Job:         "toStoragePool",
+		}
+		// executes WrapRsync from rsyncprom and export metrics to prometheus
+		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
+
+	// This is not being used since now I rsync from external to storagepool (its faster)
 	case "cmd":
 		params := rsyncprom.WrapParams{
 			Pushgateway: pg,

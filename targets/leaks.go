@@ -91,7 +91,7 @@ func backupLeaksToHDD(cfg internal.Config) error {
 	}
 
 	rCmd := []string{"-av", "--delete", externalLocation, "/storagepool/backups/leaks_backup/"}
-	if err = internal.ExecCmdToProm("rsync", rCmd, "rsync", cfg.Targets[3].Instance, cfg.Pushgateway.Host); err != nil {
+	if err = internal.ExecCmdToProm("rsync", rCmd, "toStoragePool", cfg.Targets[3].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
