@@ -7,17 +7,9 @@ import (
 )
 
 func backupWorkLaptopToExternal(cfg internal.Config) error {
-	locations := [][]string{
-		{"-av", "--delete", "-e", "ssh", "worklaptop:/home/brun0/Desktop/work", "/mnt/pve/external/worklaptop_backup"},
-		{"-av", "--delete", "-e", "ssh", "worklaptop:/home/brun0/Desktop/shared_folder", "/mnt/pve/external/worklaptop_backup"},
-	}
-
-	for _, v := range locations {
-		// FIXME: This is a workaround for the issue https://github.com/stapelberg/rsyncprom/issues/1
-		//rCmd := []string{"-av", "--delete", "-e", "ssh", "worklaptop:/home/brun0/Desktop/{work,shared_folder}", "/mnt/pve/external/worklaptop_backup"}
-		if err := internal.ExecCmdToProm("rsync", v, "toExternal", cfg.Targets[6].Instance, cfg.Pushgateway.Host); err != nil {
-			return err
-		}
+	rCmd := []string{"-av", "--delete", "-e", "ssh", "worklaptop:/home/brun0/Desktop/work", "worklaptop:/home/brun0/Desktop/shared_folder", "/mnt/pve/external/worklaptop_backup"}
+	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[6].Instance, cfg.Pushgateway.Host); err != nil {
+		return err
 
 	}
 
