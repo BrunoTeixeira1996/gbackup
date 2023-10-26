@@ -33,6 +33,7 @@ func backupMonitoringToExternal(cfg internal.Config) error {
 		{"-av", "--delete", "-e", "ssh", "monitoring:/etc/systemd/system/alertmanager.service", "/mnt/pve/external/monitoring_backup"},
 		{"-av", "--delete", "-e", "ssh", "monitoring:/etc/alertmanager/alertmanager.yml", "/mnt/pve/external/monitoring_backup"},
 		{"-av", "--delete", "-e", "ssh", "monitoring:/etc/systemd/system/pushgateway.service", "/mnt/pve/external/monitoring_backup"},
+		{"-av", "-e", "ssh", "monitoring:/etc/grafana/grafana_dashboard.json", "/mnt/pve/external/monitoring_backup"},
 	}
 
 	for _, v := range locations {
