@@ -9,7 +9,7 @@ import (
 )
 
 var supportedTargets = []string{
-	"leaks_backup",
+	// "leaks_backup",
 	"postgresql_backup",
 	"gokr_perm_backup",
 	"gokr_config_backup",

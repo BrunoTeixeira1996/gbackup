@@ -7,7 +7,8 @@ import (
 // Function that dumps databases in postgresql server
 // and then backups up to external hard drive
 func backupPostgresqlToExternal(cfg internal.Config) error {
-	cmd := "pg_dump waiw > waiw.sql && pg_dump leaks > leaks.sql"
+	//cmd := "pg_dump waiw > waiw.sql && pg_dump leaks > leaks.sql"
+	cmd := "pg_dump waiw > waiw.sql"
 
 	err := internal.ExecuteCmdSSH(cmd, cfg.Targets[0].Host, cfg.Targets[0].Keypath)
 	if err != nil {
@@ -25,7 +26,8 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 // Function that copies previous database dump to
 // HDD present in proxmox instance
 func backupPostgresqlToHDD(cfg internal.Config) error {
-	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/mnt/pve/external/postgresql_backup/leaks.sql", "/storagepool/backups/postgresql_backup"}
+	//	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/mnt/pve/external/postgresql_backup/leaks.sql", "/storagepool/backups/postgresql_backup"}
+	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/storagepool/backups/postgresql_backup"}
 
 	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
 	if err != nil {
