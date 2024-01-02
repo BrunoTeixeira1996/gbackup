@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+	"os"
 	"sync"
 	"time"
 
@@ -100,8 +102,65 @@ func logic() error {
 	return nil
 }
 
+func isEverythingConfigured() bool {
+	senderEmail := os.Getenv("SENDEREMAIL")
+	senderPass := os.Getenv("SENDERPASS")
+	if senderEmail != "" && senderPass != "" {
+		log.Println("SENDEREMAIL && SENDERPASS are present, so lets continue ...")
+		return true
+	}
+
+	log.Println("SENDEREMAIL && SENDERPASS not present, so quiting ...")
+	return false
+}
+
 func main() {
-	if err := logic(); err != nil {
-		internal.Logger.Printf(err.Error())
+	if !isEverythingConfigured() {
+		os.Exit(1)
+	}
+
+	log.Println("Running version:", version)
+
+	runCh := make(chan struct{})
+	go func() {
+		// Run forever, trigger a run at 17:00 every Friday.
+		for {
+			now := time.Now()
+			runTodayHour := now.Hour() < 17
+			runTodayDay := now.Weekday().String() == "Friday"
+			today := now.Day()
+			log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
+			for {
+				if time.Now().Day() != today {
+					// Day changed, re-evaluate whether to run today.
+					break
+				}
+				// If today is not Friday, sleep until next day and re-evaluate
+				if !runTodayDay {
+					nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+					hoursLeft := nextDay.Sub(now)
+					log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
+					time.Sleep(time.Until(nextDay))
+					break
+				}
+
+				// Today is Friday, so wait until 17:00
+				nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
+				log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
+				time.Sleep(time.Until(nextHour))
+
+				if time.Now().Hour() >= 17 && runTodayHour && now.Weekday().String() == "Friday" {
+					runTodayHour = false
+					runTodayDay = false
+					runCh <- struct{}{}
+				}
+			}
+		}
+	}()
+
+	for range runCh {
+		if err := logic(); err != nil {
+			internal.Logger.Printf(err.Error())
+		}
 	}
 }
