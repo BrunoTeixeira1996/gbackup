@@ -1,7 +1,10 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -20,6 +23,39 @@ var supportedTargets = []string{
 	"syncthing_backup",
 	"monitoring_backup",
 	"work_laptop",
+}
+
+// Handles POST to backup on demand
+func backupHandle(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
+	if r.Method != "POST" {
+		http.Error(w, "NOT POST!", http.StatusBadRequest)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	newBackup := struct {
+		Op string `json:"operation"`
+	}{}
+
+	if err := decoder.Decode(&newBackup); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		log.Println("Error while unmarshal json response:", err)
+		fmt.Fprintf(w, "Please provide a valid POST body with the operation you want\n")
+		return
+	}
+
+	log.Printf("Executing backup on demand with operation: %s\n", newBackup.Op)
+	fmt.Fprintf(w, "Executing backup on demand with operation: %s\n", newBackup.Op)
+	if err := logic(); err != nil {
+		internal.Logger.Printf(err.Error())
+	}
+}
+
+func StartWebHook() {
+	log.Println("Started webhook ... ")
+	http.HandleFunc("/backup", backupHandle)
+	http.ListenAndServe(":8000", nil)
 }
 
 // Function that executes backup based on target type
@@ -120,6 +156,9 @@ func main() {
 	}
 
 	log.Println("Running version:", version)
+
+	// used by the on demand backup
+	go StartWebHook()
 
 	runCh := make(chan struct{})
 	go func() {
