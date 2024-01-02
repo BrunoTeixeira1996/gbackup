@@ -15,7 +15,7 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 		return err
 	}
 
-	rCmd := []string{"-av", "--delete", "-e", "ssh", "bot:/root/*.sql", "/mnt/pve/external/postgresql_backup"}
+	rCmd := []string{"-av", "--delete", "-e", "ssh", "database:/root/*.sql", "/mnt/pve/external/postgresql_backup"}
 	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[0].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
