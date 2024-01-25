@@ -18,3 +18,13 @@ code {
 <code>
 {{ .Content }}
 </code>
+
+<br>
+
+<hr>
+{{ range $e := .ElapsedTimes }}
+<b> {{ $e.Target }} - {{ $e.Elapsed }}</b> <br>
+{{ end }}
+<br>
+Total: {{ .TotalElapsedTime }} (in seconds)<br>
+<hr>

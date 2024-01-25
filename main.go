@@ -59,7 +59,8 @@ func StartWebHook() {
 }
 
 // Function that executes backup based on target type
-func getExecutionFunction(target string, cfg internal.Config) error {
+func getExecutionFunction(target string, cfg internal.Config, el *internal.ElapsedTime) error {
+	start := time.Now()
 	switch target {
 	case "postgresql_backup":
 		if err := targets.ExecutePostgreSQLBackup(cfg); err != nil {
@@ -94,7 +95,9 @@ func getExecutionFunction(target string, cfg internal.Config) error {
 			internal.Logger.Println(err)
 		}
 	}
-
+	end := time.Now()
+	el.Target = target
+	el.Elapsed = end.Sub(start).Seconds()
 	return nil
 }
 
@@ -104,6 +107,7 @@ func logic() error {
 		err     error
 		wg      sync.WaitGroup
 		success int
+		times   []internal.ElapsedTime
 	)
 
 	if cfg, err = internal.ReadTomlFile(); err != nil {
@@ -112,14 +116,16 @@ func logic() error {
 
 	for _, t := range supportedTargets {
 		wg.Add(1)
+		el := &internal.ElapsedTime{}
 		go func(t string) {
 			internal.Logger.Printf("Starting %s\n\n", t)
-			if err := getExecutionFunction(t, cfg); err != nil {
+			if err := getExecutionFunction(t, cfg, el); err != nil {
 				internal.Logger.Println(err)
 			} else {
 				success += 1
 			}
 			wg.Done()
+			times = append(times, *el)
 		}(t)
 	}
 	wg.Wait()
@@ -129,6 +135,8 @@ func logic() error {
 		Totalbackups:       len(supportedTargets),
 		Totalbackupsuccess: success,
 		PiTemp:             internal.GetPiTemp(),
+		ElapsedTimes:       times,
+		TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
 	}
 
 	if err := internal.SendEmail(finalResult); err != nil {

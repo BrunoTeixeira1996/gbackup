@@ -15,6 +15,8 @@ type EmailTemplate struct {
 	Totalbackupsuccess int
 	PiTemp             string
 	Content            string
+	ElapsedTimes       []ElapsedTime
+	TotalElapsedTime   float64
 }
 
 type Smtp struct {
