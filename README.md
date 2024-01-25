@@ -11,21 +11,12 @@ The current backup plan is shown below but I backup the following:
   - this is files from alertmanager, prometheus, grafana and pushgateway
 - work laptop
 
-**It is important to note that I first use `rsync` to backup everything to an external hard drive plugged in my proxmox instance and then I perform a `cp` to the storagepool that is a HDD that resides inside the proxmox and is used only for backups.**
+At first I was using `rsync` to backup everything to an external hard drive plugged in my proxmox and then use `cp` to backup everything to a different location (storagepool - HDD that resides inside the proxmox). However now I am using `rsync` in both backups.
 
+![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/82b2a47d-4998-410d-b9ff-583c338d846f)
 
-![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/ddc4a4d6-813a-4eab-a70a-2e4a460aad3e)
+I was using crontab inside proxmox but now I've managed to create a similiar cron using golang so its easier to apply this to any unix based OS without caring if crontab is installed or no.
 
-Inside the proxmox instance I run the following cronjob
-- Note that I do have the necessary env vars so cronjob knows whats the email and password for sending emails
+Then I monitor the `rsync` commands using Prometheus as shown bellow.
 
-``` bash
-0 17 * * FRI /root/gbackup/gbackup > /root/gbackup/logstdout 2> /root/gbackup/logstderr
-```
-
-
-Then I monitor the `rsync` and `cp` commands using Prometheus as shown bellow.
-
-**This is a simple dashboard as I am new to Grafana but the main thing I use is the AlertManager in case something is wrong**
-
-![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/210c3976-f776-42a8-a215-f691ff21af45)
+![image](https://github.com/BrunoTeixeira1996/gbackup/assets/12052283/953d3c75-29ce-401d-9973-3f773533e664)
