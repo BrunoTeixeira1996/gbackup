@@ -13,7 +13,7 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/targets"
 )
 
-const version = "3.0"
+const version = "4.0"
 
 var supportedTargets = []string{
 	// "leaks_backup",
