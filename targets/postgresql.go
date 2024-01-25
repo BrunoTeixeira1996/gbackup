@@ -1,6 +1,8 @@
 package targets
 
 import (
+	"time"
+
 	"github.com/BrunoTeixeira1996/gbackup/internal"
 )
 
@@ -8,6 +10,7 @@ import (
 // and then backups up to external hard drive
 func backupPostgresqlToExternal(cfg internal.Config) error {
 	//cmd := "pg_dump waiw > waiw.sql && pg_dump leaks > leaks.sql"
+	// note that in order to pg_dump without password you need to export PGPASSWORD="yourpass"
 	cmd := "pg_dump waiw > waiw.sql"
 
 	err := internal.ExecuteCmdSSH(cmd, cfg.Targets[0].Host, cfg.Targets[0].Keypath)
@@ -38,7 +41,8 @@ func backupPostgresqlToHDD(cfg internal.Config) error {
 }
 
 // Function that handles both backups
-func ExecutePostgreSQLBackup(cfg internal.Config) error {
+func ExecutePostgreSQLBackup(cfg internal.Config, el *internal.ElapsedTime) error {
+	start := time.Now()
 	if err := backupPostgresqlToExternal(cfg); err != nil {
 		return err
 	}
@@ -46,6 +50,11 @@ func ExecutePostgreSQLBackup(cfg internal.Config) error {
 	if err := backupPostgresqlToHDD(cfg); err != nil {
 		return err
 	}
+
+	// Calculate run time
+	end := time.Now()
+	el.Target = cfg.Targets[0].Name
+	el.Elapsed = end.Sub(start).Seconds()
 
 	return nil
 }

@@ -17,6 +17,7 @@ type EmailTemplate struct {
 	Content            string
 	ElapsedTimes       []ElapsedTime
 	TotalElapsedTime   float64
+	TargetsSize        []TargetSize
 }
 
 type Smtp struct {

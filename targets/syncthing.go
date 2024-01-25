@@ -1,6 +1,10 @@
 package targets
 
-import "github.com/BrunoTeixeira1996/gbackup/internal"
+import (
+	"time"
+
+	"github.com/BrunoTeixeira1996/gbackup/internal"
+)
 
 // Function that backups Syncthing folder
 // to external hard drive
@@ -26,7 +30,9 @@ func backupSyncthingToHDD(cfg internal.Config) error {
 }
 
 // Function that handles both backups
-func ExecuteSyncthingBackup(cfg internal.Config) error {
+func ExecuteSyncthingBackup(cfg internal.Config, el *internal.ElapsedTime) error {
+	start := time.Now()
+
 	if err := backupSyncthingToExternal(cfg); err != nil {
 		return err
 	}
@@ -34,6 +40,11 @@ func ExecuteSyncthingBackup(cfg internal.Config) error {
 	if err := backupSyncthingToHDD(cfg); err != nil {
 		return err
 	}
+
+	// Calculate run time
+	end := time.Now()
+	el.Target = cfg.Targets[2].Name
+	el.Elapsed = end.Sub(start).Seconds()
 
 	return nil
 }

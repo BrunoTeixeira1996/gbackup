@@ -59,55 +59,132 @@ func StartWebHook() {
 }
 
 // Function that executes backup based on target type
-func getExecutionFunction(target string, cfg internal.Config, el *internal.ElapsedTime) error {
-	start := time.Now()
+// FIXME: Clean duplicated code
+func getExecutionFunction(target string, cfg internal.Config, el *internal.ElapsedTime, ts *internal.TargetSize) error {
+	var err error
+
 	switch target {
 	case "postgresql_backup":
-		if err := targets.ExecutePostgreSQLBackup(cfg); err != nil {
+		// GetFolderSize before backup
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[0].Name)
+		}
+
+		if err := targets.ExecutePostgreSQLBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
+
+		// GetFolderSize after backup
+		ts.After, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[0].Name)
+		}
+
+		ts.Name = cfg.Targets[0].Name
 
 	case "gokr_perm_backup":
-		if err := targets.ExecuteGokrPermBackup(cfg); err != nil {
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[1].Name)
+		}
+
+		if err := targets.ExecuteGokrPermBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
+
+		ts.After, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[1].Name)
+		}
+
+		ts.Name = cfg.Targets[1].Name
 
 	case "gokr_config_backup":
-		if err := targets.ExecuteGokrConfBackup(cfg); err != nil {
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[5].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[5].Name)
+		}
+
+		if err := targets.ExecuteGokrConfBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
+
+		ts.After, err = internal.GetFolderSize(cfg.Targets[5].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[5].Name)
+		}
+
+		ts.Name = cfg.Targets[5].Name
 
 	case "syncthing_backup":
-		if err := targets.ExecuteSyncthingBackup(cfg); err != nil {
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[2].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[2].Name)
+		}
+
+		if err := targets.ExecuteSyncthingBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
 
+		ts.After, err = internal.GetFolderSize(cfg.Targets[2].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[2].Name)
+		}
+
+		ts.Name = cfg.Targets[2].Name
+
 	case "monitoring_backup":
-		if err := targets.ExecuteMonitoringBackup(cfg); err != nil {
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[4].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[4].Name)
+		}
+
+		if err := targets.ExecuteMonitoringBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
+
+		ts.After, err = internal.GetFolderSize(cfg.Targets[4].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[4].Name)
+		}
+
+		ts.Name = cfg.Targets[4].Name
+
 	case "leaks_backup":
 		if err := targets.ExecuteLeaksBackup(cfg); err != nil {
 			internal.Logger.Println(err)
 		}
+
 	case "work_laptop":
-		if err := targets.ExecuteWorkLaptopBackup(cfg); err != nil {
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[6].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
+		}
+
+		if err := targets.ExecuteWorkLaptopBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
+
+		ts.After, err = internal.GetFolderSize(cfg.Targets[6].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
+		}
+
+		ts.Name = cfg.Targets[6].Name
+
 	}
-	end := time.Now()
-	el.Target = target
-	el.Elapsed = end.Sub(start).Seconds()
 	return nil
 }
 
 func logic() error {
 	var (
-		cfg     internal.Config
-		err     error
-		wg      sync.WaitGroup
-		success int
-		times   []internal.ElapsedTime
+		cfg         internal.Config
+		err         error
+		wg          sync.WaitGroup
+		success     int
+		times       []internal.ElapsedTime
+		targetsSize []internal.TargetSize
 	)
 
 	if cfg, err = internal.ReadTomlFile(); err != nil {
@@ -117,15 +194,20 @@ func logic() error {
 	for _, t := range supportedTargets {
 		wg.Add(1)
 		el := &internal.ElapsedTime{}
+		ts := &internal.TargetSize{}
 		go func(t string) {
 			internal.Logger.Printf("Starting %s\n\n", t)
-			if err := getExecutionFunction(t, cfg, el); err != nil {
+			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
 				internal.Logger.Println(err)
 			} else {
 				success += 1
 			}
 			wg.Done()
+			// appends every run time of each target
 			times = append(times, *el)
+
+			// append every folder size change of each target
+			targetsSize = append(targetsSize, *ts)
 		}(t)
 	}
 	wg.Wait()
@@ -137,6 +219,7 @@ func logic() error {
 		PiTemp:             internal.GetPiTemp(),
 		ElapsedTimes:       times,
 		TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
+		TargetsSize:        targetsSize,
 	}
 
 	if err := internal.SendEmail(finalResult); err != nil {

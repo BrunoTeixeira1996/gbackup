@@ -7,11 +7,12 @@ import (
 )
 
 type Target struct {
-	Name     string `toml:"name"`
-	Host     string `toml:"host"`
-	Keypath  string `toml:"keypath"`
-	Instance string `toml:"instance"`
-	MAC      string `toml:"mac"`
+	Name         string `toml:"name"`
+	Host         string `toml:"host"`
+	Keypath      string `toml:"keypath"`
+	Instance     string `toml:"instance"`
+	MAC          string `toml:"mac"`
+	ExternalPath string `toml:"external_path"`
 }
 
 type Pushgateway struct {

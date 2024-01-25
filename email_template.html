@@ -21,10 +21,20 @@ code {
 
 <br>
 
+<h3>Execution time</h3>
 <hr>
 {{ range $e := .ElapsedTimes }}
 <b> {{ $e.Target }} - {{ $e.Elapsed }}</b> <br>
 {{ end }}
 <br>
 Total: {{ .TotalElapsedTime }} (in seconds)<br>
+<hr>
+
+<br>
+
+<h3>File changes</h3>
+<hr>
+{{ range $t := .TargetsSize }}
+{{ $t.Name }} - <b>Before:</b>{{ $t.Before }} Mb / <b>After:</b>{{ $t.After}} Mb <br>
+{{ end }}
 <hr>

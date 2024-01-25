@@ -6,10 +6,12 @@ name = "postgresql"
 host = "192.168.30.171"
 keypath = "/root/.ssh/id_ed25519_postgresql_backup"
 instance = "brun0:postgresql"
+external_path = "/mnt/pve/external/postgresql_backup"
 
 [[targets]]
 name = "gokr_perm"
 instance = "brun0:gokr_perm_waiw"
+external_path = "/mnt/pve/external/gokrazy_backup"
 
 
 [[targets]]
@@ -17,6 +19,7 @@ name = "syncthing"
 host = "192.168.30.36"
 keypath = "/root/.ssh/id_ed25519_syncthing_backup"
 instance = "brun0:syncthing"
+external_path = "/mnt/pve/external/syncthing_backup"
 
 [[targets]]
 name = "leaks"
@@ -27,12 +30,14 @@ name = "monitoring"
 host = "192.168.30.77"
 keypath = "/root/.ssh/id_ed25519_monitoring"
 instance = "brun0:monitoring"
+external_path = "/mnt/pve/external/monitoring_backup"
 
 [[targets]]
 name = "gokr_config"
 host = "192.168.30.99"
 keypath = "/root/.ssh/id_ed25519_gkconfig"
 instance = "brun0:gokr_config"
+external_path = "/mnt/pve/external/gokrazy_backup_config"
 
 [[targets]]
 name = "work_laptop"
@@ -40,7 +45,9 @@ host = "192.168.30.40"
 keypath = "/root/.ssh/id_ed25519_worklaptop"
 instance = "brun0:worklaptop"
 mac = "84:14:4d:f7:2a:c4"
+external_path = "/mnt/pve/external/worklaptop_backup"
 
 [[targets]]
 name = "gokr_perm"
 instance = "brun0:gokr_perm_gmah"
+external_path = "/mnt/pve/external/gokrazy_backup"

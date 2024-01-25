@@ -1,6 +1,10 @@
 package targets
 
-import "github.com/BrunoTeixeira1996/gbackup/internal"
+import (
+	"time"
+
+	"github.com/BrunoTeixeira1996/gbackup/internal"
+)
 
 /*
    Backups up conf files from:
@@ -46,7 +50,8 @@ func backupMonitoringToHDD(cfg internal.Config) error {
 }
 
 // Function that handles the backup
-func ExecuteMonitoringBackup(cfg internal.Config) error {
+func ExecuteMonitoringBackup(cfg internal.Config, el *internal.ElapsedTime) error {
+	start := time.Now()
 	if err := backupMonitoringToExternal(cfg); err != nil {
 		return err
 	}
@@ -54,6 +59,11 @@ func ExecuteMonitoringBackup(cfg internal.Config) error {
 	if err := backupMonitoringToHDD(cfg); err != nil {
 		return err
 	}
+
+	// Calculate run time
+	end := time.Now()
+	el.Target = cfg.Targets[4].Name
+	el.Elapsed = end.Sub(start).Seconds()
 
 	return nil
 }

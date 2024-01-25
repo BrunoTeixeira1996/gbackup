@@ -2,6 +2,7 @@ package targets
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal"
 )
@@ -27,12 +28,13 @@ func backupWorkLaptopToHDD(cfg internal.Config) error {
 }
 
 // Function that handles both backups
-func ExecuteWorkLaptopBackup(cfg internal.Config) error {
+func ExecuteWorkLaptopBackup(cfg internal.Config, el *internal.ElapsedTime) error {
 	isAlive, err := internal.IsAlive(cfg.Targets[6].MAC)
 	if err != nil {
 		return err
 	}
 	if isAlive {
+		start := time.Now()
 		if err := backupWorkLaptopToExternal(cfg); err != nil {
 			return err
 		}
@@ -40,6 +42,10 @@ func ExecuteWorkLaptopBackup(cfg internal.Config) error {
 		if err := backupWorkLaptopToHDD(cfg); err != nil {
 			return err
 		}
+		// Calculate run time
+		end := time.Now()
+		el.Target = cfg.Targets[6].Name
+		el.Elapsed = end.Sub(start).Seconds()
 	} else {
 		return fmt.Errorf("The target %s is not alive: %w", cfg.Targets[6].Instance, err)
 	}
