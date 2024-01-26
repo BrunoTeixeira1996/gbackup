@@ -30,7 +30,7 @@ func backupPostgresqlToExternal(cfg internal.Config) error {
 // HDD present in proxmox instance
 func backupPostgresqlToHDD(cfg internal.Config) error {
 	//	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/mnt/pve/external/postgresql_backup/leaks.sql", "/storagepool/backups/postgresql_backup"}
-	c := []string{"/mnt/pve/external/postgresql_backup/waiw.sql", "/storagepool/backups/postgresql_backup"}
+	c := []string{"-av", "--delete", "/mnt/pve/external/postgresql_backup/waiw.sql", "/storagepool/backups/postgresql_backup"}
 
 	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[0].Instance, cfg.Pushgateway.Host)
 	if err != nil {

@@ -39,7 +39,7 @@ func backupMonitoringToExternal(cfg internal.Config) error {
 // Function that copies previous backup from external to
 // HDD present in proxmox instance
 func backupMonitoringToHDD(cfg internal.Config) error {
-	c := []string{"-av", "--delete", "/mnt/pve/external/monitoring_backup", "/storagepool/backups"}
+	c := []string{"-av", "--delete", "/mnt/pve/external/monitoring_backup", "/storagepool/backups/monitoring_backup"}
 
 	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[4].Instance, cfg.Pushgateway.Host)
 	if err != nil {

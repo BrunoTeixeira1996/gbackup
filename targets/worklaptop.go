@@ -18,7 +18,7 @@ func backupWorkLaptopToExternal(cfg internal.Config) error {
 }
 
 func backupWorkLaptopToHDD(cfg internal.Config) error {
-	c := []string{"-av", "--delete", "/mnt/pve/external/worklaptop_backup/", "/storagepool/backups/"}
+	c := []string{"-av", "--delete", "/mnt/pve/external/worklaptop_backup/", "/storagepool/backups/worklaptop_backup"}
 	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[6].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
