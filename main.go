@@ -47,16 +47,16 @@ func backupHandle(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Executing backup on demand with operation: %s\n", newBackup.Op)
 	fmt.Fprintf(w, "Executing backup on demand with operation: %s\n", newBackup.Op)
-	w.Write([]byte("Executed gbackup on demand! Check logs for more info"))
-	/*
-		if err := logic(); err != nil {
-			internal.Logger.Printf(err.Error())
-			w.Write([]byte(err.Error()))
-		} else {
 
-			w.Write([]byte("Executed gbackup on demand! Check logs for more info"))
-		}
-	*/
+	// Executes logic to backup
+	// but returns always if there's an error or no
+	if err := logic(); err != nil {
+		internal.Logger.Printf(err.Error())
+		w.Write([]byte(err.Error()))
+	} else {
+		w.Write([]byte("Executed gbackup on demand! Check logs for more info"))
+	}
+
 }
 
 func StartWebHook() {
