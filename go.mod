@@ -20,5 +20,5 @@ require (
 	github.com/prometheus/procfs v0.6.0 // indirect
 	github.com/stapelberg/rsyncparse v0.0.0-20211228091344-84a4474990ee // indirect
 	golang.org/x/sys v0.10.0 // indirect
-	google.golang.org/protobuf v1.28.2-0.20230118093459-a9481185b34d // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 )
