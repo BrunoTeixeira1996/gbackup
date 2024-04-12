@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/prometheus/client_golang v1.11.0
+	github.com/prometheus/client_golang v1.11.1
 	github.com/stapelberg/rsyncprom v0.0.0-20220111200458-bbf82934093b
 	golang.org/x/crypto v0.11.0
 )
