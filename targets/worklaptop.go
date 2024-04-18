@@ -8,7 +8,7 @@ import (
 )
 
 func backupWorkLaptopToExternal(cfg internal.Config) error {
-	rCmd := []string{"-av", "--delete", "-e", "ssh", "worklaptop:/home/brun0/Desktop/work", "worklaptop:/home/brun0/Desktop/shared_folder", "/mnt/pve/external/worklaptop_backup"}
+	rCmd := []string{"-av", "-e", "ssh", "worklaptop:/home/brun0/Desktop/work", "worklaptop:/home/brun0/Desktop/shared_folder", "/mnt/pve/external/worklaptop_backup"}
 	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[6].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 
@@ -18,7 +18,7 @@ func backupWorkLaptopToExternal(cfg internal.Config) error {
 }
 
 func backupWorkLaptopToHDD(cfg internal.Config) error {
-	c := []string{"-av", "--delete", "/mnt/pve/external/worklaptop_backup/", "/storagepool/backups/worklaptop_backup"}
+	c := []string{"-av", "/mnt/pve/external/worklaptop_backup/", "/storagepool/backups/worklaptop_backup"}
 	err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[6].Instance, cfg.Pushgateway.Host)
 	if err != nil {
 		return err
