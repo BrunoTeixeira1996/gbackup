@@ -51,3 +51,10 @@ external_path = "/mnt/pve/external/worklaptop_backup"
 name = "gokr_perm"
 instance = "brun0:gokr_perm_gmah"
 external_path = "/mnt/pve/external/gokrazy_backup"
+
+[[targets]]
+name = "gocam"
+host = "192.168.30.190"
+keypath = "/root/.ssh/id_ed25519_gocam"
+instance = "brun0:gocam"
+external_path = "/mnt/pve/external/gocam_backup"

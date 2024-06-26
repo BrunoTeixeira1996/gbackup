@@ -23,6 +23,7 @@ var supportedTargets = []string{
 	"syncthing_backup",
 	"monitoring_backup",
 	"work_laptop",
+	"gocam_backup",
 }
 
 // Handles POST to backup on demand
@@ -179,7 +180,22 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 		}
 
 		ts.Name = cfg.Targets[6].Name
+	case "gocam_backup":
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[8].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
+		}
 
+		if err := targets.ExecuteGocamBackup(cfg, el); err != nil {
+			internal.Logger.Println(err)
+		}
+
+		ts.After, err = internal.GetFolderSize(cfg.Targets[8].ExternalPath)
+		if err != nil {
+			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
+		}
+
+		ts.Name = cfg.Targets[8].Name
 	}
 	return nil
 }
