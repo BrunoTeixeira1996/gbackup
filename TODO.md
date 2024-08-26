@@ -26,3 +26,16 @@
 	- Number of backups and number of well executed backups
   - [x] Add temp control for the raspberry pi (node_hwmon_temp_celsius{instance="brun0-pi:9100"}) - create alert for temp high than 60
   - [x] Document (properly) what every rsync and cronjobs do
+
+## v2
+
+- New version of gbackup for a different setup
+
+- [ ] Clean previous code
+- [ ] Perform rsync on `/` and not only on files and folders?
+  - This is be the best approach as the first rsync will take sometime but then it will be fast since we are doing incremental backups
+  - Also get the apt and pipx packages
+  - Test this with a VM by having a backup of my work laptop and rsync that backup to a fresh clean VM
+- [ ] Implement WoL (Wake on Lan)
+- [ ] Implement the shutdown of the NAS
+- [ ] Check if its end of month, if yes compress the data and send to ????
