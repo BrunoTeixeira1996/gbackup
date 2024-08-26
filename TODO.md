@@ -31,6 +31,7 @@
 
 - New version of gbackup for a different setup
 
+- [x] Setup new default branch
 - [ ] Clean previous code
 - [ ] Perform rsync on `/` and not only on files and folders?
   - This is be the best approach as the first rsync will take sometime but then it will be fast since we are doing incremental backups
