@@ -69,9 +69,15 @@ func sendMagicPacket(nasMac string) error {
 
 // Wakes up the NAS
 func Wakeup(nas NAS, ctx context.Context) error {
-	log.Printf("sending magic packet to %s (%s)\n", nas.Name, nas.MAC)
-	if err := sendMagicPacket(nas.MAC); err != nil {
-		return err
+	// check if the system is reachable before issuing the shutdown command
+	if isReachable(nas.IP) {
+		log.Printf("%s (%s) is up ... skiping sending magic packet", nas.Name, nas.IP)
+		return nil
+	} else {
+		log.Printf("sending magic packet to %s (%s)\n", nas.Name, nas.MAC)
+		if err := sendMagicPacket(nas.MAC); err != nil {
+			return err
+		}
 	}
 
 	{
