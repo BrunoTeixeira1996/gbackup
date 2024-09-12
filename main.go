@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal"
@@ -47,7 +48,7 @@ func backupHandle(w http.ResponseWriter, r *http.Request) {
 	// Executes logic to backup
 	// but returns always if there's an error or no
 	if err := run(); err != nil {
-		internal.Logger.Printf(err.Error())
+		log.Printf(err.Error())
 		w.Write([]byte(err.Error()))
 	} else {
 		w.Write([]byte("Executed gbackup on demand! Check logs for more info"))
@@ -68,18 +69,18 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 
 	switch target {
 	case "work_laptop":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[6].ExternalPath)
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
 			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[0].Name)
 		}
 
 		if err := targets.ExecuteWorkLaptopBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
+			log.Println(err)
 		}
 
 		ts.After, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[0].Name)
+			log.Printf("[ERROR] could not get folder size for %s on the second run\n", cfg.Targets[0].Name)
 		}
 
 		ts.Name = cfg.Targets[0].Name
@@ -91,12 +92,12 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 		}
 
 		if err := targets.ExecuteGokrPermBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
+			log.Println(err)
 		}
 
 		ts.After, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[1].Name)
+			log.Printf("[ERROR] could not get folder size for %s on the second run\n", cfg.Targets[1].Name)
 		}
 
 		ts.Name = cfg.Targets[1].Name
@@ -111,10 +112,10 @@ func run() error {
 		configPathFlag = flag.String("config", "", "location of toml config file")
 		cfg            internal.Config
 		err            error
-		// wg          sync.WaitGroup
-		// success     int
-		// times       []internal.ElapsedTime
-		// targetsSize []internal.TargetSize
+		wg             sync.WaitGroup
+		success        int
+		times          []internal.ElapsedTime
+		targetsSize    []internal.TargetSize
 	)
 
 	flag.Parse()
@@ -124,7 +125,7 @@ func run() error {
 	}
 
 	if cfg, err = internal.ReadTomlFile(*configPathFlag); err != nil {
-		internal.Logger.Fatal(err)
+		log.Fatal(err)
 	}
 
 	log.Printf("waking up %s\n", cfg.NAS.Name)
@@ -132,49 +133,45 @@ func run() error {
 		return err
 	}
 
-	log.Println("sleeping for 60 seconds")
-	time.Sleep(60 * time.Second)
-	log.Println("wake up from sleep")
+	for _, t := range supportedTargets {
+		wg.Add(1)
+		el := &internal.ElapsedTime{}
+		ts := &internal.TargetSize{}
+		go func(t string) {
+			log.Printf("starting backup %s\n\n", t)
+			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
+				log.Println(err)
+			} else {
+				success += 1
+			}
+			wg.Done()
+			// appends every run time of each target
+			times = append(times, *el)
+
+			// append every folder size change of each target
+			targetsSize = append(targetsSize, *ts)
+		}(t)
+	}
+	wg.Wait()
+
+	finalResult := &internal.EmailTemplate{
+		Timestamp:          time.Now().String(),
+		Totalbackups:       len(supportedTargets),
+		Totalbackupsuccess: success,
+		PiTemp:             internal.GetPiTemp(),
+		ElapsedTimes:       times,
+		TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
+		TargetsSize:        targetsSize,
+	}
+
+	if err := internal.SendEmail(finalResult); err != nil {
+		log.Printf(err.Error())
+	}
 
 	log.Printf("shutting down %s\n", cfg.NAS.Name)
 	if err := internal.Shutdown(cfg.NAS); err != nil {
 		return err
 	}
-
-	// for _, t := range supportedTargets {
-	// 	wg.Add(1)
-	// 	el := &internal.ElapsedTime{}
-	// 	ts := &internal.TargetSize{}
-	// 	go func(t string) {
-	// 		internal.Logger.Printf("Starting %s\n\n", t)
-	// 		if err := getExecutionFunction(t, cfg, el, ts); err != nil {
-	// 			internal.Logger.Println(err)
-	// 		} else {
-	// 			success += 1
-	// 		}
-	// 		wg.Done()
-	// 		// appends every run time of each target
-	// 		times = append(times, *el)
-
-	// 		// append every folder size change of each target
-	// 		targetsSize = append(targetsSize, *ts)
-	// 	}(t)
-	// }
-	// wg.Wait()
-
-	// finalResult := &internal.EmailTemplate{
-	// 	Timestamp:          time.Now().String(),
-	// 	Totalbackups:       len(supportedTargets),
-	// 	Totalbackupsuccess: success,
-	// 	PiTemp:             internal.GetPiTemp(),
-	// 	ElapsedTimes:       times,
-	// 	TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
-	// 	TargetsSize:        targetsSize,
-	// }
-
-	// if err := internal.SendEmail(finalResult); err != nil {
-	// 	internal.Logger.Printf(err.Error())
-	// }
 
 	return nil
 }
@@ -244,7 +241,7 @@ func main() {
 
 	// for range runCh {
 	// 	if err := logic(); err != nil {
-	// 		internal.Logger.Printf(err.Error())
+	// 		log.Printf(err.Error())
 	// 	}
 	// }
 }
