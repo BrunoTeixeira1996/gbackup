@@ -9,11 +9,11 @@ import (
 // Function that backups /perm partition in gokrazy
 // to external hard drive
 func backupGokrPermToExternal(cfg internal.Config) error {
-	waiwCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/pve/external/gokrazy_backup/waiw_backup"}
+	waiwCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/external/gokrazy_backup/waiw_backup"}
 	if err := internal.ExecCmdToProm("rsync", waiwCmd, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
-	gmahCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://gmah-backup/gmah", "/mnt/pve/external/gokrazy_backup/gmah_backup"}
+	gmahCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://gmah-backup/gmah", "/mnt/external/gokrazy_backup/gmah_backup"}
 	if err := internal.ExecCmdToProm("rsync", gmahCmd, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
