@@ -1,12 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal"
@@ -16,14 +17,9 @@ import (
 const version = "4.0"
 
 var supportedTargets = []string{
-	// "leaks_backup",
-	"postgresql_backup",
 	"gokr_perm_backup",
 	"gokr_config_backup",
-	"syncthing_backup",
-	"monitoring_backup",
 	"work_laptop",
-	"gocam_backup",
 }
 
 // Handles POST to backup on demand
@@ -51,7 +47,7 @@ func backupHandle(w http.ResponseWriter, r *http.Request) {
 
 	// Executes logic to backup
 	// but returns always if there's an error or no
-	if err := logic(); err != nil {
+	if err := run(); err != nil {
 		internal.Logger.Printf(err.Error())
 		w.Write([]byte(err.Error()))
 	} else {
@@ -200,54 +196,76 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 	return nil
 }
 
-func logic() error {
+func run() error {
 	var (
-		cfg         internal.Config
-		err         error
-		wg          sync.WaitGroup
-		success     int
-		times       []internal.ElapsedTime
-		targetsSize []internal.TargetSize
+		ctx            = context.Background()
+		configPathFlag = flag.String("config", "", "location of toml config file")
+		cfg            internal.Config
+		err            error
+		// wg          sync.WaitGroup
+		// success     int
+		// times       []internal.ElapsedTime
+		// targetsSize []internal.TargetSize
 	)
 
-	if cfg, err = internal.ReadTomlFile(); err != nil {
+	flag.Parse()
+
+	if *configPathFlag == "" {
+		return fmt.Errorf("[ERROR] please provide the path for the config file")
+	}
+
+	if cfg, err = internal.ReadTomlFile(*configPathFlag); err != nil {
 		internal.Logger.Fatal(err)
 	}
 
-	for _, t := range supportedTargets {
-		wg.Add(1)
-		el := &internal.ElapsedTime{}
-		ts := &internal.TargetSize{}
-		go func(t string) {
-			internal.Logger.Printf("Starting %s\n\n", t)
-			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
-				internal.Logger.Println(err)
-			} else {
-				success += 1
-			}
-			wg.Done()
-			// appends every run time of each target
-			times = append(times, *el)
-
-			// append every folder size change of each target
-			targetsSize = append(targetsSize, *ts)
-		}(t)
-	}
-	wg.Wait()
-
-	finalResult := &internal.EmailTemplate{
-		Timestamp:          time.Now().String(),
-		Totalbackups:       len(supportedTargets),
-		Totalbackupsuccess: success,
-		PiTemp:             internal.GetPiTemp(),
-		ElapsedTimes:       times,
-		TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
-		TargetsSize:        targetsSize,
+	log.Printf("waking up %s\n", cfg.NAS.Name)
+	if err := internal.Wakeup(cfg.NAS, ctx); err != nil {
+		return err
 	}
 
-	if err := internal.SendEmail(finalResult); err != nil {
-		internal.Logger.Printf(err.Error())
+	log.Println("sleeping for 60 seconds")
+	time.Sleep(60 * time.Second)
+	log.Println("wake up from sleep")
+
+	log.Printf("shutting down %s\n", cfg.NAS.Name)
+	if err := internal.Shutdown(cfg.NAS); err != nil {
+		return err
 	}
+
+	// for _, t := range supportedTargets {
+	// 	wg.Add(1)
+	// 	el := &internal.ElapsedTime{}
+	// 	ts := &internal.TargetSize{}
+	// 	go func(t string) {
+	// 		internal.Logger.Printf("Starting %s\n\n", t)
+	// 		if err := getExecutionFunction(t, cfg, el, ts); err != nil {
+	// 			internal.Logger.Println(err)
+	// 		} else {
+	// 			success += 1
+	// 		}
+	// 		wg.Done()
+	// 		// appends every run time of each target
+	// 		times = append(times, *el)
+
+	// 		// append every folder size change of each target
+	// 		targetsSize = append(targetsSize, *ts)
+	// 	}(t)
+	// }
+	// wg.Wait()
+
+	// finalResult := &internal.EmailTemplate{
+	// 	Timestamp:          time.Now().String(),
+	// 	Totalbackups:       len(supportedTargets),
+	// 	Totalbackupsuccess: success,
+	// 	PiTemp:             internal.GetPiTemp(),
+	// 	ElapsedTimes:       times,
+	// 	TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
+	// 	TargetsSize:        targetsSize,
+	// }
+
+	// if err := internal.SendEmail(finalResult); err != nil {
+	// 	internal.Logger.Printf(err.Error())
+	// }
 
 	return nil
 }
@@ -265,55 +283,59 @@ func isEverythingConfigured() bool {
 }
 
 func main() {
-	if !isEverythingConfigured() {
-		os.Exit(1)
+	if err := run(); err != nil {
+		log.Println(err.Error())
 	}
 
-	log.Println("Running version:", version)
+	// if !isEverythingConfigured() {
+	// 	os.Exit(1)
+	// }
 
-	// used by the on demand backup
-	go StartWebHook()
+	// log.Println("Running version:", version)
 
-	runCh := make(chan struct{})
-	go func() {
-		// Run forever, trigger a run at 17:00 every Friday.
-		for {
-			now := time.Now()
-			runTodayHour := now.Hour() < 17
-			runTodayDay := now.Weekday().String() == "Friday"
-			today := now.Day()
-			log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
-			for {
-				if time.Now().Day() != today {
-					// Day changed, re-evaluate whether to run today.
-					break
-				}
-				// If today is not Friday, sleep until next day and re-evaluate
-				if !runTodayDay {
-					nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
-					hoursLeft := nextDay.Sub(now)
-					log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
-					time.Sleep(time.Until(nextDay))
-					break
-				}
+	// // used by the on demand backup
+	// go StartWebHook()
 
-				// Today is Friday, so wait until 17:00
-				nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
-				log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
-				time.Sleep(time.Until(nextHour))
+	// runCh := make(chan struct{})
+	// go func() {
+	// 	// Run forever, trigger a run at 17:00 every Friday.
+	// 	for {
+	// 		now := time.Now()
+	// 		runTodayHour := now.Hour() < 17
+	// 		runTodayDay := now.Weekday().String() == "Friday"
+	// 		today := now.Day()
+	// 		log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
+	// 		for {
+	// 			if time.Now().Day() != today {
+	// 				// Day changed, re-evaluate whether to run today.
+	// 				break
+	// 			}
+	// 			// If today is not Friday, sleep until next day and re-evaluate
+	// 			if !runTodayDay {
+	// 				nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+	// 				hoursLeft := nextDay.Sub(now)
+	// 				log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
+	// 				time.Sleep(time.Until(nextDay))
+	// 				break
+	// 			}
 
-				if time.Now().Hour() >= 17 && runTodayHour && now.Weekday().String() == "Friday" {
-					runTodayHour = false
-					runTodayDay = false
-					runCh <- struct{}{}
-				}
-			}
-		}
-	}()
+	// 			// Today is Friday, so wait until 17:00
+	// 			nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
+	// 			log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
+	// 			time.Sleep(time.Until(nextHour))
 
-	for range runCh {
-		if err := logic(); err != nil {
-			internal.Logger.Printf(err.Error())
-		}
-	}
+	// 			if time.Now().Hour() >= 17 && runTodayHour && now.Weekday().String() == "Friday" {
+	// 				runTodayHour = false
+	// 				runTodayDay = false
+	// 				runCh <- struct{}{}
+	// 			}
+	// 		}
+	// 	}
+	// }()
+
+	// for range runCh {
+	// 	if err := logic(); err != nil {
+	// 		internal.Logger.Printf(err.Error())
+	// 	}
+	// }
 }
