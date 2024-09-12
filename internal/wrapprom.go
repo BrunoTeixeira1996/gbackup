@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"io"
+	"log"
 	"os"
 	"os/exec"
 	"syscall"
@@ -35,7 +36,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		stdoutPipe = rc
 
-		Logger.Printf("executing: %q\n", c.Args)
+		log.Printf("executing: %q\n", c.Args)
 		if err := c.Start(); err != nil {
 			return nil, err
 		}
@@ -51,7 +52,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 					return code
 				}
 			}
-			Logger.Print(err)
+			log.Print(err)
 			return 1
 		}
 		return 0
@@ -95,7 +96,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 // the only thing that matters here is the start and end time and then
 // the exit code of the command
 func wrapCmd(ctx context.Context, params *rsyncprom.WrapParams, args []string, start func(context.Context, []string) (io.Reader, error), wait func() int) error {
-	//Logger.Printf("push gateway: %q", params.Pushgateway)
+	//log.Printf("push gateway: %q", params.Pushgateway)
 
 	startTimeMetric := prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: params.Job + "_start_timestamp_seconds",
@@ -109,7 +110,7 @@ func wrapCmd(ctx context.Context, params *rsyncprom.WrapParams, args []string, s
 			p.Collector(c)
 		}
 		if err := p.Add(); err != nil {
-			Logger.Print(err)
+			log.Print(err)
 		}
 	}
 	pushAll(startTimeMetric)
@@ -118,7 +119,7 @@ func wrapCmd(ctx context.Context, params *rsyncprom.WrapParams, args []string, s
 
 	// defer will wait for the wait() function to finish
 	defer func() {
-		//Logger.Printf("Pushing exit code %d", exitCode)
+		//log.Printf("Pushing exit code %d", exitCode)
 		exitCodeMetric := prometheus.NewGauge(prometheus.GaugeOpts{
 			Name: params.Job + "_exit_code",
 			Help: "The exit code (0 = success, non-zero = failure)",
