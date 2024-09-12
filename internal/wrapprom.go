@@ -35,7 +35,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		stdoutPipe = rc
 
-		Logger.Printf("Executing: %q\n", c.Args)
+		Logger.Printf("executing: %q\n", c.Args)
 		if err := c.Start(); err != nil {
 			return nil, err
 		}

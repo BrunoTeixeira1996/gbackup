@@ -18,8 +18,7 @@ const version = "4.0"
 
 var supportedTargets = []string{
 	"gokr_perm_backup",
-	"gokr_config_backup",
-	"work_laptop",
+	// "work_laptop",
 }
 
 // Handles POST to backup on demand
@@ -68,21 +67,19 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 	var err error
 
 	switch target {
-	case "postgresql_backup":
-		// GetFolderSize before backup
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
+	case "work_laptop":
+		ts.Before, err = internal.GetFolderSize(cfg.Targets[6].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[0].Name)
+			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[0].Name)
 		}
 
-		if err := targets.ExecutePostgreSQLBackup(cfg, el); err != nil {
+		if err := targets.ExecuteWorkLaptopBackup(cfg, el); err != nil {
 			internal.Logger.Println(err)
 		}
 
-		// GetFolderSize after backup
 		ts.After, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[0].Name)
+			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[0].Name)
 		}
 
 		ts.Name = cfg.Targets[0].Name
@@ -90,7 +87,7 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 	case "gokr_perm_backup":
 		ts.Before, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[1].Name)
+			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[1].Name)
 		}
 
 		if err := targets.ExecuteGokrPermBackup(cfg, el); err != nil {
@@ -99,99 +96,11 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 
 		ts.After, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[1].Name)
+			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[1].Name)
 		}
 
 		ts.Name = cfg.Targets[1].Name
 
-	case "gokr_config_backup":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[5].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[5].Name)
-		}
-
-		if err := targets.ExecuteGokrConfBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
-		}
-
-		ts.After, err = internal.GetFolderSize(cfg.Targets[5].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[5].Name)
-		}
-
-		ts.Name = cfg.Targets[5].Name
-
-	case "syncthing_backup":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[2].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[2].Name)
-		}
-
-		if err := targets.ExecuteSyncthingBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
-		}
-
-		ts.After, err = internal.GetFolderSize(cfg.Targets[2].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[2].Name)
-		}
-
-		ts.Name = cfg.Targets[2].Name
-
-	case "monitoring_backup":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[4].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[4].Name)
-		}
-
-		if err := targets.ExecuteMonitoringBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
-		}
-
-		ts.After, err = internal.GetFolderSize(cfg.Targets[4].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[4].Name)
-		}
-
-		ts.Name = cfg.Targets[4].Name
-
-	case "leaks_backup":
-		if err := targets.ExecuteLeaksBackup(cfg); err != nil {
-			internal.Logger.Println(err)
-		}
-
-	case "work_laptop":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[6].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
-		}
-
-		if err := targets.ExecuteWorkLaptopBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
-		}
-
-		ts.After, err = internal.GetFolderSize(cfg.Targets[6].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
-		}
-
-		ts.Name = cfg.Targets[6].Name
-	case "gocam_backup":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[8].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
-		}
-
-		if err := targets.ExecuteGocamBackup(cfg, el); err != nil {
-			internal.Logger.Println(err)
-		}
-
-		ts.After, err = internal.GetFolderSize(cfg.Targets[8].ExternalPath)
-		if err != nil {
-			log.Printf("[ERROR] Could not get folder size for %s\n", cfg.Targets[6].Name)
-		}
-
-		ts.Name = cfg.Targets[8].Name
 	}
 	return nil
 }

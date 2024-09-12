@@ -14,23 +14,7 @@ func backupGokrPermToExternal(cfg internal.Config) error {
 		return err
 	}
 	gmahCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://gmah-backup/gmah", "/mnt/pve/external/gokrazy_backup/gmah_backup"}
-	if err := internal.ExecCmdToProm("rsync", gmahCmd, "toExternal", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Function that copies backed up /perm partition to
-// HDD present in proxmox instance
-func backupGokrPermToHDD(cfg internal.Config) error {
-	c := []string{"-av", "--delete", "/mnt/pve/external/gokrazy_backup/waiw_backup", "/storagepool/backups/gokrazy_backup/waiw_backup"}
-	if err := internal.ExecCmdToProm("rsync", c, "toStoragePool", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
-		return err
-	}
-
-	g := []string{"-av", "--delete", "/mnt/pve/external/gokrazy_backup/gmah_backup", "/storagepool/backups/gokrazy_backup/gmah_backup"}
-	if err := internal.ExecCmdToProm("rsync", g, "toStoragePool", cfg.Targets[7].Instance, cfg.Pushgateway.Host); err != nil {
+	if err := internal.ExecCmdToProm("rsync", gmahCmd, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Host); err != nil {
 		return err
 	}
 
@@ -41,10 +25,6 @@ func backupGokrPermToHDD(cfg internal.Config) error {
 func ExecuteGokrPermBackup(cfg internal.Config, el *internal.ElapsedTime) error {
 	start := time.Now()
 	if err := backupGokrPermToExternal(cfg); err != nil {
-		return err
-	}
-
-	if err := backupGokrPermToHDD(cfg); err != nil {
 		return err
 	}
 

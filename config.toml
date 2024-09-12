@@ -4,15 +4,7 @@ ip = "192.168.30.200"
 mac = "9c:6b:00:07:bc:85"
 
 [pushgateway]
-host = "http://192.168.30.77:9091"
-
-
-[[targets]]
-name = "gokr_config"
-host = "192.168.30.99"
-keypath = "/root/.ssh/id_ed25519_gkconfig"
-instance = "brun0:gokr_config"
-external_path = "/mnt/pve/external/gokrazy_backup_config"
+host = "http://192.168.30.24:9091"
 
 [[targets]]
 name = "work_laptop"
