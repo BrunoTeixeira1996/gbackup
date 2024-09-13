@@ -9,7 +9,7 @@ import (
 
 func backupWorkLaptopToExternal(cfg internal.Config) error {
 	rCmd := []string{"-av", "-e", "ssh", "worklaptop:/home/brun0/Desktop/work", "worklaptop:/home/brun0/Desktop/shared_folder", "/mnt/pve/external/worklaptop_backup"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[0].Instance, cfg.Pushgateway.Host); err != nil {
+	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[0].Instance, cfg.Pushgateway.Url); err != nil {
 		return err
 
 	}

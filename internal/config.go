@@ -13,12 +13,12 @@ type NAS struct {
 }
 
 type Pushgateway struct {
-	Host string `toml:"host"`
+	Url string `toml:"url"`
 }
 
 type Target struct {
 	Name         string `toml:"name"`
-	Host         string `toml:"host"`
+	IP           string `toml:"ip"`
 	Keypath      string `toml:"keypath"`
 	Instance     string `toml:"instance"`
 	MAC          string `toml:"mac"`

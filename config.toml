@@ -4,11 +4,11 @@ ip = "192.168.30.200"
 mac = "9c:6b:00:07:bc:85"
 
 [pushgateway]
-host = "http://192.168.30.24:9091"
+url = "http://192.168.30.24:9091"
 
 [[targets]]
 name = "work_laptop"
-host = "192.168.30.5"
+ip = "192.168.30.5"
 keypath = "/root/.ssh/id_ed25519_worklaptop"
 instance = "brun0:worklaptop"
 mac = "84:14:4d:f7:2a:c4"
