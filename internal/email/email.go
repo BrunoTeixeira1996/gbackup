@@ -1,4 +1,4 @@
-package internal
+package email
 
 import (
 	"bytes"
@@ -7,6 +7,8 @@ import (
 	"os"
 	"strings"
 	"text/template"
+
+	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
 
 type EmailTemplate struct {
@@ -15,9 +17,9 @@ type EmailTemplate struct {
 	Totalbackupsuccess int
 	PiTemp             string
 	Content            string
-	ElapsedTimes       []ElapsedTime
+	ElapsedTimes       []utils.ElapsedTime
 	TotalElapsedTime   float64
-	TargetsSize        []TargetSize
+	TargetsSize        []utils.TargetSize
 }
 
 type Smtp struct {

@@ -1,4 +1,4 @@
-package internal
+package nas
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"net"
 	"os/exec"
 	"time"
+
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 )
 
 // Check if SSH is open
@@ -68,7 +70,7 @@ func sendMagicPacket(nasMac string) error {
 }
 
 // Wakes up the NAS
-func Wakeup(nas NAS, ctx context.Context) error {
+func Wakeup(nas config.NAS, ctx context.Context) error {
 	// check if the system is reachable before issuing the shutdown command
 	if isReachable(nas.IP) {
 		log.Printf("%s (%s) is up ... ignoring sending magic packet", nas.Name, nas.IP)
@@ -106,7 +108,7 @@ func isReachable(addr string) bool {
 }
 
 // Shuts down the NAS
-func Shutdown(nas NAS) error {
+func Shutdown(nas config.NAS) error {
 	// check if the system is reachable before issuing the shutdown command
 	if !isReachable(nas.IP) {
 		log.Printf("%s (%s) is already down\n", nas.Name, nas.IP)
@@ -123,6 +125,6 @@ func Shutdown(nas NAS) error {
 	if !isReachable(nas.IP) {
 		log.Printf("confirmed that %s (%s) is down\n", nas.Name, nas.IP)
 	}
-	
+
 	return nil
 }

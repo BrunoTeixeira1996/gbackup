@@ -1,4 +1,4 @@
-package internal
+package pi
 
 import (
 	"encoding/json"

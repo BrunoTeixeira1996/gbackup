@@ -1,4 +1,4 @@
-package internal
+package utils
 
 type ElapsedTime struct {
 	Target  string

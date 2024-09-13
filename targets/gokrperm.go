@@ -1,28 +1,46 @@
 package targets
 
 import (
+	"log"
 	"time"
 
-	"github.com/BrunoTeixeira1996/gbackup/internal"
+	"github.com/BrunoTeixeira1996/gbackup/internal/commands"
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
+
+type supportedTargets struct {
+	Name    string
+	Command string
+}
 
 // Function that backups /perm partition in gokrazy
 // to external hard drive
-func backupGokrPermToExternal(cfg internal.Config) error {
-	waiwCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://waiw-backup/waiw", "/mnt/external/gokrazy_backup/waiw_backup"}
-	if err := internal.ExecCmdToProm("rsync", waiwCmd, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Url); err != nil {
-		return err
-	}
-	gmahCmd := []string{"-av", "--delete", "-e", "ssh", "rsync://gmah-backup/gmah", "/mnt/external/gokrazy_backup/gmah_backup"}
-	if err := internal.ExecCmdToProm("rsync", gmahCmd, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Url); err != nil {
-		return err
+func backupGokrPermToExternal(cfg config.Config) error {
+	var e error
+
+	sT := []supportedTargets{
+		{
+			Name:    "waiw",
+			Command: "-av --delete -e ssh rsync://waiw-backup/waiw /mnt/external/gokrazy_backup/waiw_backup",
+		},
+		{
+			Name:    "gmah",
+			Command: "-av --delete -e ssh rsync://gmah-backup/gmah /mnt/external/gokrazy_backup/gmah_backup",
+		},
 	}
 
-	return nil
+	for _, t := range sT {
+		if err := commands.RsyncCommand(t.Command, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Url); err != nil {
+			log.Printf("[ERROR] while using RsyncCommand in %s: %s\n", t.Name, err)
+			e = err
+		}
+	}
+	return e
 }
 
 // Function that handles both backups
-func ExecuteGokrPermBackup(cfg internal.Config, el *internal.ElapsedTime) error {
+func ExecuteGokrPermBackup(cfg config.Config, el *utils.ElapsedTime) error {
 	start := time.Now()
 	if err := backupGokrPermToExternal(cfg); err != nil {
 		return err

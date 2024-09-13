@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,7 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/BrunoTeixeira1996/gbackup/internal"
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/email"
+	"github.com/BrunoTeixeira1996/gbackup/internal/pi"
+	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 	"github.com/BrunoTeixeira1996/gbackup/targets"
 )
 
@@ -57,19 +59,19 @@ func backupHandle(w http.ResponseWriter, r *http.Request) {
 }
 
 func StartWebHook() {
-	log.Println("Started webhook ... ")
+	log.Println("started webhook ... ")
 	http.HandleFunc("/backup", backupHandle)
 	http.ListenAndServe(":8000", nil)
 }
 
 // Function that executes backup based on target type
 // FIXME: Clean duplicated code
-func getExecutionFunction(target string, cfg internal.Config, el *internal.ElapsedTime, ts *internal.TargetSize) error {
+func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTime, ts *utils.TargetSize) error {
 	var err error
 
 	switch target {
 	case "work_laptop":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
+		ts.Before, err = utils.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
 			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[0].Name)
 		}
@@ -78,7 +80,7 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 			log.Println(err)
 		}
 
-		ts.After, err = internal.GetFolderSize(cfg.Targets[0].ExternalPath)
+		ts.After, err = utils.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
 			log.Printf("[ERROR] could not get folder size for %s on the second run\n", cfg.Targets[0].Name)
 		}
@@ -86,7 +88,7 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 		ts.Name = cfg.Targets[0].Name
 
 	case "gokr_perm_backup":
-		ts.Before, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
+		ts.Before, err = utils.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
 			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[1].Name)
 		}
@@ -95,7 +97,7 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 			log.Println(err)
 		}
 
-		ts.After, err = internal.GetFolderSize(cfg.Targets[1].ExternalPath)
+		ts.After, err = utils.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
 			log.Printf("[ERROR] could not get folder size for %s on the second run\n", cfg.Targets[1].Name)
 		}
@@ -108,14 +110,14 @@ func getExecutionFunction(target string, cfg internal.Config, el *internal.Elaps
 
 func run() error {
 	var (
-		ctx            = context.Background()
+		//ctx            = context.Background()
 		configPathFlag = flag.String("config", "", "location of toml config file")
-		cfg            internal.Config
+		cfg            config.Config
 		err            error
 		wg             sync.WaitGroup
 		success        int
-		times          []internal.ElapsedTime
-		targetsSize    []internal.TargetSize
+		times          []utils.ElapsedTime
+		targetsSize    []utils.TargetSize
 	)
 
 	flag.Parse()
@@ -124,19 +126,21 @@ func run() error {
 		return fmt.Errorf("[ERROR] please provide the path for the config file")
 	}
 
-	if cfg, err = internal.ReadTomlFile(*configPathFlag); err != nil {
+	if cfg, err = config.ReadTomlFile(*configPathFlag); err != nil {
 		log.Fatal(err)
 	}
 
-	log.Printf("verifying nas (%s) status\n", cfg.NAS.Name)
-	if err := internal.Wakeup(cfg.NAS, ctx); err != nil {
-		return err
-	}
+	/*DEBUG FOR NOW*/
+	// log.Printf("verifying nas (%s) status\n", cfg.NAS.Name)
+	// if err := internal.Wakeup(cfg.NAS, ctx); err != nil {
+	// 	return err
+	// }
+	/*DEBUG FOR NOW*/
 
 	for _, t := range supportedTargets {
 		wg.Add(1)
-		el := &internal.ElapsedTime{}
-		ts := &internal.TargetSize{}
+		el := &utils.ElapsedTime{}
+		ts := &utils.TargetSize{}
 		go func(t string) {
 			log.Printf("starting backup %s\n\n", t)
 			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
@@ -154,24 +158,26 @@ func run() error {
 	}
 	wg.Wait()
 
-	finalResult := &internal.EmailTemplate{
+	finalResult := &email.EmailTemplate{
 		Timestamp:          time.Now().String(),
 		Totalbackups:       len(supportedTargets),
 		Totalbackupsuccess: success,
-		PiTemp:             internal.GetPiTemp(),
+		PiTemp:             pi.GetPiTemp(),
 		ElapsedTimes:       times,
-		TotalElapsedTime:   internal.CalculateTotalElaspedTime(times),
+		TotalElapsedTime:   utils.CalculateTotalElaspedTime(times),
 		TargetsSize:        targetsSize,
 	}
 
-	if err := internal.SendEmail(finalResult); err != nil {
+	if err := email.SendEmail(finalResult); err != nil {
 		log.Printf(err.Error())
 	}
 
-	log.Printf("shutting down %s\n", cfg.NAS.Name)
-	if err := internal.Shutdown(cfg.NAS); err != nil {
-		return err
-	}
+	/*DEBUG FOR NOW*/
+	// log.Printf("shutting down %s\n", cfg.NAS.Name)
+	// if err := internal.Shutdown(cfg.NAS); err != nil {
+	// 	return err
+	// }
+	/*DEBUG FOR NOW*/
 
 	return nil
 }

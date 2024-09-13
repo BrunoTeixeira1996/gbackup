@@ -1,4 +1,4 @@
-package internal
+package utils
 
 import (
 	"log"
@@ -20,6 +20,7 @@ func roundFloat(val float64, precision uint) float64 {
 
 // Returns folder size in Megabytes
 func GetFolderSize(folderPath string) (float64, error) {
+	log.Println(folderPath)
 	var totalSize float64
 	log.Println("checking folder size ...")
 	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {

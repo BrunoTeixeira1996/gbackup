@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/BrunoTeixeira1996/gbackup/internal"
+	"github.com/BrunoTeixeira1996/gbackup/internal/commands"
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
 
-func backupWorkLaptopToExternal(cfg internal.Config) error {
+func backupWorkLaptopToExternal(cfg config.Config) error {
 	rCmd := []string{"-av", "-e", "ssh", "worklaptop:/home/brun0/Desktop/work", "worklaptop:/home/brun0/Desktop/shared_folder", "/mnt/pve/external/worklaptop_backup"}
-	if err := internal.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[0].Instance, cfg.Pushgateway.Url); err != nil {
+	if err := commands.ExecCmdToProm("rsync", rCmd, "toExternal", cfg.Targets[0].Instance, cfg.Pushgateway.Url); err != nil {
 		return err
 
 	}
@@ -18,8 +20,8 @@ func backupWorkLaptopToExternal(cfg internal.Config) error {
 }
 
 // Function that handles both backups
-func ExecuteWorkLaptopBackup(cfg internal.Config, el *internal.ElapsedTime) error {
-	isAlive, err := internal.IsAlive(cfg.Targets[0].MAC)
+func ExecuteWorkLaptopBackup(cfg config.Config, el *utils.ElapsedTime) error {
+	isAlive, err := utils.IsAlive(cfg.Targets[0].MAC)
 	if err != nil {
 		return err
 	}
