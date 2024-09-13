@@ -47,6 +47,8 @@ func ExecuteGokrPermBackup(cfg config.Config, el *utils.ElapsedTime) error {
 	if err := backupGokrPermToExternal(cfg); err != nil {
 		return err
 	}
+	log.Printf("[backup info] completed backup of gokrazy /perm to external\n")
+
 
 	// Calculate run time
 	end := time.Now()

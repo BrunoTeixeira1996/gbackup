@@ -12,7 +12,14 @@ func ExecuteExternalToNASBackup(cfg config.Config) error {
 	// TODO: calculate time
 	//start := time.Now()
 
-	command := "-av --delete -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump /mnt/external nas1:/mnt/datastore/backupExternal"
+	command := `-av --delete -e ssh
+	--exclude=template
+	--exclude=snippets
+	--exclude=private
+	--exclude=lost+found
+	--exclude=images
+	--exclude=dump
+	/mnt/external nas1:/mnt/datastore/backupExternal`
 
 	log.Printf("[backup info] starting rsync command external -> NAS (%s)\n", cfg.NAS.Name)
 	if err := commands.RsyncCommand(command, "toNAS", "external hard drive", cfg.Pushgateway.Url); err != nil {
