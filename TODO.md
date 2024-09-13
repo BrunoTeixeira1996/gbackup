@@ -33,8 +33,11 @@
 
 - [x] Setup new default branch
 - [x] Check if `/mnt/external` is mounted
+- [ ] `external` backup should be the last backup since it will contain more data (i.e worklatop, gokrazy_perm ...)
 - [ ] Fix Prometheus metrics
+- [ ] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
 - [ ] Clean previous code
+- [ ] Modify email template to be similar to PBS email
 - [ ] Perform rsync on `/` and not only on files and folders?
   - This is be the best approach as the first rsync will take sometime but then it will be fast since we are doing incremental backups
   - Also get the apt and pipx packages
