@@ -26,18 +26,17 @@ func checkSSH(ctx context.Context, addr string) error {
 		select {
 		case <-ctx.Done():
 			// the context's timeout or cancellation was triggered
-			return fmt.Errorf("context ended before SSH became reachable on %s: %v", addr, ctx.Err())
+			return fmt.Errorf("[nas error] context ended before SSH became reachable on %s: %v", addr, ctx.Err())
 		case <-ticker.C:
 			// attempt to connect to TCP port 22 (SSH)
 			conn, err := (&net.Dialer{}).DialContext(ctx, "tcp", addr+":22")
 			if err == nil {
 				defer conn.Close()
 				// SSH is reachable
-				log.Printf("ssh is open on %s\n", addr)
+				log.Printf("[nas info] ssh is open on %s\n", addr)
 				return nil
 			}
-			// Log the failed attempt (optional)
-			log.Printf("ssh not reachable on %s, retrying...\n", addr)
+			log.Printf("[nas info] ssh not reachable on %s, retrying...\n", addr)
 		}
 	}
 }
@@ -49,7 +48,7 @@ func sendMagicPacket(nasMac string) error {
 		return err
 	}
 	if got, want := len(hwaddr), 6; got != want {
-		return fmt.Errorf("[ERROR] unexpected number of parts in hardware address %q: got %d, want %d", nasMac, got, want)
+		return fmt.Errorf("[nas error] could not send magic packet unexpected number of parts in hardware address %q: got %d, want %d", nasMac, got, want)
 	}
 
 	socket, err := net.DialUDP("udp4",
@@ -71,26 +70,27 @@ func sendMagicPacket(nasMac string) error {
 
 // Wakes up the NAS
 func Wakeup(nas config.NAS, ctx context.Context) error {
-	// check if the system is reachable before issuing the shutdown command
+	log.Printf("[nas info] validate if nas is reachable\n")
 	if isReachable(nas.IP) {
-		log.Printf("%s (%s) is up ... ignoring sending magic packet", nas.Name, nas.IP)
+		log.Printf("[nas info] %s (%s) is up ... ignoring sending magic packet", nas.Name, nas.IP)
 		return nil
 	}
 
-	log.Printf("sending magic packet to %s (%s)\n", nas.Name, nas.MAC)
+	log.Printf("[nas info] sending magic packet to %s (%s-%s)\n", nas.Name, nas.IP, nas.MAC)
 	if err := sendMagicPacket(nas.MAC); err != nil {
 		return err
 	}
+	log.Printf("[nas info] magic packet sent to %s (%s-%s)\n", nas.Name, nas.IP, nas.MAC)
 
 	{
 		ctx, canc := context.WithTimeout(ctx, 5*time.Minute)
 		defer canc()
 		// check if port 22 is open already
-		log.Printf("checking if ssh is open on %s\n", nas.Name)
+		log.Printf("[nas info] checking if ssh is open on %s\n", nas.Name)
 		if err := checkSSH(ctx, nas.IP); err != nil {
 			return err
 		}
-		log.Printf("host %s is now awake\n", nas.Name)
+		log.Printf("[nas info] host %s is now awake\n", nas.Name)
 	}
 
 	return nil
@@ -100,7 +100,7 @@ func Wakeup(nas config.NAS, ctx context.Context) error {
 func isReachable(addr string) bool {
 	conn, err := net.DialTimeout("tcp", addr+":22", 5*time.Second)
 	if err != nil {
-		// connection failed (likely system is down)
+		log.Printf("[nas info] connection failed, likely system is down\n")
 		return false
 	}
 	conn.Close()

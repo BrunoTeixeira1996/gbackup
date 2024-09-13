@@ -30,16 +30,18 @@ func backupGokrPermToExternal(cfg config.Config) error {
 		},
 	}
 
+	log.Printf("[backup info] starting rsync command gokrazy /perm -> external\n")
 	for _, t := range sT {
+		log.Printf("[backup info] performing backup of %s\n", t.Name)
 		if err := commands.RsyncCommand(t.Command, "toExternal", cfg.Targets[1].Instance, cfg.Pushgateway.Url); err != nil {
-			log.Printf("[ERROR] while using RsyncCommand in %s: %s\n", t.Name, err)
+			log.Printf("[backup error] could not perform RsyncCommand in %s: %s\n", t.Name, err)
 			e = err
 		}
 	}
 	return e
 }
 
-// Function that handles both backups
+// Function that backups gokrazy perm folder to external hard drive
 func ExecuteGokrPermBackup(cfg config.Config, el *utils.ElapsedTime) error {
 	start := time.Now()
 	if err := backupGokrPermToExternal(cfg); err != nil {

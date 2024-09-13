@@ -8,11 +8,8 @@ import (
 	"net/http"
 	"os"
 	"sync"
-	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
-	"github.com/BrunoTeixeira1996/gbackup/internal/email"
-	"github.com/BrunoTeixeira1996/gbackup/internal/pi"
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 	"github.com/BrunoTeixeira1996/gbackup/targets"
 )
@@ -21,6 +18,7 @@ const version = "4.0"
 
 var supportedTargets = []string{
 	"gokr_perm_backup",
+	//"external_hard_drive",
 	// "work_laptop",
 }
 
@@ -73,7 +71,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 	case "work_laptop":
 		ts.Before, err = utils.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[0].Name)
+			log.Printf("[get execution error] could not get folder size for %s\n", cfg.Targets[0].Name)
 		}
 
 		if err := targets.ExecuteWorkLaptopBackup(cfg, el); err != nil {
@@ -82,7 +80,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 
 		ts.After, err = utils.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] could not get folder size for %s on the second run\n", cfg.Targets[0].Name)
+			log.Printf("[get execution error] could not get folder size for %s on the second run\n", cfg.Targets[0].Name)
 		}
 
 		ts.Name = cfg.Targets[0].Name
@@ -90,7 +88,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 	case "gokr_perm_backup":
 		ts.Before, err = utils.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] could not get folder size for %s\n", cfg.Targets[1].Name)
+			log.Printf("[get execution error] could not get folder size for %s\n", cfg.Targets[1].Name)
 		}
 
 		if err := targets.ExecuteGokrPermBackup(cfg, el); err != nil {
@@ -99,12 +97,21 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 
 		ts.After, err = utils.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[ERROR] could not get folder size for %s on the second run\n", cfg.Targets[1].Name)
+			log.Printf("[get execution error] could not get folder size for %s on the second run\n", cfg.Targets[1].Name)
 		}
 
 		ts.Name = cfg.Targets[1].Name
 
+	case "external_hard_drive":
+		if err := targets.ExecuteExternalToNASBackup(cfg, el); err != nil {
+			log.Println(err)
+		}
+
+		ts.Name = "external hard drive"
+
 	}
+	fmt.Printf("\n\n")
+
 	return nil
 }
 
@@ -122,19 +129,24 @@ func run() error {
 
 	flag.Parse()
 
-	if *configPathFlag == "" {
-		return fmt.Errorf("[ERROR] please provide the path for the config file")
+	log.Printf("[run info] validating setup\n")
+	if !isEverythingConfigured(*configPathFlag) {
+		return fmt.Errorf("[run error] please configure the setup properly")
 	}
+	log.Printf("[run info] setup is OK\n")
 
+	log.Printf("[run info] reading toml file\n")
 	if cfg, err = config.ReadTomlFile(*configPathFlag); err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("[run error] could not read toml file properly: %s", err)
 	}
+	log.Printf("[run info] toml file is OK\n\n")
 
 	/*DEBUG FOR NOW*/
-	// log.Printf("verifying nas (%s) status\n", cfg.NAS.Name)
-	// if err := internal.Wakeup(cfg.NAS, ctx); err != nil {
-	// 	return err
+	// log.Printf("[run info] verifying nas (%s) status\n", cfg.NAS.Name)
+	// if err := nas.Wakeup(cfg.NAS, ctx); err != nil {
+	// 	return fmt.Errorf("[run error] could not wake up nas (%s): %s", cfg.NAS.Name, err)
 	// }
+	// log.Printf("[run info] nas (%s) status OK\n", cfg.NAS.Name)
 	/*DEBUG FOR NOW*/
 
 	for _, t := range supportedTargets {
@@ -142,7 +154,7 @@ func run() error {
 		el := &utils.ElapsedTime{}
 		ts := &utils.TargetSize{}
 		go func(t string) {
-			log.Printf("starting backup %s\n\n", t)
+			log.Printf("[run info] starting backup %s\n", t)
 			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
 				log.Println(err)
 			} else {
@@ -158,50 +170,64 @@ func run() error {
 	}
 	wg.Wait()
 
-	finalResult := &email.EmailTemplate{
-		Timestamp:          time.Now().String(),
-		Totalbackups:       len(supportedTargets),
-		Totalbackupsuccess: success,
-		PiTemp:             pi.GetPiTemp(),
-		ElapsedTimes:       times,
-		TotalElapsedTime:   utils.CalculateTotalElaspedTime(times),
-		TargetsSize:        targetsSize,
-	}
+	// finalResult := &email.EmailTemplate{
+	// 	Timestamp:          time.Now().String(),
+	// 	Totalbackups:       len(supportedTargets),
+	// 	Totalbackupsuccess: success,
+	// 	PiTemp:             pi.GetPiTemp(),
+	// 	ElapsedTimes:       times,
+	// 	TotalElapsedTime:   utils.CalculateTotalElaspedTime(times),
+	// 	TargetsSize:        targetsSize,
+	// }
 
-	if err := email.SendEmail(finalResult); err != nil {
-		log.Printf(err.Error())
-	}
+	//log.Printf("[run info] preparing email fields\n")
+	// if err := email.SendEmail(finalResult); err != nil {
+	// 	log.Printf("[run error] could not send email: %s", err)
+	// }
 
 	/*DEBUG FOR NOW*/
-	// log.Printf("shutting down %s\n", cfg.NAS.Name)
+	// log.Printf("[run info] shutting down nas (%s)\n", cfg.NAS.Name)
 	// if err := internal.Shutdown(cfg.NAS); err != nil {
-	// 	return err
+	// 	return fmt.Errorf("[run error] could not shut down nas (%s): %s", cfg.NAS.Name, err)
 	// }
+	// log.Printf("[run info] nas (%s) off\n", cfg.NAS.Name)
+
 	/*DEBUG FOR NOW*/
 
 	return nil
 }
 
-func isEverythingConfigured() bool {
+func isEverythingConfigured(configPathFlag string) bool {
+	log.Printf("[setup info] validating config flag\n")
+	if configPathFlag == "" {
+		log.Printf("[setup error] please provide the path for the config file\n")
+		return false
+	}
+	log.Printf("[setup info] config flag OK\n")
+
+	log.Printf("[setup info] validating env vars \n")
 	senderEmail := os.Getenv("SENDEREMAIL")
 	senderPass := os.Getenv("SENDERPASS")
-	if senderEmail != "" && senderPass != "" {
-		log.Println("SENDEREMAIL && SENDERPASS are present, so lets continue ...")
-		return true
+	if senderEmail == "" || senderPass == "" {
+		log.Printf("[setup error] SENDEREMAIL or SENDERPASS are not present\n")
+		return false
 	}
+	log.Printf("[setup info] env vars are OK\n")
 
-	log.Println("SENDEREMAIL && SENDERPASS not present, so quiting ...")
-	return false
+	log.Printf("[setup info] validating mount point\n")
+	if !utils.IsExternalMounted() {
+		log.Printf("[setup error] mount point is not mounted in the system\n")
+		return false
+	}
+	log.Printf("[setup info] mount point is OK\n")
+
+	return true
 }
 
 func main() {
 	if err := run(); err != nil {
 		log.Println(err.Error())
 	}
-
-	// if !isEverythingConfigured() {
-	// 	os.Exit(1)
-	// }
 
 	// log.Println("Running version:", version)
 

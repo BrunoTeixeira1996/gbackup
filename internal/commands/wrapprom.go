@@ -9,8 +9,6 @@ import (
 	"os/exec"
 	"syscall"
 
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/push"
 	"github.com/stapelberg/rsyncprom"
 )
 
@@ -36,7 +34,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		stdoutPipe = rc
 
-		log.Printf("executing: %q\n", c.Args)
+		log.Printf("[prom] executing: %q\n", c.Args)
 		if err := c.Start(); err != nil {
 			return nil, err
 		}
@@ -52,7 +50,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 					return code
 				}
 			}
-			log.Print(err)
+			log.Printf("[prom] error while waiting: %v\n", err)
 			return 1
 		}
 		return 0
@@ -67,74 +65,18 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
+		log.Printf("[prom] executing %s %s -> err result: %v\n", instance, params.Job, err)
 
-	case "toStoragePool":
+	case "toNAS":
 		params := rsyncprom.WrapParams{
 			Pushgateway: pg,
 			Instance:    instance,
-			Job:         "toStoragePool",
+			Job:         "toNAS",
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-
-	// This is not being used since now I rsync from external to storagepool (its faster)
-	case "cmd":
-		params := rsyncprom.WrapParams{
-			Pushgateway: pg,
-			Instance:    instance,
-			Job:         "cmd",
-		}
-		// executes wrampCmd and export metrics to prometheus
-		err = wrapCmd(ctx, &params, flag.Args(), start, wait)
+		log.Printf("[prom] executing %s %s -> err result: %v\n", instance, params.Job, err)
 	}
 
 	return err
-}
-
-// stolen from https://github.com/stapelberg/rsyncprom/blob/main/rsyncprom.go
-// Function that wraps unix commands collecting metrics to prometheus
-// the only thing that matters here is the start and end time and then
-// the exit code of the command
-func wrapCmd(ctx context.Context, params *rsyncprom.WrapParams, args []string, start func(context.Context, []string) (io.Reader, error), wait func() int) error {
-	//log.Printf("push gateway: %q", params.Pushgateway)
-
-	startTimeMetric := prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: params.Job + "_start_timestamp_seconds",
-		Help: "The timestamp of the cmd start",
-	})
-	startTimeMetric.SetToCurrentTime()
-	pushAll := func(collectors ...prometheus.Collector) {
-		p := push.New(params.Pushgateway, params.Job).
-			Grouping("instance", params.Instance)
-		for _, c := range collectors {
-			p.Collector(c)
-		}
-		if err := p.Add(); err != nil {
-			log.Print(err)
-		}
-	}
-	pushAll(startTimeMetric)
-
-	exitCode := 0
-
-	// defer will wait for the wait() function to finish
-	defer func() {
-		//log.Printf("Pushing exit code %d", exitCode)
-		exitCodeMetric := prometheus.NewGauge(prometheus.GaugeOpts{
-			Name: params.Job + "_exit_code",
-			Help: "The exit code (0 = success, non-zero = failure)",
-		})
-		exitCodeMetric.Set(float64(exitCode))
-		// end timestamp is push_time_seconds
-		pushAll(exitCodeMetric)
-	}()
-
-	_, err := start(ctx, args)
-	if err != nil {
-		return err
-	}
-
-	exitCode = wait()
-
-	return nil
 }

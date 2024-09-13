@@ -1,6 +1,8 @@
 package commands
 
-import "strings"
+import (
+	"strings"
+)
 
 func RsyncCommand(cmd, to, target, pushgatewayURL string) error {
 	rcommand := strings.Fields(cmd)

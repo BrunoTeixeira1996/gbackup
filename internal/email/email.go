@@ -3,6 +3,7 @@ package email
 import (
 	"bytes"
 	"fmt"
+	"log"
 	"net/smtp"
 	"os"
 	"strings"
@@ -70,9 +71,6 @@ func buildEmail(e *EmailTemplate) (string, error) {
 
 func SendEmail(body *EmailTemplate) error {
 	senderEmail, senderPass := getEnvs()
-	if senderEmail == "" || senderPass == "" {
-		return fmt.Errorf("Please setup the SENDEREMAIL and SENDERPASS env vars")
-	}
 
 	s := &Smtp{}
 	s.setSmtpValues()
@@ -84,9 +82,10 @@ func SendEmail(body *EmailTemplate) error {
 	to := fmt.Sprintf("To: <%s>\r\n", recipientEmail)
 	subject := "Subject: Backup executed\r\n"
 
+	log.Printf("[email] building email body\n")
 	finalBody, err := buildEmail(body)
 	if err != nil {
-		return fmt.Errorf("Error while building email template: %w", err)
+		return fmt.Errorf("[email] could not build email template: %s", err)
 	}
 
 	msg := headers + from + to + subject + "\r\n" + finalBody + "\r\n"
@@ -94,8 +93,10 @@ func SendEmail(body *EmailTemplate) error {
 	auth := smtp.PlainAuth("", senderEmail, senderPass, s.Host)
 
 	if err := smtp.SendMail(s.Address, auth, senderEmail, []string{recipientEmail}, []byte(msg)); err != nil {
-		return err
+		return fmt.Errorf("[email] could not send email: %s", err)
 	}
+
+	log.Printf("[email] sent email to %s\n", recipientEmail)
 
 	return nil
 }

@@ -32,7 +32,7 @@
 - New version of gbackup for a different setup
 
 - [x] Setup new default branch
-- [ ] Check if `/mnt/external` is mounted
+- [x] Check if `/mnt/external` is mounted
 - [ ] Fix Prometheus metrics
 - [ ] Clean previous code
 - [ ] Perform rsync on `/` and not only on files and folders?
