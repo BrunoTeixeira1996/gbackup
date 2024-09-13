@@ -35,6 +35,7 @@
 - [x] Check if `/mnt/external` is mounted
 - [x] `external` backup should be the last backup since it will contain more data (i.e worklatop, gokrazy_perm ...)
 - [ ] Perform rsync on worklaptop but only on important folders and files (pipx, apt)
+- [ ] Save output from backups by date as well as folders by date to know what date was that backed up
 - [ ] Fix Prometheus metrics
 - [ ] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
 - [ ] Clean previous code
