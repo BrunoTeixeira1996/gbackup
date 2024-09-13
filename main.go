@@ -18,7 +18,6 @@ const version = "4.0"
 
 var supportedTargets = []string{
 	"gokr_perm_backup",
-	//"external_hard_drive",
 	// "work_laptop",
 }
 
@@ -101,14 +100,6 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 		}
 
 		ts.Name = cfg.Targets[1].Name
-
-	case "external_hard_drive":
-		if err := targets.ExecuteExternalToNASBackup(cfg, el); err != nil {
-			log.Println(err)
-		}
-
-		ts.Name = "external hard drive"
-
 	}
 	fmt.Printf("\n\n")
 
@@ -169,6 +160,12 @@ func run() error {
 		}(t)
 	}
 	wg.Wait()
+
+	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
+	if err := targets.ExecuteExternalToNASBackup(cfg); err != nil {
+		log.Println(err)
+	}
+
 
 	// finalResult := &email.EmailTemplate{
 	// 	Timestamp:          time.Now().String(),

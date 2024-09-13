@@ -33,7 +33,7 @@
 
 - [x] Setup new default branch
 - [x] Check if `/mnt/external` is mounted
-- [ ] `external` backup should be the last backup since it will contain more data (i.e worklatop, gokrazy_perm ...)
+- [x] `external` backup should be the last backup since it will contain more data (i.e worklatop, gokrazy_perm ...)
 - [ ] Fix Prometheus metrics
 - [ ] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
 - [ ] Clean previous code
