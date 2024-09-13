@@ -71,13 +71,13 @@ func sendMagicPacket(nasMac string) error {
 func Wakeup(nas NAS, ctx context.Context) error {
 	// check if the system is reachable before issuing the shutdown command
 	if isReachable(nas.IP) {
-		log.Printf("%s (%s) is up ... skiping sending magic packet", nas.Name, nas.IP)
+		log.Printf("%s (%s) is up ... ignoring sending magic packet", nas.Name, nas.IP)
 		return nil
-	} else {
-		log.Printf("sending magic packet to %s (%s)\n", nas.Name, nas.MAC)
-		if err := sendMagicPacket(nas.MAC); err != nil {
-			return err
-		}
+	}
+
+	log.Printf("sending magic packet to %s (%s)\n", nas.Name, nas.MAC)
+	if err := sendMagicPacket(nas.MAC); err != nil {
+		return err
 	}
 
 	{
@@ -88,7 +88,7 @@ func Wakeup(nas NAS, ctx context.Context) error {
 		if err := checkSSH(ctx, nas.IP); err != nil {
 			return err
 		}
-		log.Printf("host %s now awake\n", nas.Name)
+		log.Printf("host %s is now awake\n", nas.Name)
 	}
 
 	return nil
@@ -109,7 +109,7 @@ func isReachable(addr string) bool {
 func Shutdown(nas NAS) error {
 	// check if the system is reachable before issuing the shutdown command
 	if !isReachable(nas.IP) {
-		log.Printf("%s (%s) is already down or not reachable", nas.Name, nas.IP)
+		log.Printf("%s (%s) is already down\n", nas.Name, nas.IP)
 		return nil
 	}
 
@@ -121,10 +121,8 @@ func Shutdown(nas NAS) error {
 	time.Sleep(20 * time.Second)
 
 	if !isReachable(nas.IP) {
-		log.Printf("confirmed that %s (%s) is down", nas.Name, nas.IP)
-		return nil
+		log.Printf("confirmed that %s (%s) is down\n", nas.Name, nas.IP)
 	}
-
-	log.Printf("%s (%s) shut down \n", nas.Name, nas.IP)
+	
 	return nil
 }

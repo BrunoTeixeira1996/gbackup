@@ -128,7 +128,7 @@ func run() error {
 		log.Fatal(err)
 	}
 
-	log.Printf("waking up %s\n", cfg.NAS.Name)
+	log.Printf("verifying nas (%s) status\n", cfg.NAS.Name)
 	if err := internal.Wakeup(cfg.NAS, ctx); err != nil {
 		return err
 	}
