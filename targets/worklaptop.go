@@ -10,14 +10,15 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
 
-/*
-TODO: 
-backup ~/Desktop ~/.ssh /etc
-execute pipx list and save that for future (pipx list and save output)
-execute apt list installed and save that for future (dpkg --get-selections and save output)
-*/
 func backupWorkLaptopToExternal(cfg config.Config) error {
-	command := "-av -e ssh worklaptop:/home/brun0/Desktop/work worklaptop:/home/brun0/Desktop/shared_folder /mnt/pve/external/worklaptop_backup"
+
+
+	command := `-av --copy-links --delete -e ssh
+	--exclude=personal
+	--exclude=tools
+	worklaptop:/home/brun0/Desktop
+	worklaptop:/home/brun0/.ssh
+	/mnt/external/worklaptop_backup/`+utils.CurrentTime()+`/`
 
 	log.Printf("[backup info] starting rsync command worklatop -> external\n")
 	if err := commands.RsyncCommand(command, "toExternal", "worklaptop", cfg.Pushgateway.Url); err != nil {
