@@ -1,5 +1,7 @@
 package utils
 
+import "time"
+
 type ElapsedTime struct {
 	Target  string
 	Elapsed float64
@@ -12,4 +14,8 @@ func CalculateTotalElaspedTime(times []ElapsedTime) float64 {
 	}
 
 	return totalElapsedTime
+}
+
+func CurrentTime() string {
+	return time.Now().Format("2006-02-01")
 }
