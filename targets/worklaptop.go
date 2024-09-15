@@ -13,7 +13,7 @@ import (
 func backupWorkLaptopToExternal(cfg config.Config) error {
 
 
-	command := `-av --copy-links --delete -e ssh
+	command := `-av --copy-links -e ssh
 	--exclude=personal
 	--exclude=tools
 	worklaptop:/home/brun0/Desktop
