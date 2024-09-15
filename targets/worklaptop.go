@@ -12,13 +12,13 @@ import (
 
 func backupWorkLaptopToExternal(cfg config.Config) error {
 
-
+	// note that here we dont want to --delete because we need to save old projects
 	command := `-av --copy-links -e ssh
 	--exclude=personal
 	--exclude=tools
 	worklaptop:/home/brun0/Desktop
 	worklaptop:/home/brun0/.ssh
-	/mnt/external/worklaptop_backup/`+utils.CurrentTime()+`/`
+	/mnt/external/worklaptop_backup`
 
 	log.Printf("[backup info] starting rsync command worklatop -> external\n")
 	if err := commands.RsyncCommand(command, "toExternal", "worklaptop", cfg.Pushgateway.Url); err != nil {
