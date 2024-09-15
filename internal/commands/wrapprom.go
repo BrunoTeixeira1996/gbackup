@@ -65,7 +65,14 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-		log.Printf("[prom] executing %s %s -> err result: %v\n", instance, params.Job, err)
+		log.Printf("[prom] executing %s %s -> result: %s\n", instance, params.Job,
+			func() string {
+				if err == nil {
+					return "OK"
+				}
+				return err.Error()
+			}(),
+		)
 
 	case "toNAS":
 		params := rsyncprom.WrapParams{
@@ -75,7 +82,14 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-		log.Printf("[prom] executing %s %s -> err result: %v\n", instance, params.Job, err)
+		log.Printf("[prom] executing %s %s -> result: %s\n", instance, params.Job,
+			func() string {
+				if err == nil {
+					return "OK"
+				}
+				return err.Error()
+			}(),
+		)
 	}
 
 	return err
