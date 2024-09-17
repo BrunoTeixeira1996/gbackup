@@ -35,7 +35,7 @@
 - [x] Check if `/mnt/external` is mounted
 - [x] `external` backup should be the last backup since it will contain more data (i.e worklatop, gokrazy_perm ...)
 - [x] Clean previous code
-- [ ] Implement logic to keep 2 backups and delete the older one for the external -> NAS since PBS does the same
+- [x] Implement logic to keep 2 backups and delete the older one for the external -> NAS since PBS does the same
 - [ ] Fix Prometheus metrics
 - [ ] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
   - https://forum.proxmox.com/threads/query-if-a-backup-task-is-running.112019/
