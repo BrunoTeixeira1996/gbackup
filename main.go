@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 	"github.com/BrunoTeixeira1996/gbackup/targets"
 )
@@ -161,11 +162,10 @@ func run() error {
 	}
 	wg.Wait()
 
-	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
-	if err := targets.ExecuteExternalToNASBackup(cfg); err != nil {
-		log.Println(err)
-	}
-
+	/*	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
+		if err := targets.ExecuteExternalToNASBackup(cfg); err != nil {
+			log.Println(err)
+		}*/
 
 	// finalResult := &email.EmailTemplate{
 	// 	Timestamp:          time.Now().String(),
@@ -222,10 +222,11 @@ func isEverythingConfigured(configPathFlag string) bool {
 }
 
 func main() {
-	if err := run(); err != nil {
-		log.Println(err.Error())
-	}
-
+	proxmox.Test()
+	/*	if err := run(); err != nil {
+			log.Println(err.Error())
+		}
+	*/
 	// log.Println("Running version:", version)
 
 	// // used by the on demand backup
