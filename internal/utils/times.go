@@ -1,6 +1,8 @@
 package utils
 
-import "time"
+import (
+	"time"
+)
 
 type ElapsedTime struct {
 	Target  string
@@ -18,4 +20,18 @@ func CalculateTotalElaspedTime(times []ElapsedTime) float64 {
 
 func CurrentTime() string {
 	return time.Now().Format("2006-02-01")
+}
+
+// Gets epoch time for the current day at 12 PM
+func Epoch() int64 {
+	now := time.Now()
+
+	timeAt2PM := time.Date(
+		now.Year(),
+		now.Month(),
+		now.Day(),
+		12, 0, 0, 0,
+		now.Location())
+
+	return timeAt2PM.Unix()
 }
