@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 	"sync"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
@@ -122,14 +121,14 @@ func run() error {
 	flag.Parse()
 
 	log.Printf("[run info] validating setup\n")
-	if !isEverythingConfigured(*configPathFlag) {
+	if !utils.IsEverythingConfigured(*configPathFlag) {
 		return fmt.Errorf("[run error] please configure the setup properly")
 	}
 	log.Printf("[run info] setup is OK\n")
 
 	log.Printf("[run info] reading toml file\n")
 	if cfg, err = config.ReadTomlFile(*configPathFlag); err != nil {
-		return fmt.Errorf("[run error] could not read toml file properly: %s", err)
+		fmt.Errorf("[run error] could read toml file: %s", err)
 	}
 	log.Printf("[run info] toml file is OK\n\n")
 
@@ -148,7 +147,7 @@ func run() error {
 		go func(t string) {
 			log.Printf("[run info] starting backup %s\n", t)
 			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
-				log.Println(err)
+				log.Printf("[run error] could not getExecutionFunction: %s\n", err)
 			} else {
 				success += 1
 			}
@@ -182,6 +181,11 @@ func run() error {
 	// 	log.Printf("[run error] could not send email: %s", err)
 	// }
 
+	// check PBS backup, if err is nil, that means we can turn off NAS
+	if err := proxmox.CheckPBSBackupStatus(); err != nil {
+		return fmt.Errorf("[run error] could not check PBS backup status ... ignoring turning off NAS: %s\n", err)
+	}
+
 	/*DEBUG FOR NOW*/
 	// log.Printf("[run info] shutting down nas (%s)\n", cfg.NAS.Name)
 	// if err := internal.Shutdown(cfg.NAS); err != nil {
@@ -194,39 +198,11 @@ func run() error {
 	return nil
 }
 
-func isEverythingConfigured(configPathFlag string) bool {
-	log.Printf("[setup info] validating config flag\n")
-	if configPathFlag == "" {
-		log.Printf("[setup error] please provide the path for the config file\n")
-		return false
-	}
-	log.Printf("[setup info] config flag OK\n")
-
-	log.Printf("[setup info] validating env vars \n")
-	senderEmail := os.Getenv("SENDEREMAIL")
-	senderPass := os.Getenv("SENDERPASS")
-	if senderEmail == "" || senderPass == "" {
-		log.Printf("[setup error] SENDEREMAIL or SENDERPASS are not present\n")
-		return false
-	}
-	log.Printf("[setup info] env vars are OK\n")
-
-	log.Printf("[setup info] validating mount point\n")
-	if !utils.IsExternalMounted() {
-		log.Printf("[setup error] mount point is not mounted in the system\n")
-		return false
-	}
-	log.Printf("[setup info] mount point is OK\n")
-
-	return true
-}
-
 func main() {
-	proxmox.Test()
-	/*	if err := run(); err != nil {
-			log.Println(err.Error())
-		}
-	*/
+	if err := run(); err != nil {
+		log.Println(err.Error())
+	}
+
 	// log.Println("Running version:", version)
 
 	// // used by the on demand backup

@@ -45,7 +45,7 @@ func checkSSH(ctx context.Context, addr string) error {
 func sendMagicPacket(nasMac string) error {
 	hwaddr, err := net.ParseMAC(nasMac)
 	if err != nil {
-		return err
+		return fmt.Errorf("[nas error] could not parse mac %s: %s\n", nasMac, err)
 	}
 	if got, want := len(hwaddr), 6; got != want {
 		return fmt.Errorf("[nas error] could not send magic packet unexpected number of parts in hardware address %q: got %d, want %d", nasMac, got, want)
@@ -63,7 +63,7 @@ func sendMagicPacket(nasMac string) error {
 	// https://en.wikipedia.org/wiki/Wake-on-LAN#Magic_packet
 	payload := append(bytes.Repeat([]byte{0xff}, 6), bytes.Repeat(hwaddr, 16)...)
 	if _, err := socket.Write(payload); err != nil {
-		return err
+		return fmt.Errorf("[nas error] could not append magic byte: %s\n", err)
 	}
 	return socket.Close()
 }
