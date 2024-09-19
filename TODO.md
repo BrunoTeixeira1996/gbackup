@@ -39,7 +39,7 @@
 - [ ] Clean return code
   - Caller function only return fmt.Errorf if necessary, otherwise it only return err and the function that is being called returns fmt.Errorf
 - [ ] Fix Prometheus metrics
-- [ ] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
+- [x] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
   - https://forum.proxmox.com/threads/query-if-a-backup-task-is-running.112019/
   - https://www.reddit.com/r/Proxmox/comments/1cqi54w/backup_status_via_api/
 - [ ] Modify email template to be similar to PBS email
