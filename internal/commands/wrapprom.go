@@ -3,6 +3,7 @@ package commands
 import (
 	"context"
 	"flag"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -30,13 +31,13 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		c.Stderr = os.Stderr
 		rc, err := c.StdoutPipe()
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("[prom error] could not exec.CommandContext %s\n", err)
 		}
 		stdoutPipe = rc
 
 		log.Printf("[prom] executing: %q\n", c.Args)
 		if err := c.Start(); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("[prom error] could not c.Start %s\n", err)
 		}
 		return rc, nil
 	}
@@ -50,7 +51,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 					return code
 				}
 			}
-			log.Printf("[prom] error while waiting: %v\n", err)
+			log.Printf("[prom error] error while waiting: %s\n", err)
 			return 1
 		}
 		return 0
@@ -65,7 +66,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-		log.Printf("[prom] executing %s %s -> result: %s\n", instance, params.Job,
+		log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
 			func() string {
 				if err == nil {
 					return "OK"
@@ -82,7 +83,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		// executes WrapRsync from rsyncprom and export metrics to prometheus
 		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-		log.Printf("[prom] executing %s %s -> result: %s\n", instance, params.Job,
+		log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
 			func() string {
 				if err == nil {
 					return "OK"

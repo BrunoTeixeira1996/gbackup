@@ -116,12 +116,12 @@ func (p *PVE) getAllObjects() error {
 	)
 
 	if tL, err = getEntriesForObject(*p, "lxc"); err != nil {
-		return fmt.Errorf("[getAllObjects] could not get all for LXC: %s\n", err)
+		return fmt.Errorf("[pve error] could not get all for LXC: %s\n", err)
 	}
 	p.LXCs = tL.Data
 
 	if tV, err = getEntriesForObject(*p, "qemu"); err != nil {
-		return fmt.Errorf("[getAllObjects] could not get all for VM: %s\n", err)
+		return fmt.Errorf("[pve error] could not get all for VM: %s\n", err)
 	}
 	p.VMs = tV.Data
 
@@ -137,28 +137,12 @@ func getEntriesForObject(pve PVE, objType string) (Object, error) {
 	)
 
 	if response, err = pve.API.request("GET", objType); err != nil {
-		return Object{}, fmt.Errorf("[getEntriesForObject] could not get containers from API (%s): %s\n", objType, err)
+		return Object{}, fmt.Errorf("[pve error] could not get containers from API (%s): %s\n", objType, err)
 	}
 
 	if err = json.Unmarshal(response, &ob); err != nil {
-		return Object{}, fmt.Errorf("[getEntriesForObject] could not unmarshal response: %s\n", err)
+		return Object{}, fmt.Errorf("[pve error] could not unmarshal response: %s\n", err)
 	}
 
 	return ob, nil
 }
-
-/*func Xest() {
-	pve := &PVE{}
-	var err error
-
-	if err = pve.Init(); err != nil {
-		log.Println(err)
-	}
-
-	if err = pve.getAllObjects(); err != nil {
-		log.Println(err)
-	}
-
-	log.Println("TOTAL:", len(pve.LXCs)+len(pve.VMs))
-}
-*/

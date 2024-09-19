@@ -21,7 +21,7 @@ func keepLastTwo() error {
 	// list directories in /mnt/datastore/backupExternal
 	output, err := exec.Command("ssh", "nas1", "ls", "-la", "/mnt/datastore/backupExternal").Output()
 	if err != nil {
-		log.Printf("[keepLastTwo] error while listing: %s (%s)\n", output, err)
+		log.Printf("[external backup error] error while listing: %s (%s)\n", output, err)
 		return err
 	}
 
@@ -33,7 +33,7 @@ func keepLastTwo() error {
 
 	// verify if there's at least 3 folders
 	if len(folderNames) < 3 {
-		log.Printf("[keepLastTwo] skipping this because there is only %d folder(s)\n", len(folderNames))
+		log.Printf("[external backup info] skipping this because there is only %d folder(s)\n", len(folderNames))
 		return nil
 	}
 
@@ -41,10 +41,10 @@ func keepLastTwo() error {
 
 	output, err = exec.Command("ssh", "nas1", "rm -r", oldestFolder).Output()
 	if err != nil {
-		log.Printf("[keepLastTwo] error while deleting the oldest folder: %s (%s)\n", output, err)
+		log.Printf("[external backup error] error while deleting the oldest folder: %s (%s)\n", output, err)
 		return err
 	}
-	log.Printf("[keepLastTwo] successfully deleted oldest folder %s\n", oldestFolder)
+	log.Printf("[external backup info] successfully deleted oldest folder %s\n", oldestFolder)
 
 	return nil
 }
@@ -74,19 +74,19 @@ func ExecuteExternalToNASBackup(cfg config.Config) error {
 	}
 
 	for _, t := range t {
-		log.Printf("[backup info] starting rsync command external -> NAS (%s) - %s\n", cfg.NAS.Name, t.Name)
+		log.Printf("[external backup info] starting rsync command external -> NAS (%s) - %s\n", cfg.NAS.Name, t.Name)
 		if err := commands.RsyncCommand(t.Command, "toNAS", "external hard drive", cfg.Pushgateway.Url); err != nil {
-			log.Printf("[backup error] could not perform RsyncCommand in external to NAS: %s\n", err)
+			log.Printf("[external backup error] could not perform RsyncCommand in external to NAS: %s\n", err)
 			return err
 		}
 	}
-	log.Printf("[backup info] completed backup of external to NAS (%s)\n", cfg.NAS.Name)
+	log.Printf("[external backup info] completed backup of external to NAS (%s)\n", cfg.NAS.Name)
 
-	log.Printf("[backup info] verifying len of backup folders with keepLastTwo mechanism\n")
+	log.Printf("[external backup info] verifying len of backup folders with keepLastTwo mechanism\n")
 	if err := keepLastTwo(); err != nil {
 		return err
 	}
-	log.Printf("[backup info] completed the house clean to keep 2 backup folders (newest)\n")
+	log.Printf("[external backup info] completed the house clean to keep 2 backup folders (newest)\n")
 
 	// Calculate run time
 	// end := time.Now()

@@ -36,7 +36,7 @@
 - [x] `external` backup should be the last backup since it will contain more data (i.e worklatop, gokrazy_perm ...)
 - [x] Clean previous code
 - [x] Implement logic to keep 2 backups and delete the older one for the external -> NAS since PBS does the same
-- [ ] Clean return code
+- [x] Clean return code
   - Caller function only return fmt.Errorf if necessary, otherwise it only return err and the function that is being called returns fmt.Errorf
 - [ ] Fix Prometheus metrics
 - [x] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished

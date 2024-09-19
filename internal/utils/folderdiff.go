@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"os"
@@ -22,7 +23,7 @@ func roundFloat(val float64, precision uint) float64 {
 func GetFolderSize(folderPath string) (float64, error) {
 	log.Println(folderPath)
 	var totalSize float64
-	log.Println("[folderdiff] checking folder size ...")
+	log.Println("[folderdiff info] checking folder size ...")
 	err := filepath.Walk(folderPath, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			totalSize += float64(info.Size())
@@ -30,11 +31,11 @@ func GetFolderSize(folderPath string) (float64, error) {
 		return nil
 	})
 	if err != nil {
-		return 0.0, err
+		return 0.0, fmt.Errorf("[folderdiff error] could not perform filepath.Walk %s\n", err)
 	}
 
 	final := roundFloat((totalSize / (1 << 20)), 2)
-	log.Printf("[folderdiff] total folder size (%s): %.2f\n\n\n", folderPath, final)
+	log.Printf("[folderdiff info] total folder size (%s): %.2f\n\n\n", folderPath, final)
 
 	return final, nil
 }

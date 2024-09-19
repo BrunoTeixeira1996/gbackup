@@ -45,7 +45,7 @@ func getEnvs() (string, string) {
 func buildEmail(e *EmailTemplate) (string, error) {
 	logstdoutFile, err := os.ReadFile("/root/gbackup/logstdout")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("[email error] could not read file logstdout: %s\n", err)
 	}
 
 	buf := bytes.NewBuffer(logstdoutFile)
@@ -58,12 +58,12 @@ func buildEmail(e *EmailTemplate) (string, error) {
 
 	templ, err := template.New("email_template.html").ParseFiles("/root/gbackup/email_template.html")
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("[email error] could not parse files: %s\n", err)
 	}
 
 	var outTemp bytes.Buffer
 	if err := templ.Execute(&outTemp, e); err != nil {
-		return "", err
+		return "", fmt.Errorf("[email error] could not execute template: %s\n", err)
 	}
 
 	return outTemp.String(), nil
@@ -85,7 +85,7 @@ func SendEmail(body *EmailTemplate) error {
 	log.Printf("[email] building email body\n")
 	finalBody, err := buildEmail(body)
 	if err != nil {
-		return fmt.Errorf("[email] could not build email template: %s", err)
+		return fmt.Errorf("[email error] could not build email template: %s", err)
 	}
 
 	msg := headers + from + to + subject + "\r\n" + finalBody + "\r\n"
@@ -93,10 +93,10 @@ func SendEmail(body *EmailTemplate) error {
 	auth := smtp.PlainAuth("", senderEmail, senderPass, s.Host)
 
 	if err := smtp.SendMail(s.Address, auth, senderEmail, []string{recipientEmail}, []byte(msg)); err != nil {
-		return fmt.Errorf("[email] could not send email: %s", err)
+		return fmt.Errorf("[email error] could not send email: %s", err)
 	}
 
-	log.Printf("[email] sent email to %s\n", recipientEmail)
+	log.Printf("[email info] sent email to %s\n", recipientEmail)
 
 	return nil
 }

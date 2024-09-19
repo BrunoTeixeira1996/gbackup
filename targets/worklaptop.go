@@ -20,12 +20,12 @@ func backupWorkLaptopToExternal(cfg config.Config) error {
 	worklaptop:/home/brun0/.ssh
 	/mnt/external/worklaptop_backup`
 
-	log.Printf("[backup info] starting rsync command worklatop -> external\n")
+	log.Printf("[worklaptop backup info] starting rsync command worklatop -> external\n")
 	if err := commands.RsyncCommand(command, "toExternal", "worklaptop", cfg.Pushgateway.Url); err != nil {
-		log.Printf("[backup error] could not perform RsyncCommand in worklaptop to external: %s\n", err)
+		log.Printf("[worklaptop backup error] could not perform RsyncCommand in worklaptop to external: %s\n", err)
 		return err
 	}
-	log.Printf("[backup info] completed backup of worklaptop to external\n")
+	log.Printf("[worklaptop backup info] completed backup of worklaptop to external\n")
 
 	return nil
 }
@@ -46,7 +46,7 @@ func ExecuteWorkLaptopBackup(cfg config.Config, el *utils.ElapsedTime) error {
 		el.Target = cfg.Targets[0].Name
 		el.Elapsed = end.Sub(start).Seconds()
 	} else {
-		return fmt.Errorf("[backup error] the target %s is not alive: %w", cfg.Targets[0].Instance, err)
+		return fmt.Errorf("[worklaptop backup error] the target %s is not alive: %w", cfg.Targets[0].Instance, err)
 	}
 	return nil
 }

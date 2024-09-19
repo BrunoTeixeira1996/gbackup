@@ -111,7 +111,7 @@ func isReachable(addr string) bool {
 func Shutdown(nas config.NAS) error {
 	// check if the system is reachable before issuing the shutdown command
 	if !isReachable(nas.IP) {
-		log.Printf("%s (%s) is already down\n", nas.Name, nas.IP)
+		log.Printf("[nas info] %s (%s) is already down\n", nas.Name, nas.IP)
 		return nil
 	}
 
@@ -123,7 +123,7 @@ func Shutdown(nas config.NAS) error {
 	time.Sleep(20 * time.Second)
 
 	if !isReachable(nas.IP) {
-		log.Printf("confirmed that %s (%s) is down\n", nas.Name, nas.IP)
+		log.Printf("[nas info] confirmed that %s (%s) is down\n", nas.Name, nas.IP)
 	}
 
 	return nil

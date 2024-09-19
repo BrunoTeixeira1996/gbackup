@@ -37,11 +37,11 @@ func ReadTomlFile(configPath string) (Config, error) {
 
 	input, err := os.ReadFile(configPath)
 	if err != nil {
-		return Config{}, fmt.Errorf("[ReadTomlFile] could not read toml file: %s\n", err)
+		return Config{}, fmt.Errorf("[config error] could not read toml file: %s\n", err)
 	}
 
 	if _, err := toml.Decode(string(input), &cfg); err != nil {
-		return Config{}, fmt.Errorf("[ReadTomlFile] could not toml decode toml file: %s\n", err)
+		return Config{}, fmt.Errorf("[confir error] could not toml decode toml file: %s\n", err)
 	}
 
 	return cfg, nil

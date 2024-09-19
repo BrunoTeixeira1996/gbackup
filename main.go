@@ -70,7 +70,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 	case "work_laptop":
 		ts.Before, err = utils.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
-			log.Printf("[get execution error] could not get folder size for %s\n", cfg.Targets[0].Name)
+			log.Printf("[get execution error] could not get folder size for %s: %s\n", cfg.Targets[0].Name, err)
 		}
 
 		if err := targets.ExecuteWorkLaptopBackup(cfg, el); err != nil {
@@ -79,7 +79,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 
 		ts.After, err = utils.GetFolderSize(cfg.Targets[0].ExternalPath)
 		if err != nil {
-			log.Printf("[get execution error] could not get folder size for %s on the second run\n", cfg.Targets[0].Name)
+			log.Printf("[get execution error] could not get folder size for %s on the second run: %s\n", cfg.Targets[0].Name, err)
 		}
 
 		ts.Name = cfg.Targets[0].Name
@@ -87,7 +87,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 	case "gokr_perm_backup":
 		ts.Before, err = utils.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[get execution error] could not get folder size for %s\n", cfg.Targets[1].Name)
+			log.Printf("[get execution error] could not get folder size for %s: %s\n", cfg.Targets[1].Name, err)
 		}
 
 		if err := targets.ExecuteGokrPermBackup(cfg, el); err != nil {
@@ -96,7 +96,7 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 
 		ts.After, err = utils.GetFolderSize(cfg.Targets[1].ExternalPath)
 		if err != nil {
-			log.Printf("[get execution error] could not get folder size for %s on the second run\n", cfg.Targets[1].Name)
+			log.Printf("[get execution error] could not get folder size for %s on the second run: %s\n", cfg.Targets[1].Name, err)
 		}
 
 		ts.Name = cfg.Targets[1].Name
