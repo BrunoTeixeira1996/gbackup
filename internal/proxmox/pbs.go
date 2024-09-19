@@ -1,17 +1,18 @@
 package proxmox
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
+
+type PBS struct {
+	API Boilerplate
+}
 
 type QueryBackup struct {
 	Total      int      `json:"total"`
@@ -31,14 +32,6 @@ type Backup struct {
 	Status     string  `json:"status"`
 }
 
-type PBS struct {
-	TokenID       string
-	Secret        string
-	APIUrl        string
-	Node          string
-	Authorization string
-}
-
 func (p *PBS) Init() error {
 	tokenID := os.Getenv("PBS_TOKENID")
 	secret := os.Getenv("PBS_SECRET")
@@ -47,144 +40,114 @@ func (p *PBS) Init() error {
 		return fmt.Errorf("[pbs error] please provide the PBS token and secret env vars\n")
 	}
 
-	p.TokenID = tokenID
-	p.Secret = secret
-	p.APIUrl = "https://192.168.30.200:8007/api2/json"
-	p.Node = "localhost"
-	p.Authorization = fmt.Sprintf("PBSAPIToken=%s:%s", p.TokenID, p.Secret)
+	p.API.TokenID = tokenID
+	p.API.Secret = secret
+	p.API.Url = "https://192.168.30.200:8007/api2/json"
+	p.API.Node = "localhost"
+	p.API.Authorization = fmt.Sprintf("PBSAPIToken=%s:%s", p.API.TokenID, p.API.Secret)
 
 	return nil
 }
 
-func request(pbs PBS, rType, apiPath string) ([]byte, error) {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-
-	client := &http.Client{
-		Timeout:   time.Second * 10,
-		Transport: tr,
-	}
-
-	requestBody := fmt.Sprintf("%s/nodes/%s/%s", pbs.APIUrl, pbs.Node, apiPath)
-
-	req, err := http.NewRequest(rType, requestBody, nil)
-	if err != nil {
-		return nil, fmt.Errorf("[pbs error] could not create new request:%s\n", err)
-	}
-
-	req.Header.Set("Authorization", pbs.Authorization)
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("[pbs error] could not perform client.Do: %s\n", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("[pbs error] could not perform %s request to: %s - status code: %d\n", rType, requestBody, resp.StatusCode)
-	}
-
-	res, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("[pbs error] could not read response body: %s\n", err)
-	}
-
-	return res, nil
-}
-
-func checkBackupStatus(pbs PBS) error {
+// Loops for the backups and prune jobs and waits
+// for all to finish so gbackup can proceed
+func (p *PBS) checkBackupStatus(totalObjects int) error {
 	var (
-		epoch       int64
+		epoch       int64 = utils.Epoch() // epoch time of 12 PM for the current day
 		response    []byte
 		backups     QueryBackup
 		tempBackups []Backup
-		counter     int
-		isDup       bool
 		err         error
+		sleepTime   int64 = 20                    // Sleep time between checks in seconds
+		completed         = make(map[string]bool) // Map to track completed backups by "Upid"
 	)
 
-	// get epoch time for 12 PM from current day
-	epoch = utils.Epoch()
+	// Loop until all backup and prune jobs are completed
+	for {
+		log.Println("[checkBackupStatus] checking backup status...")
 
-	// https://192.168.30.200:8007/api2/json/nodes/localhost/tasks?since=1726657200
-	path := fmt.Sprintf("tasks?since=%d", epoch)
-	if response, err = request(pbs, "GET", path); err != nil {
-		return fmt.Errorf("[checkBackupStatus] could not check backup status: %s\n", err)
-	}
+		// Fetch backup and prune jobs since the epoch
+		apiPath := fmt.Sprintf("tasks?since=%d", epoch)
+		if response, err = p.API.request("GET", apiPath); err != nil {
+			return fmt.Errorf("[checkBackupStatus] could not check backup status: %s\n", err)
+		}
 
-	if err = json.Unmarshal(response, &backups); err != nil {
-		return fmt.Errorf("[checkBackupStatus] could not unmarshal response to Backup: %s\n", err)
-	}
+		if err = json.Unmarshal(response, &backups); err != nil {
+			return fmt.Errorf("[checkBackupStatus] could not unmarshal response to Backup: %s\n", err)
+		}
 
-	// FIXME: I dont like to rely on a fixed number ... i need a better approach to this
-	// if I add another vm or LXC i need to come here and update this again ...
-	// a good approach would be to find the number of vm's + lxc dynamicaly
-	// this is possible using PVE API instead
-	// https://192.168.30.3:8006/api2/json/nodes/localhost/lxc -> lxc
-	// https://192.168.30.3:8006/api2/json/nodes/localhost/qemu -> VMs
-	for _, b := range backups.DataBackup {
-		// if there's 16 entries in tempBackups that means all backups were executed
-		if len(tempBackups) == 16 {
+		// Process backups and avoid duplicates using the map
+		for _, b := range backups.DataBackup {
+			// If we reach the expected number of jobs, exit the loop
+			if len(completed) == totalObjects*2 {
+				log.Printf("[checkBackupStatus] all %d backup and prune jobs completed\n", len(completed))
+				break
+			}
+
+			// Only process "prune" and "backup" jobs with "OK" status
+			if (b.WorkerType == "prune" || b.WorkerType == "backup") && b.Status == "OK" {
+				// Check if the backup job (identified by "Upid") is already completed
+				if _, exists := completed[b.Upid]; !exists {
+					// Add to tempBackups and mark the job as completed in the map
+					tempBackups = append(tempBackups, b)
+					completed[b.Upid] = true
+					log.Printf("[checkBackupStatus] added backup job %s (type: %s)\n", b.Upid, b.WorkerType)
+				}
+			}
+		}
+
+		// Check if all backups are done
+		if len(completed) == totalObjects*2 {
+			log.Printf("[checkBackupStatus] successfully completed %d backup and prune jobs.\n", len(completed))
 			break
 		}
 
-		// we only care about prune jobs and backups
-		// FIXME: there could be a bug in here since I dont want dup backups in tempBackups
-		if b.WorkerType == "prune" || b.WorkerType == "backup" && b.Status == "OK" {
-			for _, tempB := range tempBackups {
-				if tempB.Starttime == b.Starttime {
-					isDup = true
-					break
-				}
-			}
-			if !isDup {
-				tempBackups = append(tempBackups, b)
-			}
-		}
-
-		time.Sleep(2 * time.Minute)
-		isDup = false
+		// Sleep before retrying
+		log.Printf("[checkBackupStatus] incomplete jobs (%d/%d), sleeping for %d seconds...\n", len(completed), totalObjects*2, sleepTime)
+		time.Sleep(time.Duration(sleepTime) * time.Second)
 	}
 
+	// Final check to ensure all backups have "OK" status
 	for _, b := range tempBackups {
 		if b.Status != "OK" {
-			log.Printf("[checkBackupStatus] backup: %s was not OK\n", b.Upid)
+			return fmt.Errorf("[checkBackupStatus] backup: %s was not OK\n", b.Upid)
 		}
-		counter++
 	}
 
-	if counter == len(tempBackups) {
-		log.Printf("[checkBackupStatus] all backups are OK\n")
-	}
-
-	/*
-		TODO: get current date epoch time
-		if result, err = request(pbs, "GET", "tasks?since=epochtime"); err != nil {
-			log.Println(err)
-		}
-
-		validate that return contains 16 entries (number of vms and lxc backup 8 and prune 8)
-		if not, sleep 2 mins and try again
-		when it has 16 entries, check the status
-		if all status OK then the pbs finished backup and everything worked fine
-	*/
-
+	log.Printf("[checkBackupStatus] all backups completed successfully and have 'OK' status.\n")
 	return nil
 }
 
-func Test() {
+func CheckPBSBackupStatus() error {
 	var (
-		pbs PBS
-		err error
+		pve          = &PVE{}
+		pbs          = &PBS{}
+		totalObjects int
+		err          error
 	)
 
+	log.Println("[proxmox] initializing PBS")
 	if err = pbs.Init(); err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
-	if err := checkBackupStatus(pbs); err != nil {
-		log.Println(err)
+	log.Println("[proxmox] initializing PVE")
+	if err = pve.Init(); err != nil {
+		return err
 	}
+
+	log.Println("[proxmox] gathering all objects from PVE")
+	if err = pve.getAllObjects(); err != nil {
+		return err
+	}
+
+	totalObjects = len(pve.LXCs) + len(pve.VMs)
+	log.Printf("[proxmox] total objects: %d\n", totalObjects)
+
+	log.Println("[proxmox] checking backup status")
+	if err := pbs.checkBackupStatus(totalObjects); err != nil {
+		return err
+	}
+
+	return nil
 }
