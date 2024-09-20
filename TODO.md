@@ -38,14 +38,15 @@
 - [x] Implement logic to keep 2 backups and delete the older one for the external -> NAS since PBS does the same
 - [x] Clean return code
   - Caller function only return fmt.Errorf if necessary, otherwise it only return err and the function that is being called returns fmt.Errorf
-- [ ] Fix Prometheus metrics
+- [X] Fix Prometheus metrics
 - [x] Find a way of validating if PBS finished the backup, only shutdown NAS when this is finished
   - https://forum.proxmox.com/threads/query-if-a-backup-task-is-running.112019/
   - https://www.reddit.com/r/Proxmox/comments/1cqi54w/backup_status_via_api/
+- [ ] Buffer the output from the backup go routine in order to have the correct output from the targets
 - [ ] Modify email template to be similar to PBS email
   - This is be the best approach as the first rsync will take sometime but then it will be fast since we are doing incremental backups
   - Also get the apt and pipx packages
   - Test this with a VM by having a backup of my work laptop and rsync that backup to a fresh clean VM
 - [x] Implement WoL (Wake on Lan)
 - [x] Implement the shutdown of the NAS
-- [ ] Check if its end of month, if yes compress the data and send to ????
+- [ ] Check if its end of month, if yes compress the data and send to new external HDD plugged in Pinute (Pi)

@@ -39,9 +39,9 @@ func keepLastTwo() error {
 
 	oldestFolder := fmt.Sprintf("/mnt/datastore/backupExternal/%s", folderNames[0])
 
-	output, err = exec.Command("ssh", "nas1", "rm -r", oldestFolder).Output()
+	output, err = exec.Command("ssh", "nas1", "sudo", "rm", "-r", oldestFolder).Output()
 	if err != nil {
-		log.Printf("[external backup error] error while deleting the oldest folder: %s (%s)\n", output, err)
+		log.Printf("[external backup error] error while deleting the oldest folder (%s): %s (%s)\n", oldestFolder, output, err)
 		return err
 	}
 	log.Printf("[external backup info] successfully deleted oldest folder %s\n", oldestFolder)
@@ -73,6 +73,7 @@ func ExecuteExternalToNASBackup(cfg config.Config) error {
 		},
 	}
 
+	// TODO: Maybe i need to give different name to "external hard drive" so I can grab both rsync commands on prometheus
 	for _, t := range t {
 		log.Printf("[external backup info] starting rsync command external -> NAS (%s) - %s\n", cfg.NAS.Name, t.Name)
 		if err := commands.RsyncCommand(t.Command, "toNAS", "external hard drive", cfg.Pushgateway.Url); err != nil {

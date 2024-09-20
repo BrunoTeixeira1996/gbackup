@@ -35,7 +35,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		}
 		stdoutPipe = rc
 
-		log.Printf("[prom] executing: %q\n", c.Args)
+		log.Printf("[prom info] executing: %q\n", c.Args)
 		if err := c.Start(); err != nil {
 			return nil, fmt.Errorf("[prom error] could not c.Start %s\n", err)
 		}

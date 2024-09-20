@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"sync"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 	"github.com/BrunoTeixeira1996/gbackup/targets"
@@ -18,10 +20,11 @@ const version = "4.0"
 
 var supportedTargets = []string{
 	"gokr_perm_backup",
-	// "work_laptop",
+	"work_laptop",
 }
 
 // Handles POST to backup on demand
+// TODO clean this code as well as logs
 func backupHandle(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	if r.Method != "POST" {
@@ -55,6 +58,7 @@ func backupHandle(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// TODO clean this code as well as logs
 func StartWebHook() {
 	log.Println("started webhook ... ")
 	http.HandleFunc("/backup", backupHandle)
@@ -101,14 +105,14 @@ func getExecutionFunction(target string, cfg config.Config, el *utils.ElapsedTim
 
 		ts.Name = cfg.Targets[1].Name
 	}
-	fmt.Printf("\n\n")
+	log.Printf("\n\n")
 
 	return nil
 }
 
 func run() error {
 	var (
-		//ctx            = context.Background()
+		ctx            = context.Background()
 		configPathFlag = flag.String("config", "", "location of toml config file")
 		cfg            config.Config
 		err            error
@@ -130,15 +134,15 @@ func run() error {
 	if cfg, err = config.ReadTomlFile(*configPathFlag); err != nil {
 		fmt.Errorf("[run error] could read toml file: %s", err)
 	}
-	log.Printf("[run info] toml file is OK\n\n")
+	log.Printf("[run info] toml file is OK\n")
+	utils.Body("[CONFIGS] OK")
 
-	/*DEBUG FOR NOW*/
-	// log.Printf("[run info] verifying nas (%s) status\n", cfg.NAS.Name)
-	// if err := nas.Wakeup(cfg.NAS, ctx); err != nil {
-	// 	return fmt.Errorf("[run error] could not wake up nas (%s): %s", cfg.NAS.Name, err)
-	// }
-	// log.Printf("[run info] nas (%s) status OK\n", cfg.NAS.Name)
-	/*DEBUG FOR NOW*/
+	log.Printf("[run info] verifying nas (%s) status\n", cfg.NAS.Name)
+	if err := nas.Wakeup(cfg.NAS, ctx); err != nil {
+		return fmt.Errorf("[run error] could not wake up nas (%s): %s", cfg.NAS.Name, err)
+	}
+	log.Printf("[run info] nas (%s) status OK\n", cfg.NAS.Name)
+	utils.Body("[NAS] OK")
 
 	for _, t := range supportedTargets {
 		wg.Add(1)
@@ -161,10 +165,11 @@ func run() error {
 	}
 	wg.Wait()
 
-	/*	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
-		if err := targets.ExecuteExternalToNASBackup(cfg); err != nil {
-			log.Println(err)
-		}*/
+	utils.Body("[BACKUP TARGETS] FINISHED")
+	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
+	if err := targets.ExecuteExternalToNASBackup(cfg); err != nil {
+		log.Println(err)
+	}
 
 	// finalResult := &email.EmailTemplate{
 	// 	Timestamp:          time.Now().String(),
@@ -185,69 +190,69 @@ func run() error {
 	if err := proxmox.CheckPBSBackupStatus(); err != nil {
 		return fmt.Errorf("[run error] could not check PBS backup status ... ignoring turning off NAS: %s\n", err)
 	}
-
-	/*DEBUG FOR NOW*/
-	// log.Printf("[run info] shutting down nas (%s)\n", cfg.NAS.Name)
-	// if err := internal.Shutdown(cfg.NAS); err != nil {
-	// 	return fmt.Errorf("[run error] could not shut down nas (%s): %s", cfg.NAS.Name, err)
-	// }
-	// log.Printf("[run info] nas (%s) off\n", cfg.NAS.Name)
-
-	/*DEBUG FOR NOW*/
+	/*
+		log.Printf("[run info] shutting down nas (%s)\n", cfg.NAS.Name)
+		if err := nas.Shutdown(cfg.NAS); err != nil {
+			return fmt.Errorf("[run error] could not shut down nas (%s): %s", cfg.NAS.Name, err)
+		}
+		log.Printf("[run info] nas (%s) off\n", cfg.NAS.Name)
+		utils.Body("[NAS] Shutdown OK")
+	*/
 
 	return nil
 }
 
 func main() {
+	utils.Header(version)
+	// Uncoment this if want to debug and run on command
 	if err := run(); err != nil {
-		log.Println(err.Error())
+		log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
 	}
 
-	// log.Println("Running version:", version)
+	/*// // used by the on demand backup
+	go StartWebHook()
 
-	// // used by the on demand backup
-	// go StartWebHook()
+	runCh := make(chan struct{})
+	go func() {
+		// Run forever, trigger a run at 13:00 every Friday.
+		for {
+			now := time.Now()
+			runTodayHour := now.Hour() < 13
+			runTodayDay := now.Weekday().String() == "Friday"
+			today := now.Day()
+			log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
+			for {
+				if time.Now().Day() != today {
+					// Day changed, re-evaluate whether to run today.
+					break
+				}
+				// If today is not Friday, sleep until next day and re-evaluate
+				if !runTodayDay {
+					nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+					hoursLeft := nextDay.Sub(now)
+					log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
+					time.Sleep(time.Until(nextDay))
+					break
+				}
 
-	// runCh := make(chan struct{})
-	// go func() {
-	// 	// Run forever, trigger a run at 17:00 every Friday.
-	// 	for {
-	// 		now := time.Now()
-	// 		runTodayHour := now.Hour() < 17
-	// 		runTodayDay := now.Weekday().String() == "Friday"
-	// 		today := now.Day()
-	// 		log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
-	// 		for {
-	// 			if time.Now().Day() != today {
-	// 				// Day changed, re-evaluate whether to run today.
-	// 				break
-	// 			}
-	// 			// If today is not Friday, sleep until next day and re-evaluate
-	// 			if !runTodayDay {
-	// 				nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
-	// 				hoursLeft := nextDay.Sub(now)
-	// 				log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
-	// 				time.Sleep(time.Until(nextDay))
-	// 				break
-	// 			}
+				// Today is Friday, so wait until 13:00
+				nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
+				log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
+				time.Sleep(time.Until(nextHour))
 
-	// 			// Today is Friday, so wait until 17:00
-	// 			nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
-	// 			log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
-	// 			time.Sleep(time.Until(nextHour))
+				if time.Now().Hour() >= 13 && runTodayHour && now.Weekday().String() == "Friday" {
+					runTodayHour = false
+					runTodayDay = false
+					runCh <- struct{}{}
+				}
+			}
+		}
+	}()
 
-	// 			if time.Now().Hour() >= 17 && runTodayHour && now.Weekday().String() == "Friday" {
-	// 				runTodayHour = false
-	// 				runTodayDay = false
-	// 				runCh <- struct{}{}
-	// 			}
-	// 		}
-	// 	}
-	// }()
-
-	// for range runCh {
-	// 	if err := logic(); err != nil {
-	// 		log.Printf(err.Error())
-	// 	}
-	// }
+	for range runCh {
+		if err := run(); err != nil {
+			log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
+		}
+	}*/
+	utils.Footer(version)
 }
