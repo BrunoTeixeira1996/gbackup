@@ -1,9 +1,12 @@
-package utils
+package setup
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 )
 
 func checkEnvVars() bool {
@@ -31,26 +34,51 @@ func isExternalMounted() bool {
 	return strings.Contains(string(data), "/mnt/external")
 }
 
-func IsEverythingConfigured(configPathFlag string) bool {
+func setupToml(configPathFlag string) (config.Config, error) {
+	var (
+		cfg config.Config
+		err error
+	)
+
+	if cfg, err = config.ReadTomlFile(configPathFlag); err != nil {
+		return config.Config{}, fmt.Errorf("[setup error] could read toml file: %s", err)
+	}
+
+	return cfg, nil
+}
+
+func IsEverythingConfigured(configPathFlag string) (config.Config, bool) {
+	var (
+		cfg config.Config
+		err error
+	)
+
 	log.Printf("[setup info] validating config flag\n")
 	if configPathFlag == "" {
 		log.Printf("[setup error] please provide the path for the config file\n")
-		return false
+		return cfg, false
 	}
 	log.Printf("[setup info] config flag OK\n")
 
 	log.Printf("[setup info] validating env vars \n")
 	if !checkEnvVars() {
-		return false
+		return cfg, false
 	}
 	log.Printf("[setup info] env vars are OK\n")
 
 	log.Printf("[setup info] validating mount point\n")
 	if !isExternalMounted() {
 		log.Printf("[setup error] mount point is not mounted in the system\n")
-		return false
+		return cfg, false
 	}
 	log.Printf("[setup info] mount point is OK\n")
 
-	return true
+	log.Printf("[setup info] reading toml file\n")
+	if cfg, err = setupToml(configPathFlag); err != nil {
+		log.Println(err)
+		return cfg, false
+	}
+	log.Printf("[setup info] toml file is OK\n")
+
+	return cfg, true
 }

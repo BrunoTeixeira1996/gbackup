@@ -8,15 +8,24 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
+	"github.com/BrunoTeixeira1996/gbackup/internal/setup"
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
+
 	"github.com/BrunoTeixeira1996/gbackup/targets"
 )
 
 const version = "4.0"
+
+type backupResult struct {
+	elapsed    utils.ElapsedTime
+	targetSize utils.TargetSize
+	err        error
+}
 
 var supportedTargets = []string{
 	"gokr_perm_backup",
@@ -115,27 +124,21 @@ func run() error {
 		ctx            = context.Background()
 		configPathFlag = flag.String("config", "", "location of toml config file")
 		cfg            config.Config
-		err            error
+		setupOK        bool
 		wg             sync.WaitGroup
-		success        int
 		times          []utils.ElapsedTime
 		targetsSize    []utils.TargetSize
+		results        = make([]backupResult, len(supportedTargets)) // Slice to store backup results in order
+
 	)
 
 	flag.Parse()
 
-	log.Printf("[run info] validating setup\n")
-	if !utils.IsEverythingConfigured(*configPathFlag) {
+	log.Printf("[setup backup info] validating setup\n")
+	if cfg, setupOK = setup.IsEverythingConfigured(*configPathFlag); !setupOK {
 		return fmt.Errorf("[run error] please configure the setup properly")
 	}
-	log.Printf("[run info] setup is OK\n")
-
-	log.Printf("[run info] reading toml file\n")
-	if cfg, err = config.ReadTomlFile(*configPathFlag); err != nil {
-		fmt.Errorf("[run error] could read toml file: %s", err)
-	}
-	log.Printf("[run info] toml file is OK\n")
-	utils.Body("[CONFIGS] OK")
+	utils.Body("[SETUP] OK")
 
 	log.Printf("[run info] verifying nas (%s) status\n", cfg.NAS.Name)
 	if err := nas.Wakeup(cfg.NAS, ctx); err != nil {
@@ -144,31 +147,43 @@ func run() error {
 	log.Printf("[run info] nas (%s) status OK\n", cfg.NAS.Name)
 	utils.Body("[NAS] OK")
 
-	for _, t := range supportedTargets {
+	// Launch each backup in its own goroutine
+	for i, t := range supportedTargets {
 		wg.Add(1)
-		el := &utils.ElapsedTime{}
-		ts := &utils.TargetSize{}
-		go func(t string) {
+		go func(i int, t string) {
+			defer wg.Done()
+			el := &utils.ElapsedTime{}
+			ts := &utils.TargetSize{}
 			log.Printf("[run info] starting backup %s\n", t)
-			if err := getExecutionFunction(t, cfg, el, ts); err != nil {
-				log.Printf("[run error] could not getExecutionFunction: %s\n", err)
-			} else {
-				success += 1
-			}
-			wg.Done()
-			// appends every run time of each target
-			times = append(times, *el)
+			err := getExecutionFunction(t, cfg, el, ts)
 
-			// append every folder size change of each target
-			targetsSize = append(targetsSize, *ts)
-		}(t)
+			// Store the result for this target
+			results[i] = backupResult{elapsed: *el, targetSize: *ts, err: err}
+		}(i, t)
 	}
+	// Wait for all backups to complete
 	wg.Wait()
 
+	// Log results in order
+	for i, res := range results {
+		t := supportedTargets[i]
+		if res.err != nil {
+			log.Printf("[run error] backup %s failed: %s", t, res.err)
+		} else {
+			log.Printf("[run info] backup %s completed. Elapsed: %v, Size Before: %v, Size After: %v",
+				t, res.elapsed, res.targetSize.Before, res.targetSize.After)
+		}
+		// Collect times and sizes for further processing
+		times = append(times, res.elapsed)
+		targetsSize = append(targetsSize, res.targetSize)
+	}
 	utils.Body("[BACKUP TARGETS] FINISHED")
+
 	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
 	if err := targets.ExecuteExternalToNASBackup(cfg); err != nil {
-		log.Println(err)
+		log.Printf("[run error] backtup from external to NAS was NOT OK: %s\n", err)
+	} else {
+		utils.Body("[EXTERNAL BACKUP] OK")
 	}
 
 	// finalResult := &email.EmailTemplate{
@@ -187,17 +202,18 @@ func run() error {
 	// }
 
 	// check PBS backup, if err is nil, that means we can turn off NAS
+	log.Printf("[run info] checking PBS backup status\n")
 	if err := proxmox.CheckPBSBackupStatus(); err != nil {
 		return fmt.Errorf("[run error] could not check PBS backup status ... ignoring turning off NAS: %s\n", err)
 	}
-	/*
-		log.Printf("[run info] shutting down nas (%s)\n", cfg.NAS.Name)
-		if err := nas.Shutdown(cfg.NAS); err != nil {
-			return fmt.Errorf("[run error] could not shut down nas (%s): %s", cfg.NAS.Name, err)
-		}
-		log.Printf("[run info] nas (%s) off\n", cfg.NAS.Name)
-		utils.Body("[NAS] Shutdown OK")
-	*/
+	utils.Body("[PBS] Backup OK")
+
+	log.Printf("[run info] shutting down nas (%s)\n", cfg.NAS.Name)
+	if err := nas.Shutdown(cfg.NAS); err != nil {
+		return fmt.Errorf("[run error] could not shut down nas (%s): %s", cfg.NAS.Name, err)
+	}
+	log.Printf("[run info] nas (%s) off\n", cfg.NAS.Name)
+	utils.Body("[NAS] Shutdown OK")
 
 	return nil
 }
@@ -205,11 +221,11 @@ func run() error {
 func main() {
 	utils.Header(version)
 	// Uncoment this if want to debug and run on command
-	if err := run(); err != nil {
+	/*	if err := run(); err != nil {
 		log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
-	}
+	}*/
 
-	/*// // used by the on demand backup
+	// // used by the on demand backup
 	go StartWebHook()
 
 	runCh := make(chan struct{})
@@ -253,6 +269,6 @@ func main() {
 		if err := run(); err != nil {
 			log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
 		}
-	}*/
+	}
 	utils.Footer(version)
 }
