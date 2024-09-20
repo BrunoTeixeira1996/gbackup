@@ -16,5 +16,5 @@ external_path = "/mnt/external/worklaptop_backup"
 
 [[targets]]
 name = "gokr_perm"
-instance = "brun0:gokr_perm_gmah"
+instance = "brun0:gokr_perm"
 external_path = "/mnt/external/gokrazy_backup"
