@@ -75,8 +75,9 @@ func ExecuteExternalToNASBackup(cfg config.Config) error {
 
 	// TODO: Maybe i need to give different name to "external hard drive" so I can grab both rsync commands on prometheus
 	for _, t := range t {
+		instance := fmt.Sprintf("external-hard-drive-%s", t.Name)
 		log.Printf("[external backup info] starting rsync command external -> NAS (%s) - %s\n", cfg.NAS.Name, t.Name)
-		if err := commands.RsyncCommand(t.Command, "toNAS", "external hard drive", cfg.Pushgateway.Url); err != nil {
+		if err := commands.RsyncCommand(t.Command, "toNAS", instance, cfg.Pushgateway.Url); err != nil {
 			log.Printf("[external backup error] could not perform RsyncCommand in external to NAS: %s\n", err)
 			return err
 		}
