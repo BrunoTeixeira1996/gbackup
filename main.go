@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
@@ -238,54 +239,54 @@ func run() error {
 func main() {
 	utils.Header(version)
 	// Uncoment this if want to debug and run on command
-	if err := run(); err != nil {
-		log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
-	}
-
-	// // // used by the on demand backup
-	// go StartWebHook()
-
-	// runCh := make(chan struct{})
-	// go func() {
-	// 	// Run forever, trigger a run at 13:00 every Friday.
-	// 	for {
-	// 		now := time.Now()
-	// 		runTodayHour := now.Hour() < 13
-	// 		runTodayDay := now.Weekday().String() == "Friday"
-	// 		today := now.Day()
-	// 		log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
-	// 		for {
-	// 			if time.Now().Day() != today {
-	// 				// Day changed, re-evaluate whether to run today.
-	// 				break
-	// 			}
-	// 			// If today is not Friday, sleep until next day and re-evaluate
-	// 			if !runTodayDay {
-	// 				nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
-	// 				hoursLeft := nextDay.Sub(now)
-	// 				log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
-	// 				time.Sleep(time.Until(nextDay))
-	// 				break
-	// 			}
-
-	// 			// Today is Friday, so wait until 13:00
-	// 			nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
-	// 			log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
-	// 			time.Sleep(time.Until(nextHour))
-
-	// 			if time.Now().Hour() >= 13 && runTodayHour && now.Weekday().String() == "Friday" {
-	// 				runTodayHour = false
-	// 				runTodayDay = false
-	// 				runCh <- struct{}{}
-	// 			}
-	// 		}
-	// 	}
-	// }()
-
-	// for range runCh {
-	// 	if err := run(); err != nil {
-	// 		log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
-	// 	}
+	// if err := run(); err != nil {
+	// 	log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
 	// }
+
+	// // used by the on demand backup
+	go StartWebHook()
+
+	runCh := make(chan struct{})
+	go func() {
+		// Run forever, trigger a run at 13:00 every Friday.
+		for {
+			now := time.Now()
+			runTodayHour := now.Hour() < 13
+			runTodayDay := now.Weekday().String() == "Friday"
+			today := now.Day()
+			log.Printf("now = %v, runTodayDay = %v", now, runTodayDay)
+			for {
+				if time.Now().Day() != today {
+					// Day changed, re-evaluate whether to run today.
+					break
+				}
+				// If today is not Friday, sleep until next day and re-evaluate
+				if !runTodayDay {
+					nextDay := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, now.Location())
+					hoursLeft := nextDay.Sub(now)
+					log.Printf("Sleeping until next day ... %v hours to go", hoursLeft)
+					time.Sleep(time.Until(nextDay))
+					break
+				}
+
+				// Today is Friday, so wait until 13:00
+				nextHour := time.Now().Truncate(time.Hour).Add(1 * time.Hour)
+				log.Printf("today = %d, todayIsFriday = %v, todayHour = %v next hour: %v", today, runTodayDay, runTodayHour, nextHour)
+				time.Sleep(time.Until(nextHour))
+
+				if time.Now().Hour() >= 13 && runTodayHour && now.Weekday().String() == "Friday" {
+					runTodayHour = false
+					runTodayDay = false
+					runCh <- struct{}{}
+				}
+			}
+		}
+	}()
+
+	for range runCh {
+		if err := run(); err != nil {
+			log.Fatalf("[main error] could not proceed with gbackup: %s\n", err.Error())
+		}
+	}
 	utils.Footer(version)
 }

@@ -14,7 +14,13 @@ func ExecutePinuteBackup(cfg config.Config, el *utils.ElapsedTime) error {
 	start := time.Now()
 	var e error
 
-	command := `-av --delete /home/brun0/nut /mnt/external/pinute_backup`
+	command := `-av --delete
+    /home/brun0/nut
+    /home/brun0/src
+    /home/brun0/.ssh
+    /home/brun0/.bash_profile
+    /home/brun0/.bashrc
+    /mnt/external/pinute_backup`
 
 	log.Printf("[pinute backup info] starting rsync command pinute -> external\n")
 	if err := commands.RsyncCommand(command, "toExternal", cfg.Targets[2].Instance, cfg.Pushgateway.Url); err != nil {
