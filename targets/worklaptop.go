@@ -13,7 +13,7 @@ import (
 func backupWorkLaptopToExternal(cfg config.Config) error {
 
 	// note that here we dont want to --delete because we need to save old projects
-	command := `-av --copy-links -e ssh
+	command := `-av --temp-dir=/home/brun0/tmp --copy-links -e ssh
 	--exclude=personal
 	--exclude=tools
 	worklaptop:/home/brun0/Desktop
