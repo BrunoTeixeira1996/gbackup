@@ -14,7 +14,7 @@ func ExecutePinuteBackup(cfg config.Config, el *utils.ElapsedTime) error {
 	start := time.Now()
 	var e error
 
-	command := `-av --delete
+	command := `-av --temp-dir=/home/brun0/tmp --delete
     /home/brun0/nut
     /home/brun0/src
     /home/brun0/.ssh
@@ -31,7 +31,7 @@ func ExecutePinuteBackup(cfg config.Config, el *utils.ElapsedTime) error {
 
 	// Calculate run time
 	end := time.Now()
-	el.Target = cfg.Targets[1].Name
+	el.Target = cfg.Targets[2].Name
 	el.Elapsed = end.Sub(start).Seconds()
 
 	return e

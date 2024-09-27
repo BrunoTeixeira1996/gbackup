@@ -20,5 +20,6 @@ instance = "brun0:gokr_perm"
 external_path = "/mnt/external/gokrazy_backup"
 
 [[targets]]
-name = "pinute"
+name = "pinute_backup"
+instance = "brun0:pinute_backup"
 external_path = "/mnt/external/pinute_backup"
