@@ -43,6 +43,10 @@ func getEnvs() (string, string) {
 }
 
 func buildEmail(e *EmailTemplate) (string, error) {
+	// FIXME: when supervisorctl is correctly implemented
+	// go to /var/log/gbackup/gbackup-today_date.err.log and read
+	// this file instead of /root/gbackup/logstdout
+	// then send this file to the email
 	logstdoutFile, err := os.ReadFile("/root/gbackup/logstdout")
 	if err != nil {
 		return "", fmt.Errorf("[email error] could not read file logstdout: %s\n", err)
