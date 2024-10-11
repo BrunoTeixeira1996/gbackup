@@ -22,11 +22,11 @@ func backupGokrPermToExternal(cfg config.Config) error {
 	sT := []supportedTargets{
 		{
 			Name:    "waiw",
-			Command: "-av --temp-dir=/home/brun0/tmp --delete -e ssh rsync://waiw-backup/waiw /mnt/external/gokrazy_backup/waiw_backup",
+			Command: "-av --delete --chmod=ugo=rwx -e ssh rsync://waiw-backup/waiw /mnt/external/gokrazy_backup/waiw_backup",
 		},
 		{
 			Name:    "gmah",
-			Command: "-av --temp-dir=/home/brun0/tmp --delete -e ssh rsync://gmah-backup/gmah /mnt/external/gokrazy_backup/gmah_backup",
+			Command: "-av --delete --chmod=ugo=rwx -e ssh rsync://gmah-backup/gmah /mnt/external/gokrazy_backup/gmah_backup",
 		},
 	}
 
