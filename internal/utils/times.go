@@ -19,7 +19,7 @@ func CalculateTotalElaspedTime(times []ElapsedTime) float64 {
 }
 
 func CurrentTime() string {
-	return time.Now().Format("2006-02-01")
+	return time.Now().Format("2006-01-02")
 }
 
 // Gets epoch time for the current day at 12 PM
