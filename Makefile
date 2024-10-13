@@ -7,6 +7,9 @@ BINARY_NAME = gbackup
 TARGET_OS = linux
 TARGET_ARCH = arm64
 
+compile:
+	GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) CGO_ENABLED=0 go build -o $(BINARY_NAME) .
+
 run:
 	GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) CGO_ENABLED=0 go build -o $(BINARY_NAME) .
 	rsync -avz --update $(FILES) $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)

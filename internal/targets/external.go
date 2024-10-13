@@ -64,6 +64,10 @@ func ExecuteExternalToNASBackup(cfg config.Config) error {
 			--exclude=worklaptop_backup
 			/mnt/external nas1:/mnt/datastore/backupExternal/` + utils.CurrentTime() + `/`,
 		},
+		{
+			Name:    "worklaptop",
+			Command: "-av -e ssh /mnt/external/worklaptop_backup nas1:/mnt/datastore/backupExternal/" + utils.CurrentTime() + "/external",
+		},
 	}
 
 	// I need to give different name to "external hard drive" so I can grab both rsync commands on prometheus
