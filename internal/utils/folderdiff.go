@@ -32,7 +32,6 @@ func GetFolderSize(folderPath string) (float64, error) {
 	}
 
 	final := roundFloat((totalSize / (1 << 20)), 2)
-	//log.Printf("[folderdiff info] total folder size (%s): %.2f\n", folderPath, final)
 
 	return final, nil
 }
