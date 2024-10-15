@@ -47,7 +47,6 @@
 - [x] Implement the shutdown of the NAS
 - [x] Create new struct for targets and simplify main.go using methods
 - [ ] Calculate full backup time
-- [ ] Convert TargetSize to GB
 - [ ] Check if its end of month, if yes compress the data and send to new external HDD plugged in Pinute (Pi)
 - [ ] Modify email template to be similar to PBS email
   - This is be the best approach as the first rsync will take sometime but then it will be fast since we are doing incremental backups
