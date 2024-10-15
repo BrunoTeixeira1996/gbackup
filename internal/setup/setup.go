@@ -47,7 +47,7 @@ func setupToml(configPathFlag string) (config.Config, error) {
 	return cfg, nil
 }
 
-func IsEverythingConfigured(configPathFlag string) (config.Config, bool) {
+func IsEverythingConfigured(configPathFlag string, debugFlag bool) (config.Config, bool) {
 	var (
 		cfg config.Config
 		err error
@@ -66,12 +66,14 @@ func IsEverythingConfigured(configPathFlag string) (config.Config, bool) {
 	}
 	log.Printf("[setup info] env vars are OK\n")
 
-	log.Printf("[setup info] validating mount point\n")
-	if !isExternalMounted() {
-		log.Printf("[setup error] mount point is not mounted in the system\n")
-		return cfg, false
+	if !debugFlag {
+		log.Printf("[setup info] validating mount point\n")
+		if !isExternalMounted() {
+			log.Printf("[setup error] mount point is not mounted in the system\n")
+			return cfg, false
+		}
+		log.Printf("[setup info] mount point is OK\n")
 	}
-	log.Printf("[setup info] mount point is OK\n")
 
 	log.Printf("[setup info] reading toml file\n")
 	if cfg, err = setupToml(configPathFlag); err != nil {

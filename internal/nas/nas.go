@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"os/exec"
+	"regexp"
 	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
@@ -125,6 +126,38 @@ func Shutdown(nas config.NAS) error {
 	if !isReachable(nas.IP) {
 		log.Printf("[nas info] confirmed that %s (%s) is down\n", nas.Name, nas.IP)
 	}
+
+	return nil
+}
+
+// Function that keeps the last two backups (newest)
+func KeepLastTwo() error {
+	output, err := exec.Command("ssh", "nas1", "ls", "-la", "/mnt/datastore/backupExternal").Output()
+	if err != nil {
+		log.Printf("[external backup error] error while listing: %s (%s)\n", output, err)
+		return err
+	}
+
+	// grab only folders using regex
+	regexPattern := `\d{4}-\d{2}-\d{2}`
+	re := regexp.MustCompile(regexPattern)
+
+	folderNames := re.FindAllString(string(output), -1)
+
+	// verify if there's at least 3 folders
+	if len(folderNames) < 3 {
+		log.Printf("[external backup info] skipping this because there is only %d folder(s)\n", len(folderNames))
+		return nil
+	}
+
+	oldestFolder := fmt.Sprintf("/mnt/datastore/backupExternal/%s", folderNames[0])
+
+	output, err = exec.Command("ssh", "nas1", "sudo", "rm", "-r", oldestFolder).Output()
+	if err != nil {
+		log.Printf("[external backup error] error while deleting the oldest folder (%s): %s (%s)\n", oldestFolder, output, err)
+		return err
+	}
+	log.Printf("[external backup info] successfully deleted oldest folder %s\n", oldestFolder)
 
 	return nil
 }
