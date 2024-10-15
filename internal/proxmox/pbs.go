@@ -36,10 +36,6 @@ func (p *PBS) Init() error {
 	tokenID := os.Getenv("PBS_TOKENID")
 	secret := os.Getenv("PBS_SECRET")
 
-	if tokenID == "" || secret == "" {
-		return fmt.Errorf("[pbs error] please provide the PBS token and secret env vars\n")
-	}
-
 	p.API.TokenID = tokenID
 	p.API.Secret = secret
 	p.API.Url = "https://192.168.30.200:8007/api2/json"
@@ -49,7 +45,7 @@ func (p *PBS) Init() error {
 	return nil
 }
 
-// Loops for the backups and prune jobs and waits
+// Loops all backups and prune jobs and waits
 // for all to finish so gbackup can proceed
 func (p *PBS) checkBackupStatus(totalObjects int) error {
 	var (

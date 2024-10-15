@@ -29,7 +29,7 @@ type Target struct {
 	RsyncCommands []config.RsyncCommand `toml:"rsync_commands"`
 }
 
-// InitTargets initializes the targets from the config package.
+// Initializes the targets from the config package.
 func InitTargets(cfg config.Config) []Target {
 	var targets []Target
 	for _, t := range cfg.Targets {
@@ -46,14 +46,24 @@ func InitTargets(cfg config.Config) []Target {
 	return targets
 }
 
+// Display all values from previous backups
 func DisplayFinalResults(results []BackupResult) {
 	for _, r := range results {
 		log.Printf("TargetName: %s - ElapsedTime: %.3f - TargetSize Before: %.3f, TargetSize After: %.3f - Error: %v", r.TargetName, r.ElapsedTime.Value, r.TargetSize.Before, r.TargetSize.After, r.Err)
 	}
 }
 
+// Validates if there's an error on any backup
+func ValidateBackupResultErrors(backupResults []BackupResult) {
+	for _, b := range backupResults {
+		if b.Err != nil {
+			log.Printf("[errors in backup] found error in %s: %v\n", b.TargetName, b.Err)
+		}
+	}
+}
+
+// From a MAC address get the associated IP
 func (t *Target) getAssociatedIPFromMAC() (string, error) {
-	// FIXME: retry if error, sometimes this can happen for some reason
 	command := fmt.Sprintf("ip neighbor | grep '%s'", t.MAC)
 	out, err := exec.Command("bash", "-c", command).Output()
 	if err != nil {
@@ -62,23 +72,48 @@ func (t *Target) getAssociatedIPFromMAC() (string, error) {
 	return strings.Split(string(out), " ")[0], nil
 }
 
+// Check if target has IP, if yes it tries to ping it to see if it is alive
+// if does not have IP try to use the MAC to grab the IP and ping that to see if it
+// is alive
 func (t *Target) isAlive() (bool, error) {
-	targetIP, err := t.getAssociatedIPFromMAC()
-	if err != nil {
-		return false, err
-	}
-	out, err := exec.Command("ping", targetIP, "-c 2").Output()
-	if err != nil {
-		return false, fmt.Errorf("[is alive error] could not ping that IP: %s\n", err)
+	var err error
+	const maxRetries = 2
+	const retryDelay = 2 * time.Second
+
+	// If MAC is provided, get the associated IP
+	if t.MAC != "" {
+		t.IP, err = t.getAssociatedIPFromMAC()
+		if err != nil {
+			return false, fmt.Errorf("[is alive error] could not get IP from MAC: %s\n", err)
+		}
 	}
 
-	if strings.Contains(string(out), "Destination Host Unreachable") {
-		return false, nil
-	} else {
-		return true, nil
+	ticker := time.NewTicker(retryDelay)
+	defer ticker.Stop()
+
+	for i := 0; i <= maxRetries; i++ {
+		out, err := exec.Command("ping", t.IP, "-c", "2").Output()
+		if err == nil {
+			if strings.Contains(string(out), "Destination Host Unreachable") {
+				return false, nil
+			}
+			// If we successfully pinged, return true
+			return true, nil
+		}
+
+		if i < maxRetries {
+			<-ticker.C // Wait for the next tick before retrying
+		}
 	}
+
+	// If all retries fail and no valid response was obtained, return false
+	return false, fmt.Errorf("[is alive error] could not ping that IP: %s\n", err)
 }
 
+// Execute an individual backup
+// starts by getting the initial folder size, then start a timer
+// after that it iterates the rsynccommands from the toml file and executes those
+// after finishing this, it will calculate the final folder size and end the timer
 func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *utils.TargetSize) error {
 	var (
 		e   error
@@ -112,6 +147,10 @@ func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *uti
 	return e
 }
 
+// Wraps all targets to backup
+// for each target it will calculate the elapsed time + target size
+// then it will check if that target is alive and if it is it will start the backup
+// in the end it will gather all results to a BackupResult struct
 func ExecuteTargetsBackups(targets []Target, cfg config.Config) []BackupResult {
 	var err error
 	results := make([]BackupResult, len(targets)) // Slice to store backup results in order
@@ -119,7 +158,10 @@ func ExecuteTargetsBackups(targets []Target, cfg config.Config) []BackupResult {
 	for i, target := range targets {
 		el := &utils.ElapsedTime{}
 		ts := &utils.TargetSize{}
-		if target.MAC != "" {
+		if target.IP != "" {
+			log.Printf("[execute backups info] target %s contains IP (%s) - checking if it is alive\n", target.Name, target.IP)
+
+		} else if target.MAC != "" {
 			log.Printf("[execute backups info] target %s contains mac (%s) - checking if it is alive\n", target.Name, target.MAC)
 			isAlive, err := target.isAlive()
 			if err != nil {
@@ -140,12 +182,4 @@ func ExecuteTargetsBackups(targets []Target, cfg config.Config) []BackupResult {
 	}
 
 	return results
-}
-
-func ValidateBackupResultErrors(backupResults []BackupResult) {
-	for _, b := range backupResults {
-		if b.Err != nil {
-			log.Printf("[errors in backup] found error in %s: %v\n", b.TargetName, b.Err)
-		}
-	}
 }

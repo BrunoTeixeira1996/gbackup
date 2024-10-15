@@ -94,10 +94,6 @@ func (p *PVE) Init() error {
 	tokenID := os.Getenv("PVE_TOKENID")
 	secret := os.Getenv("PVE_SECRET")
 
-	if tokenID == "" || secret == "" {
-		return fmt.Errorf("[pve error] please provide the PVE token and secret env vars\n")
-	}
-
 	p.API.TokenID = tokenID
 	p.API.Secret = secret
 	p.API.Url = "https://192.168.30.3:8006/api2/json"

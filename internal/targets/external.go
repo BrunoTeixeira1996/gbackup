@@ -15,6 +15,7 @@ type External struct {
 	RsyncCommands []config.RsyncCommand `toml:"rsync_commands"`
 }
 
+// Verify the external hard drive size based on the operation
 func (e *External) VerifyExternalSize(operation string, ts *utils.TargetSize) {
 	var err error
 
@@ -34,7 +35,7 @@ func (e *External) VerifyExternalSize(operation string, ts *utils.TargetSize) {
 	}
 }
 
-// InitExternal initializes the external from the config package.
+// Initializes the external from the config package.
 func InitExternal(cfg config.Config) External {
 	return External{
 		Name:          cfg.External.Name,
@@ -43,7 +44,10 @@ func InitExternal(cfg config.Config) External {
 	}
 }
 
-// Function that backups /external folder to NAS
+// Wrap function that backups external hard drive to NAS
+// starts the backup based on the commands provided on the toml file for the external object
+// after the backup is done, it will clean the third folder (if exists) so we keep 2 folders
+// to be prepare for a disaster recovery
 func ExecuteExternalToNASBackup(external External, cfg config.Config) error {
 	var err error
 

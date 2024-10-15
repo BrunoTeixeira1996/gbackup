@@ -20,6 +20,7 @@ command = "-av -e ssh /mnt/external/worklaptop_backup nas1:/mnt/datastore/backup
 
 [[targets]]
 name = "gokr_perm"
+ip = "192.168.30.12"
 instance = "brun0:gokr_perm"
 mac = "d8:3a:dd:3b:84:64"
 external_path = "/mnt/external/gokrazy_backup"
