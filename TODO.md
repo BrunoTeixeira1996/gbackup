@@ -49,6 +49,3 @@
 - [ ] Calculate full backup time
 - [ ] Check if its end of month, if yes compress the data and send to new external HDD plugged in Pinute (Pi)
 - [ ] Modify email template to be similar to PBS email
-  - This is be the best approach as the first rsync will take sometime but then it will be fast since we are doing incremental backups
-  - Also get the apt and pipx packages
-  - Test this with a VM by having a backup of my work laptop and rsync that backup to a fresh clean VM
