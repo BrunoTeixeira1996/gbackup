@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-FILES = gbackup config.toml temp_config.toml email_template.html
+FILES = gbackup config.toml temp_config.toml internal/email/email.html
 REMOTE_USER = brun0
 REMOTE_HOST = pinute
 REMOTE_PATH = /home/$(REMOTE_USER)/src/gbackup
