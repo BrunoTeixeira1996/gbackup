@@ -7,6 +7,7 @@ import (
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 	"github.com/BrunoTeixeira1996/gbackup/internal/email"
+	"github.com/BrunoTeixeira1996/gbackup/internal/forward"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 	"github.com/BrunoTeixeira1996/gbackup/internal/setup"
@@ -25,7 +26,10 @@ func Run(args Args) error {
 		ctx        = context.Background()
 		setupOK    bool
 		tsExternal = &utils.TargetSize{}
+		err        error
 	)
+
+	forward.ForwardMessageToTelegram("EXECUTING BACKUP", forward.Message{Content: "Starting ...", Err: nil})
 
 	log.Printf("[setup backup info] validating setup\n")
 	if args.Cfg, setupOK = setup.IsEverythingConfigured(args.ConfigPathFlag, args.DebugFlag); !setupOK {
@@ -39,7 +43,6 @@ func Run(args Args) error {
 	}
 	log.Printf("[run info] nas (%s) status OK\n", args.Cfg.NAS.Name)
 	utils.Body("[NAS] OK")
-
 	external := targets.InitExternal(args.Cfg)
 	ts := targets.InitTargets(args.Cfg)
 
@@ -91,9 +94,12 @@ func Run(args Args) error {
 		logPathFile = "/home/brun0/Desktop/personal/gbackup/internal/email/testlog.txt"
 	}
 
-	if err := e.SendEmail(results, logPathFile); err != nil {
+	if err = e.SendEmail(results, logPathFile); err != nil {
 		log.Println(err)
 	}
+
+	// this also captures the e.SendEmail error in case of any error
+	forward.ForwardMessageToTelegram("FINISHED BACKUP [OK]", forward.Message{Content: results, Err: err})
 
 	return nil
 }

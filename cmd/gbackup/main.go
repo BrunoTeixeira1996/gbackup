@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/forward"
 	"github.com/BrunoTeixeira1996/gbackup/internal/handle"
 	"github.com/BrunoTeixeira1996/gbackup/internal/run"
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
@@ -54,6 +55,7 @@ func main() {
 
 		for range runCh {
 			if err := run.Run(args); err != nil {
+				forward.ForwardMessageToTelegram("FINISHED BACKUP [NOT OK]", forward.Message{Content: "Got an error in the backup", Err: err})
 				log.Fatalf("[main error] could not proceed with gbackup: %s\n", err)
 			}
 		}
