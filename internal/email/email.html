@@ -1,0 +1,32 @@
+<style>
+code {
+  font-family: Consolas,"courier new";
+  color: crimson;
+  background-color: #f1f1f1;
+  padding: 2px;
+  font-size: 105%;
+}
+</style>
+
+<h3>{{ .Timestamp }}</h3>
+<hr>
+<b>Total backups: {{ .TotalBackups }}<br>
+<hr>
+
+<h3>Logs</h3>
+<hr>
+<code>
+{{ range $c := .Content }}
+  {{ $c }}<br>
+{{ end }}
+</code>
+
+<h3>Backup Results</h3>
+<hr>
+{{ range $b := .BackupResults }}
+<b> {{ $b.TargetName }} - {{ $b.ElapsedTime }} - {{ $b.TargetSize }} - {{ $b.Err }}</b> <br>
+{{ end }}
+
+<hr>
+
+<br>

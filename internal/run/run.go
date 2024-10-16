@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
+	"github.com/BrunoTeixeira1996/gbackup/internal/email"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 	"github.com/BrunoTeixeira1996/gbackup/internal/setup"
@@ -78,6 +79,20 @@ func Run(args Args) error {
 		}
 		log.Printf("[run info] nas (%s) off\n", args.Cfg.NAS.Name)
 		utils.Body("[NAS] Shutdown OK")
+	}
+
+	e := email.EmailClient{}
+	e.InitEmailClient()
+	var logPathFile string
+
+	if !args.DebugFlag {
+		logPathFile = "/var/log/gbackup/gbackup.err.log"
+	} else {
+		logPathFile = "/home/brun0/Desktop/personal/gbackup/internal/email/testlog.txt"
+	}
+
+	if err := e.SendEmail(results, logPathFile); err != nil {
+		log.Println(err)
 	}
 
 	return nil
