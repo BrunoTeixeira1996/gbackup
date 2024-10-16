@@ -10,7 +10,7 @@ TARGET_ARCH = arm64
 compile:
 	GOOS=$(TARGET_OS) GOARCH=$(TARGET_ARCH) CGO_ENABLED=0 go build -o $(BINARY_NAME) ./cmd/gbackup
 
-run-ssh:
+run-in-ssh:
 	$(MAKE) compile
 	rsync -avz --update $(FILES) $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)
 	ssh $(REMOTE_USER)@$(REMOTE_HOST) 'source .bash_profile; cd $(REMOTE_PATH) && ./$(BINARY_NAME) -config $(REMOTE_PATH)/config.toml'
@@ -19,10 +19,8 @@ gdb:
 	GOOS=$(TARGET_OS) go build -gcflags "all=-N -l" -o $(BINARY_NAME) ./cmd/gbackup
 	gdb ./$(BINARY_NAME)
 
-debug:
-	$(MAKE) compile
-	rsync -avz --update $(FILES) $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)
-	ssh $(REMOTE_USER)@$(REMOTE_HOST) 'source .bash_profile; cd $(REMOTE_PATH) && ./$(BINARY_NAME) -config $(REMOTE_PATH)/temp_config.toml'
+tests:
+	go test ./... -v
 
 deploy:
 	$(MAKE) compile
