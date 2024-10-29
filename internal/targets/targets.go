@@ -47,10 +47,26 @@ func InitTargets(cfg config.Config) []Target {
 }
 
 // Display all values from previous backups
-func DisplayFinalResults(results []BackupResult) {
-	for _, r := range results {
+func DisplayFinalResults(backupResults []BackupResult) {
+	for _, r := range backupResults {
 		log.Printf("TargetName: %s - ElapsedTime: %.3f - TargetSize Before: %.3f, TargetSize After: %.3f - Error: %v", r.TargetName, r.ElapsedTime.Value, r.TargetSize.Before, r.TargetSize.After, r.Err)
 	}
+}
+
+// Return all values from previous backups but to a string
+func ReturnFinalResultsFormatted(backupResults []BackupResult) string {
+	var (
+		finalResults string
+		temp         string
+	)
+
+	for _, r := range backupResults {
+		temp = fmt.Sprintf("TargetName: %s - ElapsedTime: %.3f - TargetSize Before: %.3f, TargetSize After: %.3f - Error: %v", r.TargetName, r.ElapsedTime.Value, r.TargetSize.Before, r.TargetSize.After, r.Err)
+
+		finalResults += temp
+	}
+
+	return finalResults
 }
 
 // Validates if there's an error on any backup

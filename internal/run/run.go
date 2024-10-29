@@ -99,7 +99,7 @@ func Run(args Args) error {
 	}
 
 	// this also captures the e.SendEmail error in case of any error
-	forward.ForwardMessageToTelegram("FINISHED BACKUP [OK]", forward.Message{Content: results, Err: err})
+	forward.ForwardMessageToTelegram("FINISHED BACKUP [OK]", forward.Message{Content: targets.ReturnFinalResultsFormatted(results), Err: err})
 
 	return nil
 }
