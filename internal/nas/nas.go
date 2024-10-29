@@ -48,6 +48,8 @@ func sendMagicPacket(nasMac string) error {
 	if err != nil {
 		return fmt.Errorf("[nas error] could not parse mac %s: %s\n", nasMac, err)
 	}
+	log.Println("[nas info] sleeping 10 seconds ...")
+	time.Sleep(10 * time.Second)
 	if got, want := len(hwaddr), 6; got != want {
 		return fmt.Errorf("[nas error] could not send magic packet unexpected number of parts in hardware address %q: got %d, want %d", nasMac, got, want)
 	}
