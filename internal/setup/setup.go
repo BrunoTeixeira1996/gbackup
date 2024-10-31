@@ -23,6 +23,7 @@ func checkEnvVars() bool {
 			log.Printf("[setup error] %s is not present\n", key)
 			return false
 		}
+		log.Println(key, value)
 	}
 	return true
 }
