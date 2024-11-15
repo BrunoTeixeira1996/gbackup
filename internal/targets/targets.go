@@ -54,7 +54,7 @@ func DisplayFinalResults(backupResults []BackupResult) {
 }
 
 // Return all values from previous backups but to a string
-func ReturnFinalResultsFormatted(backupResults []BackupResult) string {
+func ReturnFinalResultsFormatted(backupResults []BackupResult, backupTotalTime float64) string {
 	var (
 		finalResults string
 		temp         string
@@ -65,6 +65,8 @@ func ReturnFinalResultsFormatted(backupResults []BackupResult) string {
 
 		finalResults += temp
 	}
+
+	finalResults += fmt.Sprintf("\n\nTotal backup time: %.3f (seconds)\n", backupTotalTime)
 
 	return finalResults
 }
