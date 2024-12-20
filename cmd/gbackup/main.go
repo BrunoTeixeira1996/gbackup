@@ -13,6 +13,8 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
 
+const version = "2.1"
+
 func main() {
 	utils.Header()
 	var (
@@ -37,6 +39,7 @@ func main() {
 		// used by the on demand backup
 		go handle.StartWebHook(args)
 
+		log.Printf("Version: %s\n", version)
 		runCh := make(chan struct{})
 		go func() {
 			for {
