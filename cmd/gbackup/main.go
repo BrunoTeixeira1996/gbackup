@@ -55,7 +55,7 @@ func main() {
 
 		for range runCh {
 			if err := run.Run(args); err != nil {
-				forward.ForwardMessageToTelegram("FINISHED BACKUP [NOT OK]", forward.Message{Content: "Got an error in the backup", Err: err})
+				forward.ForwardMessageToTelegram("FINISHED BACKUP", "Error while executing backup", err.Error())
 				log.Fatalf("[main error] could not proceed with gbackup: %s\n", err)
 			}
 		}
