@@ -119,7 +119,7 @@ func Run(args Args) error {
 	if !args.DebugFlag {
 		logPathFile = "/var/log/gbackup/gbackup.err.log"
 	} else {
-		logPathFile = "/home/brun0/Desktop/personal/gbackup/internal/email/testlog.txt"
+		logPathFile = "/home/brun0/src/gbackup/testlog.txt"
 	}
 
 	if err = e.SendEmail(results, logPathFile); err != nil {
@@ -132,6 +132,7 @@ func Run(args Args) error {
 
 	// this also captures the e.SendEmail error in case of any error
 	forward.ForwardMessageToTelegram("FINISHED BACKUP", targets.ReturnFinalResultsFormatted(results, backupTotalTime), err.Error())
+	utils.Footer()
 
 	return nil
 }
