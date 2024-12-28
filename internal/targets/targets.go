@@ -61,14 +61,14 @@ func ReturnFinalResultsFormatted(backupResults []BackupResult, backupTotalTime f
 	)
 
 	for _, r := range backupResults {
-		temp = fmt.Sprintf("TargetName: %s - ElapsedTime: %.3f - TargetSize Before: %.3f, TargetSize After: %.3f - Error: %v", r.TargetName, r.ElapsedTime.Value, r.TargetSize.Before, r.TargetSize.After, r.Err)
+		temp = fmt.Sprintf("TargetName: %s - ElapsedTime: %.3f - TargetSize Before: %.3f, TargetSize After: %.3f - Error: %v\n", r.TargetName, r.ElapsedTime.Value, r.TargetSize.Before, r.TargetSize.After, r.Err)
 
 		finalResults += temp
 	}
 
 	finalResults += fmt.Sprintf("\n\nTotal backup time: %.3f (seconds)\n", backupTotalTime)
 
-	return finalResults
+	return "```\n" + finalResults + "```"
 }
 
 // Validates if there's an error on any backup

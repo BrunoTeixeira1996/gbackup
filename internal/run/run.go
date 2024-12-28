@@ -130,8 +130,7 @@ func Run(args Args) error {
 	endGlobalTime := time.Now()
 	backupTotalTime := endGlobalTime.Sub(startGlobalTime).Seconds()
 
-	// this also captures the e.SendEmail error in case of any error
-	forward.ForwardMessageToTelegram("FINISHED BACKUP", targets.ReturnFinalResultsFormatted(results, backupTotalTime), err.Error())
+	forward.ForwardMessageToTelegram("FINISHED BACKUP", targets.ReturnFinalResultsFormatted(results, backupTotalTime), "")
 	utils.Footer()
 
 	return nil
