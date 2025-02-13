@@ -178,6 +178,7 @@ func ExecuteTargetsBackups(targets []Target, cfg config.Config) []BackupResult {
 		ts := &utils.TargetSize{}
 		if target.IP != "" {
 			log.Printf("[execute backups info] target %s contains IP (%s) - checking if it is alive\n", target.Name, target.IP)
+			// TODO: actualy check if IP is pingable
 
 		} else if target.MAC != "" {
 			log.Printf("[execute backups info] target %s contains mac (%s) - checking if it is alive\n", target.Name, target.MAC)
