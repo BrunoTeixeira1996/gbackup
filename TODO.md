@@ -52,5 +52,5 @@ I can read the `/var/log/gbackup.err.log` file and grab all lines that are betwe
 - [ ] Check if its end of month, if yes compress the data and send to new external HDD plugged in Pinute (Pi)
 
 
-- [ ] Implement gbackup interaction with new worklaptop
+- [x] Implement gbackup interaction with new worklaptop
 - [ ] Fix folders and erase the `--delete` flag for rsync
