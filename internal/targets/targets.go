@@ -133,7 +133,7 @@ func (t *Target) isAlive() (bool, error) {
 // starts by getting the initial folder size, then start a timer
 // after that it iterates the rsynccommands from the toml file and executes those
 // after finishing this, it will calculate the final folder size and end the timer
-func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *utils.TargetSize) error {
+func (t *Target) ExecuteBackup(cfg config.Config, el *utils.ElapsedTime, ts *utils.TargetSize) error {
 	var (
 		listOfErrors string
 		err          error
@@ -166,7 +166,10 @@ func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *uti
 	el.Target = t.Name
 	el.Value = end.Sub(start).Seconds()
 
-	return fmt.Errorf(listOfErrors)
+	if listOfErrors != "" {
+		return fmt.Errorf(listOfErrors)
+	}
+	return nil
 }
 
 // Wraps all targets to backup
@@ -192,21 +195,9 @@ func ExecuteTargetsBackups(targets []Target, cfg config.Config) []BackupResult {
 				continue
 			}
 
-		} /* else if target.MAC != "" {
-			log.Printf("[execute backups info] target %s contains mac (%s) - checking if it is alive\n", target.Name, target.MAC)
-			isAlive, err := target.isAlive()
-			if err != nil {
-				log.Println(err)
-			}
-			if !isAlive {
-				log.Printf("[execute backups info] target %s is not alive skipping backup\n", target.Name)
-				continue
-			}
-			log.Printf("[execute backups info] target %s is alive\n", target.Name)
+		}
 
-		}*/
-
-		if err = target.executeBackup(cfg, el, ts); err != nil {
+		if err = target.ExecuteBackup(cfg, el, ts); err != nil {
 			log.Println(err)
 		}
 		results[i] = BackupResult{TargetName: target.Name, ElapsedTime: *el, TargetSize: *ts, Err: err}
