@@ -56,7 +56,7 @@ func (p *PBS) checkBackupStatus(totalObjects int) error {
 		err              error
 		sleepTime        int64 = 20                    // Sleep time between checks in seconds
 		completed              = make(map[string]bool) // Map to track completed backups by "Upid"
-		maximumSleepTime int64 = 3600                  // waits 1 hour before continuing with the program
+		maximumSleepTime int64 = 1800                  // waits 30 minutes before continuing with the program
 	)
 
 	// Loop until all backup and prune jobs are completed
@@ -64,7 +64,7 @@ func (p *PBS) checkBackupStatus(totalObjects int) error {
 		// The PBS backup can break (it shouldn't but it might) so I can warn the telegram bot and end the program instead of staying on an infinite loop
 		maximumSleepTime -= 20
 		if maximumSleepTime == 0 {
-			return fmt.Errorf("[pbs info] 1 hour passed and no PBS backup was completed, so ignoring the PBS backup but please check this")
+			return fmt.Errorf("[pbs info] 30 minutes passed and no PBS backup was completed, so ignoring the PBS backup but please check this")
 		}
 
 		log.Println("[pbs info] checking backup status...")
