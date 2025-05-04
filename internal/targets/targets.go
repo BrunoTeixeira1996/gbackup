@@ -126,7 +126,7 @@ func (t *Target) isAlive() (bool, error) {
 	}
 
 	// If all retries fail and no valid response was obtained, return false
-	return false, fmt.Errorf("[is alive error] could not ping that IP: %s\n", err)
+	return false, fmt.Errorf("[is alive error] could not ping that IP: %v\n", err)
 }
 
 // Execute an individual backup
