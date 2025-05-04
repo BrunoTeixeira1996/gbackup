@@ -13,7 +13,7 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
 
-const version = "2.3"
+const version = "2.4"
 
 func main() {
 	utils.Header()
