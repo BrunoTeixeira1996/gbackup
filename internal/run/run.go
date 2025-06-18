@@ -92,10 +92,8 @@ func Run(args Args) error {
 	// check PBS backup, if err is nil, that means we can turn off NAS
 	log.Printf("[run info] checking PBS backup status\n")
 	if err := proxmox.CheckPBSBackupStatus(); err != nil {
-		e := fmt.Errorf("[run error] could not check PBS backup status ... ignoring turning off NAS: %s\n", err)
-
+		e := fmt.Errorf("[run error] could not check PBS backup status: %s\n", err)
 		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
-		return e
 	}
 	utils.Body("[PBS] Backup OK")
 

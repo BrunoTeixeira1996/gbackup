@@ -98,8 +98,9 @@ func (t *Target) isAlive() (bool, error) {
 	const maxRetries = 2
 	const retryDelay = 2 * time.Second
 
-	// If MAC is provided, get the associated IP
-	if t.MAC != "" {
+	// If the target only has the MAC address, grab the IP
+	// from the MAC address
+	if t.IP == "" {
 		t.IP, err = t.getAssociatedIPFromMAC()
 		if err != nil {
 			return false, fmt.Errorf("[is alive error] could not get IP from MAC: %s\n", err)
@@ -125,17 +126,17 @@ func (t *Target) isAlive() (bool, error) {
 	}
 
 	// If all retries fail and no valid response was obtained, return false
-	return false, fmt.Errorf("[is alive error] could not ping that IP: %s\n", err)
+	return false, fmt.Errorf("[is alive error] could not ping that IP: %v\n", err)
 }
 
 // Execute an individual backup
 // starts by getting the initial folder size, then start a timer
 // after that it iterates the rsynccommands from the toml file and executes those
 // after finishing this, it will calculate the final folder size and end the timer
-func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *utils.TargetSize) error {
+func (t *Target) ExecuteBackup(cfg config.Config, el *utils.ElapsedTime, ts *utils.TargetSize) error {
 	var (
-		e   error
-		err error
+		listOfErrors string
+		err          error
 	)
 
 	ts.Before, err = utils.GetFolderSize(t.ExternalPath)
@@ -149,7 +150,10 @@ func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *uti
 	for _, rsyncCommand := range t.RsyncCommands {
 		if err := commands.RsyncCommand(rsyncCommand.Command, "toExternal", rsyncCommand.Name, cfg.Pushgateway.Url); err != nil {
 			log.Printf("[executeBackup error] could not perform RsyncCommand in %s: %s\n", t.Name, err)
-			e = err
+			// FIXME: I think this solves the problem when we have more than
+			// one rsync command and with multiple errors
+			// need to test this
+			listOfErrors += err.Error() + "\n"
 		}
 	}
 
@@ -162,7 +166,10 @@ func (t *Target) executeBackup(cfg config.Config, el *utils.ElapsedTime, ts *uti
 	el.Target = t.Name
 	el.Value = end.Sub(start).Seconds()
 
-	return e
+	if listOfErrors != "" {
+		return fmt.Errorf(listOfErrors)
+	}
+	return nil
 }
 
 // Wraps all targets to backup
@@ -178,23 +185,19 @@ func ExecuteTargetsBackups(targets []Target, cfg config.Config) []BackupResult {
 		ts := &utils.TargetSize{}
 		if target.IP != "" {
 			log.Printf("[execute backups info] target %s contains IP (%s) - checking if it is alive\n", target.Name, target.IP)
-			// TODO: actualy check if IP is pingable
-
-		} else if target.MAC != "" {
-			log.Printf("[execute backups info] target %s contains mac (%s) - checking if it is alive\n", target.Name, target.MAC)
 			isAlive, err := target.isAlive()
 			if err != nil {
 				log.Println(err)
 			}
 			if !isAlive {
-				log.Printf("[execute backups info] target %s is not alive skipping backup\n", target.Name)
+				log.Printf("[execute backup info] target %s is not alive skipping backup\n", target.Name)
+				results[i] = BackupResult{TargetName: target.Name, ElapsedTime: *el, TargetSize: *ts, Err: err}
 				continue
 			}
-			log.Printf("[execute backups info] target %s is alive\n", target.Name)
 
 		}
 
-		if err = target.executeBackup(cfg, el, ts); err != nil {
+		if err = target.ExecuteBackup(cfg, el, ts); err != nil {
 			log.Println(err)
 		}
 		results[i] = BackupResult{TargetName: target.Name, ElapsedTime: *el, TargetSize: *ts, Err: err}
