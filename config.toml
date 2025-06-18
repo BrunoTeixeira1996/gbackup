@@ -50,4 +50,4 @@ mac = "bc:38:98:83:5c:43"
 external_path = "/mnt/external/worklaptop_backup"
 [[targets.rsync_commands]]
 name = "Backup_work_laptop"
-command = "-av --copy-links -e ssh --exclude=personal --exclude=tools worklaptop:/home/brun0/Desktop worklaptop:/home/brun0/.ssh /mnt/external/worklaptop_backup"
+command = "-av --copy-links -e ssh --exclude=personal --exclude=work-git --exclude=tools worklaptop:/home/brun0/Desktop worklaptop:/home/brun0/.ssh /mnt/external/worklaptop_backup"
