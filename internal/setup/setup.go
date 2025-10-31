@@ -67,14 +67,12 @@ func IsEverythingConfigured(configPathFlag string, debugFlag bool) (config.Confi
 	}
 	log.Printf("[setup info] env vars are OK\n")
 
-	if !debugFlag {
-		log.Printf("[setup info] validating mount point\n")
-		if !isExternalMounted() {
-			log.Printf("[setup error] mount point is not mounted in the system\n")
-			return cfg, false
-		}
-		log.Printf("[setup info] mount point is OK\n")
+	log.Printf("[setup info] validating mount point\n")
+	if !isExternalMounted() {
+		log.Printf("[setup error] mount point is not mounted in the system\n")
+		return cfg, false
 	}
+	log.Printf("[setup info] mount point is OK\n")
 
 	log.Printf("[setup info] reading toml file\n")
 	if cfg, err = setupToml(configPathFlag); err != nil {

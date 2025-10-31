@@ -9,6 +9,7 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 	"github.com/BrunoTeixeira1996/gbackup/internal/email"
 	"github.com/BrunoTeixeira1996/gbackup/internal/forward"
+	"github.com/BrunoTeixeira1996/gbackup/internal/monitoring"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 	"github.com/BrunoTeixeira1996/gbackup/internal/setup"
@@ -35,12 +36,13 @@ func Run(args Args) error {
 	forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Starting ...", "")
 
 	log.Printf("[setup backup info] validating setup\n")
-	if args.Cfg, setupOK = setup.IsEverythingConfigured(args.ConfigPathFlag, args.DebugFlag); !setupOK {
+	args.Cfg, setupOK = setup.IsEverythingConfigured(args.ConfigPathFlag, args.DebugFlag)
+	if !setupOK {
 		e := fmt.Errorf("[run error] please configure the setup properly")
-
 		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
-		return e
+		log.Fatalf("[run error] setup is not configured correctly or mount point is missing. Exiting.")
 	}
+
 	utils.Body("[SETUP] OK")
 
 	log.Printf("[run info] verifying nas (%s) status\n", args.Cfg.NAS.Name)
@@ -77,27 +79,35 @@ func Run(args Args) error {
 
 	targets.DisplayFinalResults(results)
 
+	// grab the final results and send to Prometheus so we can see metrics in Grafana
+	monitoring.SendFinalResultsToMonitoring(results)
+
 	utils.Body("[BACKUP TARGETS] FINISHED")
 
-	log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
-	if err := targets.ExecuteExternalToNASBackup(external, args.Cfg); err != nil {
-		e := fmt.Errorf("[run error] backup from external to NAS was NOT OK: %s\n", err)
+	if !args.DebugFlag {
+		log.Printf("[run info] backup targets finished ... proceeding with external backup to NAS\n")
+		if err := targets.ExecuteExternalToNASBackup(external, args.Cfg); err != nil {
+			e := fmt.Errorf("[run error] backup from external to NAS was NOT OK: %s\n", err)
 
-		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
-		log.Printf(e.Error())
-	} else {
-		utils.Body("[EXTERNAL BACKUP] OK")
+			forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
+			log.Printf(e.Error())
+		} else {
+			utils.Body("[EXTERNAL BACKUP] OK")
+		}
 	}
 
-	// check PBS backup, if err is nil, that means we can turn off NAS
-	log.Printf("[run info] checking PBS backup status\n")
-	if err := proxmox.CheckPBSBackupStatus(); err != nil {
-		e := fmt.Errorf("[run error] could not check PBS backup status: %s\n", err)
-		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
+	// only check for PBS whenever is in production mode
+	if !args.DebugFlag {
+		// check PBS backup, if err is nil, that means we can turn off NAS
+		log.Printf("[run info] checking PBS backup status\n")
+		if err := proxmox.CheckPBSBackupStatus(); err != nil {
+			e := fmt.Errorf("[run error] could not check PBS backup status: %s\n", err)
+			forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
+		}
+		utils.Body("[PBS] Backup OK")
 	}
-	utils.Body("[PBS] Backup OK")
 
-	// we dont want to keep shuting dow NAS while debuging
+	// we dont want to keep shuting down NAS while debuging
 	if !args.DebugFlag {
 		log.Printf("[run info] shutting down nas (%s)\n", args.Cfg.NAS.Name)
 		if err := nas.Shutdown(args.Cfg.NAS); err != nil {

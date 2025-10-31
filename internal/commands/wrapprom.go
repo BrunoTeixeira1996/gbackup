@@ -57,41 +57,57 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		return 0
 	}
 
-	switch commandType {
-	case "toExternal":
-		params := rsyncprom.WrapParams{
-			Pushgateway: pg,
-			Instance:    instance,
-			Job:         "toExternal",
-		}
-		// executes WrapRsync from rsyncprom and export metrics to prometheus
-		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-		log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
-			func() string {
-				if err == nil {
-					return "OK"
-				}
-				return err.Error()
-			}(),
-		)
-
-	case "toNAS":
-		params := rsyncprom.WrapParams{
-			Pushgateway: pg,
-			Instance:    instance,
-			Job:         "toNAS",
-		}
-		// executes WrapRsync from rsyncprom and export metrics to prometheus
-		err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
-		log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
-			func() string {
-				if err == nil {
-					return "OK"
-				}
-				return err.Error()
-			}(),
-		)
+	params := rsyncprom.WrapParams{
+		Pushgateway: pg,
+		Instance:    instance,
+		Job:         commandType, // this is toExternal or toNAS
 	}
+	// executes WrapRsync from rsyncprom and export metrics to prometheus
+	err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
+	log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
+		func() string {
+			if err == nil {
+				return "OK"
+			}
+			return err.Error()
+		}(),
+	)
 
+	/*	switch commandType {
+		case "toExternal":
+			params := rsyncprom.WrapParams{
+				Pushgateway: pg,
+				Instance:    instance,
+				Job:         "toExternal",
+			}
+			// executes WrapRsync from rsyncprom and export metrics to prometheus
+			err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
+			log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
+				func() string {
+					if err == nil {
+						return "OK"
+					}
+					return err.Error()
+				}(),
+			)
+
+		case "toNAS":
+			params := rsyncprom.WrapParams{
+				Pushgateway: pg,
+				Instance:    instance,
+				Job:         "toNAS",
+			}
+			// executes WrapRsync from rsyncprom and export metrics to prometheus
+			err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
+			log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
+				func() string {
+					if err == nil {
+						return "OK"
+					}
+					return err.Error()
+				}(),
+			)
+		}
+	*/
 	return err
 }
