@@ -1,6 +1,6 @@
 [nas]
-name = "nas1"
-ip = "192.168.30.200"
+name = "nas1.lan"
+ip = "192.168.30.15"
 mac = "9c:6b:00:07:bc:85"
 
 [pushgateway]
@@ -11,16 +11,16 @@ name = "external"
 external_path = "/mnt/external"
 [[external.rsync_commands]]
 name = "external_all_except_worklaptop"
-command = "-av -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump --exclude=worklaptop_backup /mnt/external nas1:/mnt/datastore/backupExternal/{current_time}/"
+command = "-av -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump --exclude=worklaptop_backup /mnt/external nas1.lan:/mnt/datastore/backupExternal/{current_time}/"
 [[external.rsync_commands]]
 name = "external_only_worklaptop"
-command = "-av -e ssh /mnt/external/worklaptop_backup nas1:/mnt/datastore/backupExternal/{current_time}/external"
+command = "-av -e ssh /mnt/external/worklaptop_backup nas1.lan:/mnt/datastore/backupExternal/{current_time}/external"
 
 
 
 [[targets]]
 name = "gokr_perm"
-ip = "192.168.30.12"
+ip = "pinute.lan"
 instance = "brun0:gokr_perm"
 mac = "d8:3a:dd:3b:84:64"
 external_path = "/mnt/external/gokrazy_backup"
@@ -30,6 +30,9 @@ command = "-av --delete --chmod=ugo=rwx -e ssh rsync://waiw-backup/waiw /mnt/ext
 [[targets.rsync_commands]]
 name = "Backup_gmah_from_gokrazy"
 command = "-av --delete --chmod=ugo=rwx -e ssh rsync://gmah-backup/gmah /mnt/external/gokrazy_backup/gmah_backup"
+[[targets.rsync_commands]]
+name = "Backup_bull_from_gokrazy"
+command = "-av --delete --chmod=ugo=rwx -e ssh rsync://bull-backup/bull /mnt/external/gokrazy_backup/bull_backup"
 
 
 [[targets]]
@@ -43,10 +46,10 @@ command = "-av --delete /home/brun0/nut /home/brun0/src /home/brun0/.ssh /home/b
 
 [[targets]]
 name = "work_laptop"
-ip = "192.168.30.209"
+ip = "worklaptop.lan"
 keypath = "/root/.ssh/id_rsa_worklaptop"
 instance = "brun0:worklaptop"
-mac = "bc:38:98:83:5c:43"
+mac = "C4:EF:BB:88:5C:23"
 external_path = "/mnt/external/worklaptop_backup"
 [[targets.rsync_commands]]
 name = "Backup_work_laptop"

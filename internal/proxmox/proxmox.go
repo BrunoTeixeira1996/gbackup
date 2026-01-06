@@ -96,7 +96,7 @@ func (p *PVE) Init() error {
 
 	p.API.TokenID = tokenID
 	p.API.Secret = secret
-	p.API.Url = "https://192.168.30.3:8006/api2/json"
+	p.API.Url = "https://pve.lan:8006/api2/json"
 	p.API.Node = "localhost"
 	p.API.Authorization = fmt.Sprintf("PVEAPIToken=%s=%s", p.API.TokenID, p.API.Secret)
 

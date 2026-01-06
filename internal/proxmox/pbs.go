@@ -38,7 +38,7 @@ func (p *PBS) Init() error {
 
 	p.API.TokenID = tokenID
 	p.API.Secret = secret
-	p.API.Url = "https://192.168.30.200:8007/api2/json"
+	p.API.Url = "https://nas1.lan:8007/api2/json"
 	p.API.Node = "localhost"
 	p.API.Authorization = fmt.Sprintf("PBSAPIToken=%s:%s", p.API.TokenID, p.API.Secret)
 

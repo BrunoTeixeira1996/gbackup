@@ -15,7 +15,7 @@ type Demand struct {
 
 // handles POST request when performing backup on demand
 // meaning that I can always use something like
-// curl -X POST http://192.168.30.13:8000/backup -d '{"operation": ""}' -v
+// curl -X POST http://pinute.lan:8000/backup -d '{"operation": ""}' -v
 // to perform a backup whenever I want
 // this also works with telegram bot
 func (d *Demand) BackupHandle(w http.ResponseWriter, r *http.Request) {
