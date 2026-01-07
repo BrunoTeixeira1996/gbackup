@@ -66,7 +66,11 @@ func ReturnFinalResultsFormatted(backupResults []BackupResult, backupTotalTime f
 		finalResults += temp
 	}
 
-	finalResults += fmt.Sprintf("\n\nTotal backup time: %.3f (seconds)\n", backupTotalTime)
+	hours := int(backupTotalTime) / 3600
+	minutes := (int(backupTotalTime) % 3600) / 60
+	seconds := int(backupTotalTime) % 60
+
+	finalResults += fmt.Sprintf("\n\nTotal backup time: %02d:%02d:%02d (hh:mm:ss)\n", hours, minutes, seconds)
 
 	return "```\n" + finalResults + "```"
 }
