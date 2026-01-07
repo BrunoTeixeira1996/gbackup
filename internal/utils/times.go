@@ -22,29 +22,20 @@ func CurrentTime() string {
 	return time.Now().Format("2006-01-02")
 }
 
-// Gets epoch time for the current day at 12 PM
+// Gets epoch time for the current day at midnight
+// So we do the PBS backup at 12 and then at 13
+// we grab every backup that was done during the current day
+// meaning we grab the backup at 12 and this works in prod
+// and in debug mode
 func Epoch() int64 {
 	now := time.Now()
 
-	timeAt12PM := time.Date(
+	return time.Date(
 		now.Year(),
 		now.Month(),
 		now.Day(),
-		12, 0, 0, 0,
-		now.Location())
-
-	return timeAt12PM.Unix()
-
-	// If we are debugging this we want to ignore the production epoch time
-	// if isDebug {
-	// 	return time.Date(
-	// 		now.Year(),
-	// 		now.Month(),
-	// 		now.Day(),
-	// 		12, 0, 0, 0, // change this to the time we want
-	// 		now.Location()).Unix()
-	// }
-
+		0, 0, 0, 0,
+		now.Location()).Unix()
 }
 
 // Used to calculate where next friday is
