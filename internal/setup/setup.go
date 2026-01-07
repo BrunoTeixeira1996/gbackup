@@ -11,8 +11,6 @@ import (
 
 func checkEnvVars() bool {
 	envVars := map[string]string{
-		"SENDEREMAIL": os.Getenv("SENDEREMAIL"),
-		"SENDERPASS":  os.Getenv("SENDERPASS"),
 		"PBS_SECRET":  os.Getenv("PBS_SECRET"),
 		"PBS_TOKENID": os.Getenv("PBS_TOKENID"),
 		"PVE_SECRET":  os.Getenv("PVE_SECRET"),
