@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/config"
-	"github.com/BrunoTeixeira1996/gbackup/internal/email"
 	"github.com/BrunoTeixeira1996/gbackup/internal/forward"
 	"github.com/BrunoTeixeira1996/gbackup/internal/monitoring"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
@@ -28,7 +27,6 @@ func Run(args Args) error {
 		ctx        = context.Background()
 		setupOK    bool
 		tsExternal = &utils.TargetSize{}
-		err        error
 	)
 
 	startGlobalTime := time.Now()
@@ -118,21 +116,6 @@ func Run(args Args) error {
 		}
 		log.Printf("[run info] nas (%s) off\n", args.Cfg.NAS.Name)
 		utils.Body("[NAS] Shutdown OK")
-	}
-
-	e := email.EmailClient{}
-	e.InitEmailClient()
-	var logPathFile string
-
-	if !args.DebugFlag {
-		logPathFile = "/var/log/gbackup/gbackup.err.log"
-	} else {
-		logPathFile = "/home/brun0/src/gbackup/testlog.txt"
-	}
-
-	if err = e.SendEmail(results, logPathFile); err != nil {
-		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", err.Error())
-		log.Println(err)
 	}
 
 	endGlobalTime := time.Now()
