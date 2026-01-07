@@ -90,6 +90,7 @@ func (b *Boilerplate) request(rType, apiPath string) ([]byte, error) {
 	return res, nil
 }
 
+// https://forum.proxmox.com/threads/pbs-api.154610/
 func (p *PVE) Init() error {
 	tokenID := os.Getenv("PVE_TOKENID")
 	secret := os.Getenv("PVE_SECRET")
@@ -104,7 +105,7 @@ func (p *PVE) Init() error {
 }
 
 // Assigns LXC and VMs into PVE struct
-func (p *PVE) getAllObjects() error {
+func (p *PVE) GetAllObjects() error {
 	var (
 		tL  Object
 		tV  Object

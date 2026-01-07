@@ -32,6 +32,7 @@ type Backup struct {
 	Status     string  `json:"status"`
 }
 
+// https://forum.proxmox.com/threads/pbs-api.154610/
 func (p *PBS) Init() error {
 	tokenID := os.Getenv("PBS_TOKENID")
 	secret := os.Getenv("PBS_SECRET")
@@ -47,7 +48,7 @@ func (p *PBS) Init() error {
 
 // Loops all backups and prune jobs and waits
 // for all to finish so gbackup can proceed
-func (p *PBS) checkBackupStatus(totalObjects int) error {
+func (p *PBS) CheckBackupStatus(totalObjects int) error {
 	var (
 		epoch            int64 = utils.Epoch() // epoch time of 12 PM for the current day
 		response         []byte
@@ -139,7 +140,7 @@ func CheckPBSBackupStatus() error {
 	}
 
 	log.Println("[proxmox info] gathering all objects from PVE")
-	if err = pve.getAllObjects(); err != nil {
+	if err = pve.GetAllObjects(); err != nil {
 		return err
 	}
 
@@ -147,7 +148,7 @@ func CheckPBSBackupStatus() error {
 	log.Printf("[proxmox info] total objects: %d\n", totalObjects)
 
 	log.Println("[proxmox info] checking backup status")
-	if err := pbs.checkBackupStatus(totalObjects); err != nil {
+	if err := pbs.CheckBackupStatus(totalObjects); err != nil {
 		return err
 	}
 	log.Printf("[proxmox info] all backups completed successfully and have 'OK' status.\n")
