@@ -26,14 +26,25 @@ func CurrentTime() string {
 func Epoch() int64 {
 	now := time.Now()
 
-	timeAt2PM := time.Date(
+	timeAt12PM := time.Date(
 		now.Year(),
 		now.Month(),
 		now.Day(),
 		12, 0, 0, 0,
 		now.Location())
 
-	return timeAt2PM.Unix()
+	return timeAt12PM.Unix()
+
+	// If we are debugging this we want to ignore the production epoch time
+	// if isDebug {
+	// 	return time.Date(
+	// 		now.Year(),
+	// 		now.Month(),
+	// 		now.Day(),
+	// 		12, 0, 0, 0, // change this to the time we want
+	// 		now.Location()).Unix()
+	// }
+
 }
 
 // Used to calculate where next friday is
