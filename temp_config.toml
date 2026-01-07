@@ -1,5 +1,5 @@
 [nas]
-name = "nas1"
+name = "nas1.lan"
 ip = "192.168.30.200"
 mac = "9c:6b:00:07:bc:85"
 
@@ -11,10 +11,10 @@ name = "external"
 external_path = "/mnt/external"
 [[external.rsync_commands]]
 name = "external_all_except_worklaptop"
-command = "-av --delete -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump --exclude=worklaptop_backup --exclude=WORK_WINDOWS_VM_LAYER8 /mnt/external nas1:/mnt/datastore/backupExternal/{current_time}/"
+command = "-av --delete -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump --exclude=worklaptop_backup --exclude=WORK_WINDOWS_VM_LAYER8 /mnt/external nas1.lan:/mnt/datastore/backupExternal/{current_time}/"
 [[external.rsync_commands]]
 name = "external_only_worklaptop"
-command = "-av -e ssh /mnt/external/worklaptop_backup nas1:/mnt/datastore/backupExternal/{current_time}/external"
+command = "-av -e ssh /mnt/external/worklaptop_backup nas1.lan:/mnt/datastore/backupExternal/{current_time}/external"
 
 
 

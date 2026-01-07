@@ -134,7 +134,7 @@ func Shutdown(nas config.NAS) error {
 
 // Function that keeps the last two backups (newest)
 func KeepLastTwo() error {
-	output, err := exec.Command("ssh", "nas1", "ls", "-la", "/mnt/datastore/backupExternal").Output()
+	output, err := exec.Command("ssh", "nas1.lan", "ls", "-la", "/mnt/datastore/backupExternal").Output()
 	if err != nil {
 		log.Printf("[external backup error] error while listing: %s (%s)\n", output, err)
 		return err
@@ -154,7 +154,7 @@ func KeepLastTwo() error {
 
 	oldestFolder := fmt.Sprintf("/mnt/datastore/backupExternal/%s", folderNames[0])
 
-	output, err = exec.Command("ssh", "nas1", "sudo", "rm", "-r", oldestFolder).Output()
+	output, err = exec.Command("ssh", "nas1.lan", "sudo", "rm", "-r", oldestFolder).Output()
 	if err != nil {
 		log.Printf("[external backup error] error while deleting the oldest folder (%s): %s (%s)\n", oldestFolder, output, err)
 		return err
