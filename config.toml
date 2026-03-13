@@ -49,7 +49,7 @@ name = "work_laptop"
 ip = "worklaptop.lan"
 keypath = "/root/.ssh/id_rsa_worklaptop"
 instance = "brun0:worklaptop"
-mac = "C4:EF:BB:88:5C:23"
+mac = "FC:6D:77:AF:24:09"
 external_path = "/mnt/external/worklaptop_backup"
 [[targets.rsync_commands]]
 name = "Backup_work_laptop"
