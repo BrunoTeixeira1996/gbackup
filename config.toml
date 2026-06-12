@@ -46,7 +46,7 @@ command = "-av --delete /home/brun0/nut /home/brun0/src /home/brun0/.ssh /home/b
 
 [[targets]]
 name = "work_laptop"
-ip = "worklaptop.lan"
+ip = "worklaptop"
 keypath = "/root/.ssh/id_rsa_worklaptop"
 instance = "brun0:worklaptop"
 mac = "FC:6D:77:AF:24:09"
