@@ -106,7 +106,9 @@ func Run(args Args) error {
 	}
 
 	// we dont want to keep shuting down NAS while debuging
-	if !args.DebugFlag {
+	// also we dont want to shutdown NAS since now it holds jellyfin data
+	jellyFinActive := true
+	if !args.DebugFlag && !jellyFinActive {
 		log.Printf("[run info] shutting down nas (%s)\n", args.Cfg.NAS.Name)
 		if err := nas.Shutdown(args.Cfg.NAS); err != nil {
 			e := fmt.Errorf("[run error] could not shut down nas (%s): %s", args.Cfg.NAS.Name, err)
