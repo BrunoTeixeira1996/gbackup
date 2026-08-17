@@ -67,9 +67,9 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 	log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
 		func() string {
 			if err == nil {
-				return "OK"
+				return "OK ✅"
 			}
-			return err.Error()
+			return fmt.Sprintf("ERROR ❌: %s", err.Error())
 		}(),
 	)
 

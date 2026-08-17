@@ -21,7 +21,8 @@ func checkEnvVars() bool {
 			log.Printf("[setup error] %s is not present\n", key)
 			return false
 		}
-		log.Println(key, value)
+		// Just for debug, don't print values
+		//log.Println(key, value)
 	}
 	return true
 }

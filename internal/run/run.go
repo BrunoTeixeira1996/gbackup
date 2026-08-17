@@ -41,7 +41,7 @@ func Run(args Args) error {
 		log.Fatalf("[run error] setup is not configured correctly or mount point is missing. Exiting.")
 	}
 
-	utils.Body("[SETUP] OK")
+	utils.Body("[SETUP] OK ✅")
 
 	log.Printf("[run info] verifying nas (%s) status\n", args.Cfg.NAS.Name)
 	if err := nas.Wakeup(args.Cfg.NAS, ctx); err != nil {
@@ -50,8 +50,8 @@ func Run(args Args) error {
 		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
 		return e
 	}
-	log.Printf("[run info] nas (%s) status OK\n", args.Cfg.NAS.Name)
-	utils.Body("[NAS] OK")
+	log.Printf("[run info] nas (%s) status OK ✅\n", args.Cfg.NAS.Name)
+	utils.Body("[NAS] OK ✅")
 	external := targets.InitExternal(args.Cfg)
 	ts := targets.InitTargets(args.Cfg)
 
@@ -90,7 +90,7 @@ func Run(args Args) error {
 			forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
 			log.Printf(e.Error())
 		} else {
-			utils.Body("[EXTERNAL BACKUP] OK")
+			utils.Body("[EXTERNAL BACKUP] OK ✅")
 		}
 	}
 
@@ -102,7 +102,7 @@ func Run(args Args) error {
 			e := fmt.Errorf("[run error] could not check PBS backup status: %s\n", err)
 			forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
 		}
-		utils.Body("[PBS] Backup OK")
+		utils.Body("[PBS] Backup OK ✅")
 	}
 
 	// we dont want to keep shuting down NAS while debuging
@@ -117,7 +117,7 @@ func Run(args Args) error {
 			return e
 		}
 		log.Printf("[run info] nas (%s) off\n", args.Cfg.NAS.Name)
-		utils.Body("[NAS] Shutdown OK")
+		utils.Body("[NAS] Shutdown OK ✅")
 	}
 
 	endGlobalTime := time.Now()
