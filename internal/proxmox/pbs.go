@@ -83,8 +83,10 @@ func (p *PBS) CheckBackupStatus(totalObjects int) error {
 		// Process backups and avoid duplicates using the map
 		for _, b := range backups.DataBackup {
 			// If we reach the expected number of jobs, exit the loop
-			if len(completed) == totalObjects*2 {
-				log.Printf("[pbs error] all %d backup and prune jobs completed\n", len(completed))
+			// This is hardcoded because I don't backup all VMs/LXC (no storage for that)
+			// for now I only backup 8 (5 LXC and 3 VMs)
+			if len(completed) == 8*2 { //totalObjects*2 {
+				log.Printf("[pbs info] all %d backup and prune jobs completed\n", len(completed))
 				break
 			}
 
@@ -101,7 +103,7 @@ func (p *PBS) CheckBackupStatus(totalObjects int) error {
 		}
 
 		// Check if all backups are done
-		if len(completed) == totalObjects*2 {
+		if len(completed) == 16 { //totalObjects*2 {
 			log.Printf("[pbs info] successfully completed %d backup and prune jobs.\n", len(completed))
 			break
 		}
