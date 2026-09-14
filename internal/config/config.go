@@ -20,7 +20,6 @@ type Pushgateway struct {
 }
 
 type External struct {
-	Name          string         `toml:"name"`
 	ExternalPath  string         `toml:"external_path"`
 	RsyncCommands []RsyncCommand `toml:"rsync_commands"`
 }
@@ -33,8 +32,6 @@ type RsyncCommand struct {
 type Target struct {
 	Name          string         `toml:"name"`
 	IP            string         `toml:"ip"`
-	Keypath       string         `toml:"keypath,omitempty"`
-	Instance      string         `toml:"instance"`
 	MAC           string         `toml:"mac"`
 	ExternalPath  string         `toml:"external_path"`
 	RsyncCommands []RsyncCommand `toml:"rsync_commands"`

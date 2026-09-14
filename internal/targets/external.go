@@ -10,7 +10,6 @@ import (
 )
 
 type External struct {
-	Name          string                `toml:"name"`
 	ExternalPath  string                `toml:"external_path"`
 	RsyncCommands []config.RsyncCommand `toml:"rsync_commands"`
 }
@@ -38,7 +37,6 @@ func (e *External) VerifyExternalSize(operation string, ts *utils.TargetSize) {
 // Initializes the external from the config package.
 func InitExternal(cfg config.Config) External {
 	return External{
-		Name:          cfg.External.Name,
 		ExternalPath:  cfg.External.ExternalPath,
 		RsyncCommands: cfg.External.RsyncCommands,
 	}

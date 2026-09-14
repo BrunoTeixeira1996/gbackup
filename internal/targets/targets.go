@@ -22,8 +22,6 @@ type BackupResult struct {
 type Target struct {
 	Name          string                `toml:"name"`
 	IP            string                `toml:"ip"`
-	Keypath       string                `toml:"keypath,omitempty"`
-	Instance      string                `toml:"instance"`
 	MAC           string                `toml:"mac"`
 	ExternalPath  string                `toml:"external_path"`
 	RsyncCommands []config.RsyncCommand `toml:"rsync_commands"`
@@ -36,11 +34,9 @@ func InitTargets(cfg config.Config) []Target {
 		targets = append(targets, Target{
 			Name:          t.Name,
 			IP:            t.IP,
-			Keypath:       t.Keypath,
-			Instance:      t.Instance,
 			MAC:           t.MAC,
 			ExternalPath:  t.ExternalPath,
-			RsyncCommands: t.RsyncCommands, // This now references the updated structure
+			RsyncCommands: t.RsyncCommands,
 		})
 	}
 	return targets

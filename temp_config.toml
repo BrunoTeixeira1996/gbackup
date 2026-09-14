@@ -7,7 +7,6 @@ mac = "9c:6b:00:07:bc:85"
 url = "http://192.168.30.24:9091"
 
 [external]
-name = "external"
 external_path = "/mnt/external"
 [[external.rsync_commands]]
 name = "external_all_except_worklaptop"
@@ -21,7 +20,6 @@ command = "-av -e ssh /mnt/external/worklaptop_backup nas1.lan:/mnt/datastore/ba
 [[targets]]
 name = "gokr_perm"
 ip = "192.168.30.12"
-instance = "brun0:gokr_perm"
 mac = "d8:3a:dd:3b:84:64"
 external_path = "/mnt/external/gokrazy_backup"
 [[targets.rsync_commands]]
@@ -34,7 +32,6 @@ command = "-av --delete --chmod=ugo=rwx -e ssh rsync://gmah-backup/gmah /mnt/ext
 
 [[targets]]
 name = "pinute_backup"
-instance = "brun0:pinute_backup"
 external_path = "/mnt/external/pinute_backup"
 [[targets.rsync_commands]]
 name = "Backup_pinute"
@@ -44,8 +41,6 @@ command = "-av --delete /home/brun0/nut /home/brun0/src /home/brun0/.ssh /home/b
 [[targets]]
 name = "work_laptop"
 ip = "192.168.30.5"
-keypath = "/root/.ssh/id_ed25519_worklaptop"
-instance = "brun0:worklaptop"
 mac = "84:14:4d:f7:2a:c4"
 external_path = "/mnt/external/worklaptop_backup"
 [[targets.rsync_commands]]
