@@ -123,7 +123,8 @@ func (p *PBS) CheckBackupStatus(totalObjects int) error {
 	return nil
 }
 
-func CheckPBSBackupStatus() error {
+// var so it can be mocked in tests
+var CheckPBSBackupStatus = func() error {
 	var (
 		pve          = &PVE{}
 		pbs          = &PBS{}

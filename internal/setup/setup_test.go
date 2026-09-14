@@ -37,11 +37,6 @@ func TestIsMounted(t *testing.T) {
 			want:    false,
 		},
 		{
-			// isMounted must match the whole mount-point
-			// field, not just a substring. A prior version used
-			// strings.Contains on the raw file text, which meant an
-			// unrelated mount like "/mnt/external2" was wrongly treated as
-			// evidence that "/mnt/external" itself was mounted.
 			name:    "similarly-named but distinct mount point does not count",
 			content: "/dev/sdb1 /mnt/external2 ext4 rw 0 0\n",
 			want:    false,
