@@ -1,10 +1,23 @@
 package setup
 
 import (
+	"bytes"
+	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
+
+func captureLog(t *testing.T, fn func()) string {
+	t.Helper()
+	var buf bytes.Buffer
+	original := log.Writer()
+	log.SetOutput(&buf)
+	t.Cleanup(func() { log.SetOutput(original) })
+	fn()
+	return buf.String()
+}
 
 func writeMountsFile(t *testing.T, content string) string {
 	t.Helper()
@@ -173,11 +186,6 @@ func TestIsEverythingConfigured_Success(t *testing.T) {
 	}
 }
 
-// Regression coverage for a real bug: this used to check a hardcoded
-// "/mnt/external" instead of whatever the toml actually configures. Here
-// the toml points at a different, unmounted path, and the mounts fixture
-// only has the OLD hardcoded path mounted - so if the hardcoded check ever
-// comes back, this passes when it shouldn't.
 func TestIsEverythingConfigured_UsesConfiguredExternalPath(t *testing.T) {
 	setValidEnvVars(t)
 	configPath := writeConfigWithExternalPath(t, "/mnt/my-custom-disk")
@@ -197,5 +205,31 @@ func TestIsEverythingConfigured_MountNotMounted(t *testing.T) {
 	_, ok := IsEverythingConfigured(configPath, false)
 	if ok {
 		t.Error("IsEverythingConfigured() = true, want false when nothing is mounted")
+	}
+}
+
+// asserts on the log trail, not just the final bool - otherwise this could
+// pass for the wrong reason (e.g. falling through to the mount check, which
+// also returns false for an empty/zero-value config)
+func TestIsEverythingConfigured_MalformedToml(t *testing.T) {
+	setValidEnvVars(t)
+	path := filepath.Join(t.TempDir(), "config.toml")
+	if err := os.WriteFile(path, []byte("this is not valid = toml = [[["), 0644); err != nil {
+		t.Fatalf("could not write test config: %v", err)
+	}
+
+	var ok bool
+	logs := captureLog(t, func() {
+		_, ok = IsEverythingConfigured(path, false)
+	})
+
+	if ok {
+		t.Error("IsEverythingConfigured() = true, want false when the toml file is malformed")
+	}
+	if !strings.Contains(logs, "toml file") {
+		t.Errorf("expected logs to mention the toml file failure, got: %s", logs)
+	}
+	if strings.Contains(logs, "validating mount point") {
+		t.Errorf("expected IsEverythingConfigured to return before reaching the mount check, got: %s", logs)
 	}
 }
