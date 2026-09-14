@@ -2,6 +2,7 @@ package forward
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -85,6 +86,27 @@ func TestForwardMessageToTelegram_TimesOutInsteadOfHanging(t *testing.T) {
 		}
 	case <-time.After(2 * time.Second):
 		t.Fatal("ForwardMessageToTelegram() did not return within 2s; it should have timed out after 200ms")
+	}
+}
+
+// map[string]string can never actually fail to marshal, so this is the
+// only way to reach that error branch. Points at a local server (even
+// though a correct implementation never reaches the network here) so a
+// broken early-return can't accidentally hit the real bot.
+func TestForwardMessageToTelegram_MarshalError(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Error("ForwardMessageToTelegram should return before ever making a request when marshalling fails")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+	withTelegramBotURL(t, srv.URL)
+
+	original := marshalJSON
+	marshalJSON = func(v any) ([]byte, error) { return nil, fmt.Errorf("boom") }
+	t.Cleanup(func() { marshalJSON = original })
+
+	if err := ForwardMessageToTelegram("STATUS", "hello", ""); err == nil {
+		t.Fatal("expected an error when marshalling fails, got nil")
 	}
 }
 

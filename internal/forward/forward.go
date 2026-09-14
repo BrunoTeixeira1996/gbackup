@@ -15,6 +15,9 @@ var telegramBotURL = "http://bot.lan:8000/forward"
 // timeout so a hung bot doesn't block forever
 var httpClient = &http.Client{Timeout: 10 * time.Second}
 
+// var so tests can force a marshal failure
+var marshalJSON = json.Marshal
+
 // Sends message from gbackup status to telegram bot
 // then telegram bot will receive this communicate and it will
 // display in the private chat
@@ -28,7 +31,7 @@ var ForwardMessageToTelegram = func(status string, messageContent string, messag
 		"error":   messageErr,
 	}
 
-	jsonData, err := json.Marshal(requestBody)
+	jsonData, err := marshalJSON(requestBody)
 	if err != nil {
 		return fmt.Errorf("[forward error] could not marshall JSON: %s\n", err)
 	}
