@@ -28,10 +28,32 @@ func checkEnvVars() bool {
 }
 
 func isExternalMounted() bool {
-	data, _ := os.ReadFile("/proc/mounts")
+	return isMounted("/proc/mounts", "/mnt/external")
+}
 
-	// check if the mount point exists in the data
-	return strings.Contains(string(data), "/mnt/external")
+// isMounted checks whether mountPoint is mounted according to the given
+// mounts file (normally /proc/mounts). Split out from isExternalMounted so
+// the mount detection logic can be unit tested against a fixture file
+// instead of the real, environment-dependent /proc/mounts.
+//
+// Each line of a mounts file has the form
+// "<device> <mountpoint> <fstype> <options> <dump> <pass>", so we match the
+// second field exactly rather than doing a raw substring search - otherwise
+// an unrelated mount whose path merely starts with mountPoint (e.g.
+// "/mnt/external2") would be mistaken for mountPoint itself being mounted.
+func isMounted(mountsFile, mountPoint string) bool {
+	data, _ := os.ReadFile(mountsFile)
+
+	for _, line := range strings.Split(string(data), "\n") {
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		if fields[1] == mountPoint {
+			return true
+		}
+	}
+	return false
 }
 
 func setupToml(configPathFlag string) (config.Config, error) {
