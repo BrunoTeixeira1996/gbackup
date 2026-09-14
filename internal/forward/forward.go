@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -34,11 +35,13 @@ var ForwardMessageToTelegram = func(status string, messageContent string, messag
 
 	resp, err := httpClient.Post(telegramBotURL, "application/json", bytes.NewBuffer(jsonData))
 	if err != nil {
+		log.Printf("[forward error] could not make POST request: %s\n", err)
 		return fmt.Errorf("[forward error] could not make POST request: %s\n", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		log.Printf("[forward error] telegram bot returned status code: %d\n", resp.StatusCode)
 		return fmt.Errorf("[forward error] telegram bot returned status code: %d\n", resp.StatusCode)
 	}
 
