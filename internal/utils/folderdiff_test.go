@@ -97,6 +97,49 @@ func TestGetFolderSize_NestedSubdirectories(t *testing.T) {
 	}
 }
 
+func TestGetFolderSize_UnreadableSubdirectoryIsSkippedNotFatal(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("running as root, permission checks don't apply")
+	}
+
+	tmpDir, err := os.MkdirTemp("", "unreadable")
+	if err != nil {
+		t.Fatalf("Error creating test directory: %v", err)
+	}
+	defer func() {
+		os.Chmod(filepath.Join(tmpDir, "locked"), 0755) // restore so RemoveAll can clean up
+		os.RemoveAll(tmpDir)
+	}()
+
+	content := make([]byte, 50*1024)
+	if err := os.WriteFile(filepath.Join(tmpDir, "readable.txt"), content, 0644); err != nil {
+		t.Fatalf("Error creating readable file: %v", err)
+	}
+
+	lockedDir := filepath.Join(tmpDir, "locked")
+	if err := os.Mkdir(lockedDir, 0755); err != nil {
+		t.Fatalf("Error creating locked directory: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(lockedDir, "hidden.txt"), content, 0644); err != nil {
+		t.Fatalf("Error creating file in locked directory: %v", err)
+	}
+	if err := os.Chmod(lockedDir, 0); err != nil {
+		t.Fatalf("Error removing permissions from locked directory: %v", err)
+	}
+
+	// the locked dir's contents can't be walked, but that shouldn't be
+	// fatal - it just gets skipped, and the readable file still counts
+	expectedSize := roundFloat(float64(len(content))/(1<<20), 2)
+
+	gotSize, err := GetFolderSize(tmpDir)
+	if err != nil {
+		t.Fatalf("GetFolderSize() returned unexpected error: %v", err)
+	}
+	if gotSize != expectedSize {
+		t.Errorf("Expected size %.2f MB (only the readable file), but got %.2f MB", expectedSize, gotSize)
+	}
+}
+
 func TestGetFolderSize_NonexistentFolder(t *testing.T) {
 	_, err := GetFolderSize("/path/does/not/exist/hopefully")
 	if err == nil {

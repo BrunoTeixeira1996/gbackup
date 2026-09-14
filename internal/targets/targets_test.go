@@ -107,3 +107,26 @@ func TestExecuteBackup_MultipleCases(t *testing.T) {
 		})
 	}
 }
+
+func TestExecuteBackup_MissingExternalPathLogsAndContinues(t *testing.T) {
+	originalRsync := commands.RsyncCommand
+	defer func() { commands.RsyncCommand = originalRsync }()
+
+	commands.RsyncCommand = func(cmd, to, target, pushgatewayURL string) error { return nil }
+
+	target := targets.Target{
+		Name:         "TestTarget",
+		ExternalPath: "/path/does/not/exist/hopefully",
+		RsyncCommands: []config.RsyncCommand{
+			{Name: "cmd1", Command: "-av a/ b/"},
+		},
+	}
+
+	elapsed := &utils.ElapsedTime{}
+	size := &utils.TargetSize{}
+
+	err := target.ExecuteBackup(config.Config{}, elapsed, size)
+	assert.NoError(t, err)
+	assert.Equal(t, 0.0, size.Before)
+	assert.Equal(t, 0.0, size.After)
+}

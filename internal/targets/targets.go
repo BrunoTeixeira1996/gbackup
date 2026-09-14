@@ -80,10 +80,21 @@ func ValidateBackupResultErrors(backupResults []BackupResult) {
 	}
 }
 
+// vars so tests can mock these instead of shelling out for real
+var execIPNeighbor = func(mac string) ([]byte, error) {
+	command := fmt.Sprintf("ip neighbor | grep '%s'", mac)
+	return exec.Command("bash", "-c", command).Output()
+}
+
+var execPing = func(ip string) ([]byte, error) {
+	return exec.Command("ping", ip, "-c", "2").Output()
+}
+
+var isAliveRetryDelay = 2 * time.Second
+
 // From a MAC address get the associated IP
 func (t *Target) getAssociatedIPFromMAC() (string, error) {
-	command := fmt.Sprintf("ip neighbor | grep '%s'", t.MAC)
-	out, err := exec.Command("bash", "-c", command).Output()
+	out, err := execIPNeighbor(t.MAC)
 	if err != nil {
 		return "", fmt.Errorf("[get associated IP from MAC error] could not grep that mac address: %s\n", err)
 	}
@@ -96,7 +107,6 @@ func (t *Target) getAssociatedIPFromMAC() (string, error) {
 func (t *Target) isAlive() (bool, error) {
 	var err error
 	const maxRetries = 2
-	const retryDelay = 2 * time.Second
 
 	// If the target only has the MAC address, grab the IP
 	// from the MAC address
@@ -107,11 +117,11 @@ func (t *Target) isAlive() (bool, error) {
 		}
 	}
 
-	ticker := time.NewTicker(retryDelay)
+	ticker := time.NewTicker(isAliveRetryDelay)
 	defer ticker.Stop()
 
 	for i := 0; i <= maxRetries; i++ {
-		out, err := exec.Command("ping", t.IP, "-c", "2").Output()
+		out, err := execPing(t.IP)
 		if err == nil {
 			if strings.Contains(string(out), "Destination Host Unreachable") {
 				return false, nil
