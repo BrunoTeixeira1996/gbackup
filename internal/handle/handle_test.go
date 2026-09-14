@@ -87,6 +87,9 @@ func TestBackupHandle_RunFails(t *testing.T) {
 	d.BackupHandle(w, req)
 
 	resp := w.Result()
+	if resp.StatusCode != http.StatusInternalServerError {
+		t.Errorf("status code = %d, want %d (a failed backup must not report success)", resp.StatusCode, http.StatusInternalServerError)
+	}
 	body, _ := io.ReadAll(resp.Body)
 	if !strings.Contains(string(body), "backup exploded") {
 		t.Errorf("body = %q, want it to contain the run.Run error", body)

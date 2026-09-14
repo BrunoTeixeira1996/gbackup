@@ -1,8 +1,12 @@
 package handle
 
 import (
+	"bytes"
+	"fmt"
+	"log"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/run"
@@ -69,4 +73,26 @@ func TestStartWebHook_CallableMoreThanOnce(t *testing.T) {
 
 	StartWebHook(run.Args{})
 	StartWebHook(run.Args{}) // must not panic
+}
+
+// a bind failure (e.g. port already in use) must be logged, not silently
+// swallowed - otherwise the webhook goroutine just dies with no
+// operator-visible signal
+func TestStartWebHook_BindErrorIsLogged(t *testing.T) {
+	original := listenAndServe
+	defer func() { listenAndServe = original }()
+	listenAndServe = func(addr string, handler http.Handler) error {
+		return fmt.Errorf("listen tcp :8000: address already in use")
+	}
+
+	var logBuf bytes.Buffer
+	origOutput := log.Writer()
+	log.SetOutput(&logBuf)
+	defer log.SetOutput(origOutput)
+
+	StartWebHook(run.Args{})
+
+	if !strings.Contains(logBuf.String(), "address already in use") {
+		t.Errorf("expected the bind error to be logged, got: %s", logBuf.String())
+	}
 }

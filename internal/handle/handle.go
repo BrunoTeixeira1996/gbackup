@@ -38,11 +38,11 @@ func (d *Demand) BackupHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Printf("Executing backup on demand with operation: %s\n", newBackup.Op)
-	fmt.Fprintf(w, "Executing backup on demand with operation: %s\n", newBackup.Op)
 
 	// Executes logic to backup
 	if err := run.Run(d.Args); err != nil {
 		log.Printf(err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	} else {
 		w.Write([]byte("Executed gbackup on demand! Check logs for more info"))
@@ -61,5 +61,7 @@ func StartWebHook(args run.Args) {
 	log.Println("started webhook ... ")
 	mux := http.NewServeMux()
 	mux.HandleFunc("/backup", demand.BackupHandle)
-	listenAndServe(":8000", mux)
+	if err := listenAndServe(":8000", mux); err != nil {
+		log.Printf("[handle error] webhook server stopped: %v", err)
+	}
 }
