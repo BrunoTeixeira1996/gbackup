@@ -27,10 +27,6 @@ func checkEnvVars() bool {
 	return true
 }
 
-func isExternalMounted() bool {
-	return isMounted("/proc/mounts", "/mnt/external")
-}
-
 // checks the mount point as a whole field, not a substring match
 // (otherwise "/mnt/external2" would count as "/mnt/external" being mounted)
 func isMounted(mountsFile, mountPoint string) bool {
@@ -80,19 +76,19 @@ func IsEverythingConfigured(configPathFlag string, debugFlag bool) (config.Confi
 	}
 	log.Printf("[setup info] env vars are OK\n")
 
-	log.Printf("[setup info] validating mount point\n")
-	if !isExternalMounted() {
-		log.Printf("[setup error] mount point is not mounted in the system\n")
-		return cfg, false
-	}
-	log.Printf("[setup info] mount point is OK\n")
-
 	log.Printf("[setup info] reading toml file\n")
 	if cfg, err = setupToml(configPathFlag); err != nil {
 		log.Println(err)
 		return cfg, false
 	}
 	log.Printf("[setup info] toml file is OK\n")
+
+	log.Printf("[setup info] validating mount point\n")
+	if !isMounted("/proc/mounts", cfg.External.ExternalPath) {
+		log.Printf("[setup error] mount point is not mounted in the system\n")
+		return cfg, false
+	}
+	log.Printf("[setup info] mount point is OK\n")
 
 	return cfg, true
 }
