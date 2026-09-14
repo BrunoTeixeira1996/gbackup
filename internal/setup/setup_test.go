@@ -134,3 +134,68 @@ func TestIsEverythingConfigured_MissingEnvVars(t *testing.T) {
 		t.Error("IsEverythingConfigured() with missing env vars = true, want false")
 	}
 }
+
+func setValidEnvVars(t *testing.T) {
+	t.Helper()
+	for _, v := range []string{"PBS_SECRET", "PBS_TOKENID", "PVE_SECRET", "PVE_TOKENID"} {
+		t.Setenv(v, "value")
+	}
+}
+
+func writeConfigWithExternalPath(t *testing.T, externalPath string) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "config.toml")
+	content := "[external]\nexternal_path = \"" + externalPath + "\"\n"
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		t.Fatalf("could not write test config: %v", err)
+	}
+	return path
+}
+
+func withMountsFilePath(t *testing.T, path string) {
+	t.Helper()
+	original := mountsFilePath
+	mountsFilePath = path
+	t.Cleanup(func() { mountsFilePath = original })
+}
+
+func TestIsEverythingConfigured_Success(t *testing.T) {
+	setValidEnvVars(t)
+	configPath := writeConfigWithExternalPath(t, "/mnt/my-custom-disk")
+	withMountsFilePath(t, writeMountsFile(t, "/dev/sdb1 /mnt/my-custom-disk ext4 rw 0 0\n"))
+
+	cfg, ok := IsEverythingConfigured(configPath, false)
+	if !ok {
+		t.Fatal("IsEverythingConfigured() = false, want true")
+	}
+	if cfg.External.ExternalPath != "/mnt/my-custom-disk" {
+		t.Errorf("cfg.External.ExternalPath = %q, want %q", cfg.External.ExternalPath, "/mnt/my-custom-disk")
+	}
+}
+
+// Regression coverage for a real bug: this used to check a hardcoded
+// "/mnt/external" instead of whatever the toml actually configures. Here
+// the toml points at a different, unmounted path, and the mounts fixture
+// only has the OLD hardcoded path mounted - so if the hardcoded check ever
+// comes back, this passes when it shouldn't.
+func TestIsEverythingConfigured_UsesConfiguredExternalPath(t *testing.T) {
+	setValidEnvVars(t)
+	configPath := writeConfigWithExternalPath(t, "/mnt/my-custom-disk")
+	withMountsFilePath(t, writeMountsFile(t, "/dev/sdb1 /mnt/external ext4 rw 0 0\n"))
+
+	_, ok := IsEverythingConfigured(configPath, false)
+	if ok {
+		t.Error("IsEverythingConfigured() = true, want false (the toml's external_path isn't in the mounts fixture)")
+	}
+}
+
+func TestIsEverythingConfigured_MountNotMounted(t *testing.T) {
+	setValidEnvVars(t)
+	configPath := writeConfigWithExternalPath(t, "/mnt/my-custom-disk")
+	withMountsFilePath(t, writeMountsFile(t, ""))
+
+	_, ok := IsEverythingConfigured(configPath, false)
+	if ok {
+		t.Error("IsEverythingConfigured() = true, want false when nothing is mounted")
+	}
+}
