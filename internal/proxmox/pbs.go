@@ -34,6 +34,14 @@ type Backup struct {
 	Status     string  `json:"status"`
 }
 
+// vars so tests can point these at a local server / use short timings
+// instead of the real host and the real 20s/30min production values
+var (
+	pbsAPIURL              = "https://nas1.lan:8007/api2/json"
+	pbsPollIntervalSeconds int64 = 20
+	pbsMaxWaitSeconds      int64 = 1800
+)
+
 // https://forum.proxmox.com/threads/pbs-api.154610/
 func (p *PBS) Init() error {
 	tokenID := os.Getenv("PBS_TOKENID")
@@ -41,7 +49,7 @@ func (p *PBS) Init() error {
 
 	p.API.TokenID = tokenID
 	p.API.Secret = secret
-	p.API.Url = "https://nas1.lan:8007/api2/json"
+	p.API.Url = pbsAPIURL
 	p.API.Node = "localhost"
 	p.API.Authorization = fmt.Sprintf("PBSAPIToken=%s:%s", p.API.TokenID, p.API.Secret)
 
@@ -69,18 +77,20 @@ func friendlyName(workerID string, idToName map[string]string) string {
 }
 
 // Loops all backups and prune jobs and waits
-// for all to finish so gbackup can proceed
+// for all to finish so gbackup can proceed. A job with an empty status is
+// still running and not yet counted; a job with a status that isn't "OK"
+// has genuinely failed, and is reported immediately instead of waiting out
+// the full timeout for a job that will never succeed.
 func (p *PBS) CheckBackupStatus(objects []config.ProxmoxObject) error {
 	var (
 		epoch            int64 = utils.Epoch() // epoch time of 12 PM for the current day
 		response         []byte
 		backups          QueryBackup
-		tempBackups      []Backup
 		err              error
 		totalObjects           = len(objects)
-		sleepTime        int64 = 20                    // Sleep time between checks in seconds
+		sleepTime        int64 = pbsPollIntervalSeconds
 		completed              = make(map[string]bool) // Map to track completed backups by "Upid"
-		maximumSleepTime int64 = 1800                  // waits 30 minutes before continuing with the program
+		maximumSleepTime int64 = pbsMaxWaitSeconds
 	)
 
 	idToName := make(map[string]string, len(objects))
@@ -91,8 +101,8 @@ func (p *PBS) CheckBackupStatus(objects []config.ProxmoxObject) error {
 	// Loop until all backup and prune jobs are completed
 	for {
 		// The PBS backup can break (it shouldn't but it might) so I can warn the telegram bot and end the program instead of staying on an infinite loop
-		maximumSleepTime -= 20
-		if maximumSleepTime == 0 {
+		maximumSleepTime -= sleepTime
+		if maximumSleepTime <= 0 {
 			return fmt.Errorf("[pbs info] 30 minutes passed and no PBS backup was completed, so ignoring the PBS backup but please check this")
 		}
 
@@ -116,15 +126,23 @@ func (p *PBS) CheckBackupStatus(objects []config.ProxmoxObject) error {
 				break
 			}
 
-			// Only process "prune" and "backup" jobs with "OK" status
-			if (b.WorkerType == "prune" || b.WorkerType == "backup") && b.Status == "OK" {
-				// Check if the backup job (identified by "Upid") is already completed
-				if _, exists := completed[b.Upid]; !exists {
-					// Add to tempBackups and mark the job as completed in the map
-					tempBackups = append(tempBackups, b)
-					completed[b.Upid] = true
-					log.Printf("[pbs info] added %s job for %s\n", b.WorkerType, friendlyName(b.WordID, idToName))
-				}
+			// Only process "prune" and "backup" jobs
+			if b.WorkerType != "prune" && b.WorkerType != "backup" {
+				continue
+			}
+
+			if _, exists := completed[b.Upid]; exists {
+				continue
+			}
+
+			switch b.Status {
+			case "":
+				// still running, not counted yet
+			case "OK":
+				completed[b.Upid] = true
+				log.Printf("[pbs info] added %s job for %s\n", b.WorkerType, friendlyName(b.WordID, idToName))
+			default:
+				return fmt.Errorf("[pbs error] %s job for %s was not OK (status: %s)\n", b.WorkerType, friendlyName(b.WordID, idToName), b.Status)
 			}
 		}
 
@@ -137,13 +155,6 @@ func (p *PBS) CheckBackupStatus(objects []config.ProxmoxObject) error {
 		// Sleep before retrying
 		log.Printf("[pbs info] incomplete jobs (%d/%d), sleeping for %d seconds...\n", len(completed), totalObjects*2, sleepTime)
 		time.Sleep(time.Duration(sleepTime) * time.Second)
-	}
-
-	// Final check to ensure all backups have "OK" status
-	for _, b := range tempBackups {
-		if b.Status != "OK" {
-			return fmt.Errorf("[pbs error] backup: %s was not OK\n", b.Upid)
-		}
 	}
 
 	return nil

@@ -85,6 +85,33 @@ func TestGetAllObjects_Mock_MalformedJSON(t *testing.T) {
 	}
 }
 
+// the existing NonOKStatus/MalformedJSON tests fail identically for both
+// lxc and qemu, so the LXC call (made first) always errors before the qemu
+// call is ever reached - this specifically exercises the qemu-only failure
+// path
+func TestGetAllObjects_Mock_QemuFailsButLxcSucceeds(t *testing.T) {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/nodes/localhost/lxc", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, `{"data":[{"vmid":100,"name":"lxc1","status":"running"}]}`)
+	})
+	mux.HandleFunc("/nodes/localhost/qemu", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	})
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	pve := proxmox.PVE{
+		API: proxmox.Boilerplate{
+			Url:  srv.URL,
+			Node: "localhost",
+		},
+	}
+
+	if err := pve.GetAllObjects(); err == nil {
+		t.Fatal("expected an error when the qemu endpoint fails, got nil")
+	}
+}
+
 func TestGetAllObjects_Mock_UnreachableHost(t *testing.T) {
 	pve := proxmox.PVE{
 		API: proxmox.Boilerplate{

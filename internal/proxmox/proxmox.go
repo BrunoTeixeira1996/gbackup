@@ -90,6 +90,9 @@ func (b *Boilerplate) request(rType, apiPath string) ([]byte, error) {
 	return res, nil
 }
 
+// var so tests can point this at a local server instead of the real host
+var pveAPIURL = "https://pve.lan:8006/api2/json"
+
 // https://forum.proxmox.com/threads/pbs-api.154610/
 func (p *PVE) Init() error {
 	tokenID := os.Getenv("PVE_TOKENID")
@@ -97,7 +100,7 @@ func (p *PVE) Init() error {
 
 	p.API.TokenID = tokenID
 	p.API.Secret = secret
-	p.API.Url = "https://pve.lan:8006/api2/json"
+	p.API.Url = pveAPIURL
 	p.API.Node = "localhost"
 	p.API.Authorization = fmt.Sprintf("PVEAPIToken=%s=%s", p.API.TokenID, p.API.Secret)
 
