@@ -12,7 +12,7 @@ func TestInit(t *testing.T) {
 	secret := os.Getenv("PVE_SECRET")
 
 	if tokenID == "" || secret == "" {
-		t.Fatalf("PVE_TOKENID or PVE_SECRET not defined.")
+		t.Skip("PVE_TOKENID or PVE_SECRET environment variables are not set. Skipping test.")
 	}
 
 	var pve proxmox.PVE
@@ -32,7 +32,7 @@ func TestGetAllObjects(t *testing.T) {
 	secret := os.Getenv("PVE_SECRET")
 
 	if tokenID == "" || secret == "" {
-		t.Fatalf("PVE_TOKENID or PVE_SECRET not defined.")
+		t.Skip("PVE_TOKENID or PVE_SECRET environment variables are not set. Skipping test.")
 	}
 
 	var pve proxmox.PVE
