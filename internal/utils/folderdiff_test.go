@@ -15,8 +15,8 @@ func TestGetFolderSize(t *testing.T) {
 	}
 	defer os.RemoveAll(tmpDir)
 
-	// Create files
-	content := []byte("This is a test file.")
+	// Create files (big enough to round to a nonzero MB value)
+	content := make([]byte, 50*1024)
 	file1 := filepath.Join(tmpDir, "file1.txt")
 	file2 := filepath.Join(tmpDir, "file2.txt")
 
