@@ -37,11 +37,24 @@ type Target struct {
 	RsyncCommands []RsyncCommand `toml:"rsync_commands"`
 }
 
+// ProxmoxObject is one LXC/VM that PBS backs up. Add or remove entries here
+// when you add/remove something from the PBS backup job - no code change
+// needed.
+type ProxmoxObject struct {
+	ID   string `toml:"id"`
+	Name string `toml:"name"`
+}
+
+type Proxmox struct {
+	Objects []ProxmoxObject `toml:"objects"`
+}
+
 type Config struct {
 	NAS         NAS         `toml:"nas"`
 	Pushgateway Pushgateway `toml:"pushgateway"`
 	External    External    `toml:"external"`
 	Targets     []Target    `toml:"targets"`
+	Proxmox     Proxmox     `toml:"proxmox"`
 }
 
 // Helper function to replace {current_time} in RsyncCommand in external

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 	"github.com/BrunoTeixeira1996/gbackup/internal/utils"
 )
 
@@ -46,19 +48,45 @@ func (p *PBS) Init() error {
 	return nil
 }
 
+// vmidFromWorkerID pulls the vmid (e.g. "ct-101") out of a PBS worker_id,
+// which looks like "<datastore>:<vmid>" (e.g. "backupProxmox:ct-101").
+func vmidFromWorkerID(workerID string) string {
+	_, vmid, found := strings.Cut(workerID, ":")
+	if !found {
+		return workerID
+	}
+	return vmid
+}
+
+// friendlyName looks up the configured name for a job's vmid, falling back
+// to the vmid itself when it's not in the configured list.
+func friendlyName(workerID string, idToName map[string]string) string {
+	vmid := vmidFromWorkerID(workerID)
+	if name, ok := idToName[vmid]; ok {
+		return fmt.Sprintf("%s (%s)", name, vmid)
+	}
+	return vmid
+}
+
 // Loops all backups and prune jobs and waits
 // for all to finish so gbackup can proceed
-func (p *PBS) CheckBackupStatus(totalObjects int) error {
+func (p *PBS) CheckBackupStatus(objects []config.ProxmoxObject) error {
 	var (
 		epoch            int64 = utils.Epoch() // epoch time of 12 PM for the current day
 		response         []byte
 		backups          QueryBackup
 		tempBackups      []Backup
 		err              error
+		totalObjects           = len(objects)
 		sleepTime        int64 = 20                    // Sleep time between checks in seconds
 		completed              = make(map[string]bool) // Map to track completed backups by "Upid"
 		maximumSleepTime int64 = 1800                  // waits 30 minutes before continuing with the program
 	)
+
+	idToName := make(map[string]string, len(objects))
+	for _, o := range objects {
+		idToName[o.ID] = o.Name
+	}
 
 	// Loop until all backup and prune jobs are completed
 	for {
@@ -83,9 +111,7 @@ func (p *PBS) CheckBackupStatus(totalObjects int) error {
 		// Process backups and avoid duplicates using the map
 		for _, b := range backups.DataBackup {
 			// If we reach the expected number of jobs, exit the loop
-			// This is hardcoded because I don't backup all VMs/LXC (no storage for that)
-			// for now I only backup 8 (5 LXC and 3 VMs)
-			if len(completed) == 8*2 { //totalObjects*2 {
+			if len(completed) == totalObjects*2 {
 				log.Printf("[pbs info] all %d backup and prune jobs completed\n", len(completed))
 				break
 			}
@@ -97,13 +123,13 @@ func (p *PBS) CheckBackupStatus(totalObjects int) error {
 					// Add to tempBackups and mark the job as completed in the map
 					tempBackups = append(tempBackups, b)
 					completed[b.Upid] = true
-					log.Printf("[pbs info] added backup job %s (type: %s)\n", b.Upid, b.WorkerType)
+					log.Printf("[pbs info] added %s job for %s\n", b.WorkerType, friendlyName(b.WordID, idToName))
 				}
 			}
 		}
 
 		// Check if all backups are done
-		if len(completed) == 16 { //totalObjects*2 {
+		if len(completed) == totalObjects*2 {
 			log.Printf("[pbs info] successfully completed %d backup and prune jobs.\n", len(completed))
 			break
 		}
@@ -124,12 +150,11 @@ func (p *PBS) CheckBackupStatus(totalObjects int) error {
 }
 
 // var so it can be mocked in tests
-var CheckPBSBackupStatus = func() error {
+var CheckPBSBackupStatus = func(objects []config.ProxmoxObject) error {
 	var (
-		pve          = &PVE{}
-		pbs          = &PBS{}
-		totalObjects int
-		err          error
+		pve = &PVE{}
+		pbs = &PBS{}
+		err error
 	)
 
 	log.Println("[proxmox info] initializing PBS")
@@ -137,6 +162,8 @@ var CheckPBSBackupStatus = func() error {
 		return err
 	}
 
+	// Purely informational: lets you compare against len(objects) in the
+	// logs to notice when a new LXC/VM hasn't been added to config.toml yet.
 	log.Println("[proxmox info] initializing PVE")
 	if err = pve.Init(); err != nil {
 		return err
@@ -147,11 +174,10 @@ var CheckPBSBackupStatus = func() error {
 		return err
 	}
 
-	totalObjects = len(pve.LXCs) + len(pve.VMs)
-	log.Printf("[proxmox info] total objects: %d\n", totalObjects)
+	log.Printf("[proxmox info] total objects on proxmox: %d, configured for backup: %d\n", len(pve.LXCs)+len(pve.VMs), len(objects))
 
 	log.Println("[proxmox info] checking backup status")
-	if err := pbs.CheckBackupStatus(totalObjects); err != nil {
+	if err := pbs.CheckBackupStatus(objects); err != nil {
 		return err
 	}
 	log.Printf("[proxmox info] all backups completed successfully and have 'OK' status.\n")

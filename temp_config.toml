@@ -46,3 +46,29 @@ external_path = "/mnt/external/worklaptop_backup"
 [[targets.rsync_commands]]
 name = "Backup_work_laptop"
 command = "-av --copy-links -e ssh --exclude=personal --exclude=tools worklaptop:/home/brun0/Desktop worklaptop:/home/brun0/.ssh /mnt/external/worklaptop_backup"
+
+
+[[proxmox.objects]]
+id = "ct-101"
+name = "bot"
+[[proxmox.objects]]
+id = "ct-102"
+name = "gkconfig"
+[[proxmox.objects]]
+id = "ct-107"
+name = "monitoring"
+[[proxmox.objects]]
+id = "vm-111"
+name = "WS2022-DC"
+[[proxmox.objects]]
+id = "vm-115"
+name = "homeassistant"
+[[proxmox.objects]]
+id = "ct-116"
+name = "frigate"
+[[proxmox.objects]]
+id = "vm-117"
+name = "zigbee2mqtt"
+[[proxmox.objects]]
+id = "ct-118"
+name = "jellyfin"

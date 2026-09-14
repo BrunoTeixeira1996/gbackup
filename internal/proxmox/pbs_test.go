@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/BrunoTeixeira1996/gbackup/internal/config"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 )
 
@@ -51,13 +52,13 @@ func TestCheckBackupStatus(t *testing.T) {
 		t.Fatalf("Failed to initialize PBS: %s", err)
 	}
 
-	// Set a small totalObjects count for testing
-	totalObjects := 1
+	// Set a small object count for testing
+	objects := []config.ProxmoxObject{{ID: "ct-101"}}
 
 	// Set a timeout to prevent infinite loops if PBS API is unresponsive
 	done := make(chan error, 1)
 	go func() {
-		done <- pbs.CheckBackupStatus(totalObjects)
+		done <- pbs.CheckBackupStatus(objects)
 	}()
 
 	select {
