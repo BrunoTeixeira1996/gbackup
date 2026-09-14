@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"log"
 	"math"
+	"os"
 	"path/filepath"
 )
 
@@ -21,6 +22,10 @@ func roundFloat(val float64, precision uint) float64 {
 
 // GetFolderSize returns the total folder size in megabytes (MB)
 func GetFolderSize(folderPath string) (float64, error) {
+	if _, err := os.Stat(folderPath); err != nil {
+		return 0.0, fmt.Errorf("[folderdiff error] %s: %w", folderPath, err)
+	}
+
 	var totalSize float64
 
 	err := filepath.WalkDir(folderPath, func(path string, d fs.DirEntry, err error) error {
