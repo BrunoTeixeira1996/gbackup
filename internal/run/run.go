@@ -22,7 +22,8 @@ type Args struct {
 	DebugFlag      bool
 }
 
-func Run(args Args) error {
+// var so it can be mocked in tests
+var Run = func(args Args) error {
 	var (
 		ctx        = context.Background()
 		setupOK    bool

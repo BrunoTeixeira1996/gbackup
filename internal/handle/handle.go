@@ -49,6 +49,9 @@ func (d *Demand) BackupHandle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// var so it can be mocked in tests
+var listenAndServe = http.ListenAndServe
+
 // StartWebHook starts the webhook server
 func StartWebHook(args run.Args) {
 	demand := Demand{
@@ -56,6 +59,7 @@ func StartWebHook(args run.Args) {
 	}
 
 	log.Println("started webhook ... ")
-	http.HandleFunc("/backup", demand.BackupHandle)
-	http.ListenAndServe(":8000", nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/backup", demand.BackupHandle)
+	listenAndServe(":8000", mux)
 }

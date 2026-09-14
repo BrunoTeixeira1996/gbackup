@@ -8,6 +8,9 @@ import (
 	"github.com/prometheus/client_golang/prometheus/push"
 )
 
+// var so tests can point this at a local server instead of the real host
+var pushgatewayURL = "http://192.168.30.24:9091"
+
 func SendFinalResultsToMonitoring(results []targets.BackupResult) {
 	// Collectors slice
 	var collectors []prometheus.Collector
@@ -39,7 +42,7 @@ func SendFinalResultsToMonitoring(results []targets.BackupResult) {
 	}
 
 	// Push all metrics at once
-	pusher := push.New("http://192.168.30.24:9091", "gbackup_metrics")
+	pusher := push.New(pushgatewayURL, "gbackup_metrics")
 	for _, c := range collectors {
 		pusher.Collector(c)
 	}
