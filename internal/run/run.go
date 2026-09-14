@@ -96,13 +96,7 @@ func Run(args Args) error {
 
 	// only check for PBS whenever is in production mode
 	if !args.DebugFlag {
-		// check PBS backup, if err is nil, that means we can turn off NAS
-		log.Printf("[run info] checking PBS backup status\n")
-		if err := proxmox.CheckPBSBackupStatus(); err != nil {
-			e := fmt.Errorf("[run error] could not check PBS backup status: %s\n", err)
-			forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
-		}
-		utils.Body("[PBS] Backup OK ✅")
+		checkPBSBackupAndReport()
 	}
 
 	// we dont want to keep shuting down NAS while debuging
@@ -127,4 +121,15 @@ func Run(args Args) error {
 	utils.Footer()
 
 	return nil
+}
+
+func checkPBSBackupAndReport() {
+	// check PBS backup, if err is nil, that means we can turn off NAS
+	log.Printf("[run info] checking PBS backup status\n")
+	if err := proxmox.CheckPBSBackupStatus(); err != nil {
+		e := fmt.Errorf("[run error] could not check PBS backup status: %s\n", err)
+		forward.ForwardMessageToTelegram("EXECUTING BACKUP", "Error while executing backup", e.Error())
+	} else {
+		utils.Body("[PBS] Backup OK ✅")
+	}
 }
