@@ -30,11 +30,14 @@ func TestReturnFinalResultsFormatted(t *testing.T) {
 	if !strings.HasPrefix(got, "```\n") || !strings.HasSuffix(got, "```") {
 		t.Errorf("expected output wrapped in code fences, got: %q", got)
 	}
-	if !strings.Contains(got, "TargetName: t1") || !strings.Contains(got, "TargetName: t2") {
+	if !strings.Contains(got, "t1") || !strings.Contains(got, "t2") {
 		t.Errorf("expected both target names present, got: %q", got)
 	}
-	if !strings.Contains(got, "Error: boom") {
-		t.Errorf("expected error message for t2 present, got: %q", got)
+	if !strings.Contains(got, "Status: OK") {
+		t.Errorf("expected t1's status to read OK, got: %q", got)
+	}
+	if !strings.Contains(got, "Status: FAILED: boom") {
+		t.Errorf("expected t2's status to name the error, got: %q", got)
 	}
 	if !strings.Contains(got, "Total backup time: 01:01:01 (hh:mm:ss)") {
 		t.Errorf("expected formatted total time, got: %q", got)

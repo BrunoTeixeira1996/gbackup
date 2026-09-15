@@ -49,24 +49,51 @@ func DisplayFinalResults(backupResults []BackupResult) {
 	}
 }
 
+// formatDuration shows sub-minute durations in seconds, longer ones in
+// minutes and seconds
+func formatDuration(seconds float64) string {
+	if seconds < 60 {
+		return fmt.Sprintf("%.1fs", seconds)
+	}
+	minutes := int(seconds) / 60
+	remaining := seconds - float64(minutes*60)
+	return fmt.Sprintf("%dm %.1fs", minutes, remaining)
+}
+
+// formatSize shows sub-1024MB sizes in MB, larger ones in GB. mb is
+// already in megabytes (see utils.GetFolderSize).
+func formatSize(mb float64) string {
+	if mb < 1024 {
+		return fmt.Sprintf("%.2f MB", mb)
+	}
+	return fmt.Sprintf("%.2f GB", mb/1024)
+}
+
 // Return all values from previous backups but to a string
 func ReturnFinalResultsFormatted(backupResults []BackupResult, backupTotalTime float64) string {
-	var (
-		finalResults string
-		temp         string
-	)
+	var finalResults string
 
 	for _, r := range backupResults {
-		temp = fmt.Sprintf("TargetName: %s - ElapsedTime: %.3f - TargetSize Before: %.3f, TargetSize After: %.3f - Error: %v\n", r.TargetName, r.ElapsedTime.Value, r.TargetSize.Before, r.TargetSize.After, r.Err)
+		status := "OK"
+		if r.Err != nil {
+			status = fmt.Sprintf("FAILED: %v", r.Err)
+		}
 
-		finalResults += temp
+		finalResults += fmt.Sprintf(
+			"%s\n  Time: %s\n  Size: %s -> %s\n  Status: %s\n\n",
+			r.TargetName,
+			formatDuration(r.ElapsedTime.Value),
+			formatSize(r.TargetSize.Before),
+			formatSize(r.TargetSize.After),
+			status,
+		)
 	}
 
 	hours := int(backupTotalTime) / 3600
 	minutes := (int(backupTotalTime) % 3600) / 60
 	seconds := int(backupTotalTime) % 60
 
-	finalResults += fmt.Sprintf("\n\nTotal backup time: %02d:%02d:%02d (hh:mm:ss)\n", hours, minutes, seconds)
+	finalResults += fmt.Sprintf("Total backup time: %02d:%02d:%02d (hh:mm:ss)\n", hours, minutes, seconds)
 
 	return "```\n" + finalResults + "```"
 }
