@@ -108,6 +108,41 @@ func TestExecuteBackup_MultipleCases(t *testing.T) {
 	}
 }
 
+// with several rsync commands under one target, a failure must name which
+// specific command failed - otherwise "rsync exited with code 2" alone
+// doesn't tell you which of e.g. waiw/gmah/bull broke
+func TestExecuteBackup_ErrorNamesTheFailingCommand(t *testing.T) {
+	originalRsync := commands.RsyncCommand
+	defer func() { commands.RsyncCommand = originalRsync }()
+
+	commands.RsyncCommand = func(cmd, to, target, pushgatewayURL string) error {
+		if target == "Backup_bull_from_gokrazy" {
+			return fmt.Errorf("[prom error] rsync exited with code 2")
+		}
+		return nil
+	}
+
+	target := targets.Target{
+		Name:         "gokr_perm",
+		ExternalPath: t.TempDir(),
+		RsyncCommands: []config.RsyncCommand{
+			{Name: "Backup_waiw_from_gokrazy", Command: "-a a/ b/"},
+			{Name: "Backup_gmah_from_gokrazy", Command: "-a c/ d/"},
+			{Name: "Backup_bull_from_gokrazy", Command: "-a e/ f/"},
+		},
+	}
+
+	elapsed := &utils.ElapsedTime{}
+	size := &utils.TargetSize{}
+
+	err := target.ExecuteBackup(config.Config{}, elapsed, size)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "Backup_bull_from_gokrazy")
+	assert.Contains(t, err.Error(), "rsync exited with code 2")
+	assert.NotContains(t, err.Error(), "Backup_waiw_from_gokrazy: ")
+	assert.NotContains(t, err.Error(), "Backup_gmah_from_gokrazy: ")
+}
+
 func TestExecuteBackup_MissingExternalPathLogsAndContinues(t *testing.T) {
 	originalRsync := commands.RsyncCommand
 	defer func() { commands.RsyncCommand = originalRsync }()

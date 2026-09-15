@@ -1,6 +1,7 @@
 package targets
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/commands"
@@ -52,7 +53,7 @@ func ExecuteExternalToNASBackup(external External, cfg config.Config) error {
 	for _, rsyncCommand := range external.RsyncCommands {
 		if err = commands.RsyncCommand(rsyncCommand.Command, "toNAS", rsyncCommand.Name, cfg.Pushgateway.Url); err != nil {
 			log.Printf("[external backup error] could not perform RsyncCommand in external to NAS: %s\n", err)
-			return err
+			return fmt.Errorf("%s: %w", rsyncCommand.Name, err)
 		}
 	}
 	log.Printf("[external backup info] completed backup of external to NAS (%s)\n", cfg.NAS.Name)

@@ -36,12 +36,11 @@ func TestExecCmdToProm_CommandNotFound(t *testing.T) {
 	}
 }
 
-func TestExecCmdToProm_NonZeroExitDoesNotError(t *testing.T) {
+func TestExecCmdToProm_NonZeroExitReturnsError(t *testing.T) {
 	pg := newPushgatewayStub(t)
 
-	// a non-zero exit code alone isn't an error, only a failed start/parse is
 	err := commands.ExecCmdToProm("false", nil, "toExternal", "testInstance", pg.URL)
-	if err != nil {
-		t.Fatalf("ExecCmdToProm() returned unexpected error for a command that exits non-zero: %v", err)
+	if err == nil {
+		t.Fatal("expected an error for a command that exits non-zero, got nil")
 	}
 }

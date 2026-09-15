@@ -21,6 +21,7 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		c          *exec.Cmd
 		stdoutPipe io.ReadCloser
 		err        error
+		exitCode   int
 	)
 
 	ctx := context.Background()
@@ -47,14 +48,16 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		if err := c.Wait(); err != nil {
 			if exiterr, ok := err.(*exec.ExitError); ok {
 				if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-					code := status.ExitStatus()
-					return code
+					exitCode = status.ExitStatus()
+					return exitCode
 				}
 			}
 			log.Printf("[prom error] error while waiting: %s\n", err)
-			return 1
+			exitCode = 1
+			return exitCode
 		}
-		return 0
+		exitCode = 0
+		return exitCode
 	}
 
 	params := rsyncprom.WrapParams{
@@ -62,8 +65,15 @@ func ExecCmdToProm(name string, command []string, commandType string, instance s
 		Instance:    instance,
 		Job:         commandType, // this is toExternal or toNAS
 	}
-	// executes WrapRsync from rsyncprom and export metrics to prometheus
+	// executes WrapRsync from rsyncprom and export metrics to prometheus.
+	// WrapRsync only returns an error if starting the command or parsing
+	// its output failed - it records the exit code as a metric but never
+	// as a returned error, so a real rsync failure (e.g. protocol
+	// incompatibility) would otherwise be reported as success.
 	err = rsyncprom.WrapRsync(ctx, &params, flag.Args(), start, wait)
+	if err == nil && exitCode != 0 {
+		err = fmt.Errorf("[prom error] rsync exited with code %d", exitCode)
+	}
 	log.Printf("[prom info] executing %s %s -> result: %s\n", instance, params.Job,
 		func() string {
 			if err == nil {

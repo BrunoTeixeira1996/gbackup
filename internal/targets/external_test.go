@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/BrunoTeixeira1996/gbackup/internal/commands"
@@ -134,8 +135,12 @@ func TestExecuteExternalToNASBackup_RsyncFails(t *testing.T) {
 		RsyncCommands: []config.RsyncCommand{{Name: "cmd1", Command: "-av a/ b/"}},
 	}
 
-	if err := targets.ExecuteExternalToNASBackup(external, config.Config{}); err == nil {
+	err := targets.ExecuteExternalToNASBackup(external, config.Config{})
+	if err == nil {
 		t.Fatal("expected an error when RsyncCommand fails, got nil")
+	}
+	if !strings.Contains(err.Error(), "cmd1") {
+		t.Errorf("error = %v, want it to name the failing rsync command (cmd1)", err)
 	}
 	if keepLastTwoCalled {
 		t.Error("expected nas.KeepLastTwo NOT to be called when the rsync step fails, but it was")

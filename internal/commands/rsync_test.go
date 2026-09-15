@@ -53,10 +53,11 @@ func TestRsyncCommand_PropagatesError(t *testing.T) {
 	}))
 	defer pg.Close()
 
-	// source dir doesn't exist, rsync exits non-zero, but that's not an error
+	// source dir doesn't exist, rsync exits non-zero, and that must surface
+	// as a real error
 	cmd := "-a /path/does/not/exist/hopefully/ " + t.TempDir() + "/"
 	err := commands.RsyncCommand(cmd, "toExternal", "testtarget", pg.URL)
-	if err != nil {
-		t.Fatalf("RsyncCommand() returned unexpected error: %v", err)
+	if err == nil {
+		t.Fatal("expected an error when the source directory doesn't exist, got nil")
 	}
 }

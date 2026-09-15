@@ -76,7 +76,7 @@ func ReturnFinalResultsFormatted(backupResults []BackupResult, backupTotalTime f
 	for _, r := range backupResults {
 		status := "OK"
 		if r.Err != nil {
-			status = fmt.Sprintf("FAILED: %v", r.Err)
+			status = fmt.Sprintf("FAILED: %v", strings.TrimSpace(r.Err.Error()))
 		}
 
 		finalResults += fmt.Sprintf(
@@ -187,10 +187,7 @@ func (t *Target) ExecuteBackup(cfg config.Config, el *utils.ElapsedTime, ts *uti
 	for _, rsyncCommand := range t.RsyncCommands {
 		if err := commands.RsyncCommand(rsyncCommand.Command, "toExternal", rsyncCommand.Name, cfg.Pushgateway.Url); err != nil {
 			log.Printf("[executeBackup error] could not perform RsyncCommand in %s: %s\n", t.Name, err)
-			// FIXME: I think this solves the problem when we have more than
-			// one rsync command and with multiple errors
-			// need to test this
-			listOfErrors += err.Error() + "\n"
+			listOfErrors += fmt.Sprintf("%s: %s\n", rsyncCommand.Name, err)
 		}
 	}
 

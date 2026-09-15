@@ -44,6 +44,23 @@ func TestReturnFinalResultsFormatted(t *testing.T) {
 	}
 }
 
+// a trailing newline in the error (e.g. from ExecuteBackup's aggregated
+// errors) shouldn't leave a blank line inside the target's block
+func TestReturnFinalResultsFormatted_TrimsTrailingNewlineInError(t *testing.T) {
+	results := []targets.BackupResult{
+		{TargetName: "t1", Err: errors.New("Backup_bull_from_gokrazy: rsync exited with code 2\n")},
+	}
+
+	got := targets.ReturnFinalResultsFormatted(results, 0)
+
+	if strings.Contains(got, "code 2\n\n\n") {
+		t.Errorf("expected no extra blank line after the error, got: %q", got)
+	}
+	if !strings.Contains(got, "Status: FAILED: Backup_bull_from_gokrazy: rsync exited with code 2\n\n") {
+		t.Errorf("expected exactly one blank line separating target blocks, got: %q", got)
+	}
+}
+
 func TestReturnFinalResultsFormatted_TimeFormatting(t *testing.T) {
 	tests := []struct {
 		name       string
