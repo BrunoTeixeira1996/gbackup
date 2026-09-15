@@ -10,10 +10,10 @@ url = "http://192.168.30.24:9091"
 external_path = "/mnt/external"
 [[external.rsync_commands]]
 name = "external_all_except_worklaptop"
-command = "-av -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump --exclude=worklaptop_backup /mnt/external nas1.lan:/mnt/datastore/backupExternal/{current_time}/"
+command = "-a -e ssh --exclude=template --exclude=snippets --exclude=private --exclude=lost+found --exclude=images --exclude=dump --exclude=worklaptop_backup /mnt/external nas1.lan:/mnt/datastore/backupExternal/{current_time}/"
 [[external.rsync_commands]]
 name = "external_only_worklaptop"
-command = "-av -e ssh /mnt/external/worklaptop_backup nas1.lan:/mnt/datastore/backupExternal/{current_time}/external"
+command = "-a -e ssh /mnt/external/worklaptop_backup nas1.lan:/mnt/datastore/backupExternal/{current_time}/external"
 
 
 
@@ -24,13 +24,13 @@ mac = "d8:3a:dd:3b:84:64"
 external_path = "/mnt/external/gokrazy_backup"
 [[targets.rsync_commands]]
 name = "Backup_waiw_from_gokrazy"
-command = "-av --delete --chmod=ugo=rwx -e ssh rsync://waiw-backup/waiw /mnt/external/gokrazy_backup/waiw_backup"
+command = "-a --delete --chmod=ugo=rwx -e ssh rsync://waiw-backup/waiw /mnt/external/gokrazy_backup/waiw_backup"
 [[targets.rsync_commands]]
 name = "Backup_gmah_from_gokrazy"
-command = "-av --delete --chmod=ugo=rwx -e ssh rsync://gmah-backup/gmah /mnt/external/gokrazy_backup/gmah_backup"
+command = "-a --delete --chmod=ugo=rwx -e ssh rsync://gmah-backup/gmah /mnt/external/gokrazy_backup/gmah_backup"
 [[targets.rsync_commands]]
 name = "Backup_bull_from_gokrazy"
-command = "-av --delete --chmod=ugo=rwx -e ssh rsync://bull-backup/bull /mnt/external/gokrazy_backup/bull_backup"
+command = "-a --delete --chmod=ugo=rwx -e ssh rsync://bull-backup/bull /mnt/external/gokrazy_backup/bull_backup"
 
 
 [[targets]]
@@ -48,7 +48,7 @@ mac = "FC:6D:77:AF:24:09"
 external_path = "/mnt/external/worklaptop_backup"
 [[targets.rsync_commands]]
 name = "Backup_work_laptop"
-command = "-av --copy-links -e ssh --exclude=personal --exclude=work-git --exclude=tools worklaptop:/home/brun0/Desktop worklaptop:/home/brun0/.ssh /mnt/external/worklaptop_backup"
+command = "-a --copy-links -e ssh --exclude=personal --exclude=work-git --exclude=tools --exclude=kali worklaptop:/home/brun0/Desktop worklaptop:/home/brun0/.ssh /mnt/external/worklaptop_backup"
 
 
 [[proxmox.objects]]
