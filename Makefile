@@ -24,4 +24,6 @@ tests:
 
 deploy:
 	$(MAKE) compile
+	ssh $(REMOTE_HOST) 'sudo supervisorctl stop gbackup'
 	rsync -avz --update $(FILES) $(REMOTE_USER)@$(REMOTE_HOST):$(REMOTE_PATH)
+	ssh $(REMOTE_HOST) 'sudo supervisorctl start gbackup'
