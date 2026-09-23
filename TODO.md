@@ -50,4 +50,4 @@
 Since log rotation makes no sense here (because I have this as a cronjob and it is always running)
 I can read the `/var/log/gbackup.err.log` file and grab all lines that are between `2024/10/15 17:08:59 Start Gbackup: 2024/10/15` and `2024/10/15 16:12:29 End Gbackup: 2024/10/15` and build a html template based on that
 - [x] Implement gbackup interaction with new worklaptop
-- [ ] Check if its end of month, if yes perform the openwrt + switch backup, change the files present at `/mnt/pve/external/network_backup` and the gbackup already performs the rest
+- [ ] Perform the openwrt + switch backup, change the files present at `/mnt/pve/external/network_backup` and the gbackup already performs the rest
