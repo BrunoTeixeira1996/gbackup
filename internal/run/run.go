@@ -10,6 +10,7 @@ import (
 	"github.com/BrunoTeixeira1996/gbackup/internal/forward"
 	"github.com/BrunoTeixeira1996/gbackup/internal/monitoring"
 	"github.com/BrunoTeixeira1996/gbackup/internal/nas"
+	"github.com/BrunoTeixeira1996/gbackup/internal/network"
 	"github.com/BrunoTeixeira1996/gbackup/internal/proxmox"
 	"github.com/BrunoTeixeira1996/gbackup/internal/setup"
 	"github.com/BrunoTeixeira1996/gbackup/internal/targets"
@@ -62,6 +63,11 @@ var Run = func(args Args) error {
 	// count time of external backup
 	startExternal := time.Now()
 	el := utils.ElapsedTime{}
+
+	// execute the network backup here
+	if err := network.ExecuteNetworkBackup(); err != nil {
+		log.Print(err)
+	}
 
 	// execute the backup
 	results := targets.ExecuteTargetsBackups(ts, args.Cfg)

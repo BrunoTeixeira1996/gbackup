@@ -11,10 +11,14 @@ import (
 
 func checkEnvVars() bool {
 	envVars := map[string]string{
-		"PBS_SECRET":  os.Getenv("PBS_SECRET"),
-		"PBS_TOKENID": os.Getenv("PBS_TOKENID"),
-		"PVE_SECRET":  os.Getenv("PVE_SECRET"),
-		"PVE_TOKENID": os.Getenv("PVE_TOKENID"),
+		"PBS_SECRET":    os.Getenv("PBS_SECRET"),
+		"PBS_TOKENID":   os.Getenv("PBS_TOKENID"),
+		"PVE_SECRET":    os.Getenv("PVE_SECRET"),
+		"PVE_TOKENID":   os.Getenv("PVE_TOKENID"),
+		"OPENWRT_USER":  os.Getenv("OPENWRT_USER"),
+		"OPENWRT_PW":    os.Getenv("OPENWRT_PW"),
+		"TPSWITCH_USER": os.Getenv("TPSWITCH_USER"),
+		"TPSWITCH_PW":   os.Getenv("TPSWITCH_PW"),
 	}
 	for key, value := range envVars {
 		if value == "" {
