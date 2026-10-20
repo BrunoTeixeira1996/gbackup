@@ -1,0 +1,967 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"tpsw",
+				"TpswitchInit"
+			],
+			[
+				"openwr",
+				"openwrtLogin"
+			],
+			[
+				"S",
+				"StatusCode"
+			],
+			[
+				"keypadResponse",
+				"keypadResponse.Battery"
+			],
+			[
+				"keypad",
+				"keypadResponse"
+			],
+			[
+				"Ac",
+				"ActionCode"
+			],
+			[
+				"keypadResp",
+				"keypadResponse.ActionCode"
+			],
+			[
+				"handle",
+				"handleKeypadResponseAction"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "gbackup.sublime-project",
+			"file_size": 45,
+			"file_write_time": 134369595940036463,
+			"settings":
+			{
+				"buffer_size": 45,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"pretty",
+				"Pretty JSON: Format JSON"
+			],
+			[
+				"set syntax jso",
+				"Set Syntax: JSON"
+			],
+			[
+				"set syn pyt",
+				"Set Syntax: Python"
+			],
+			[
+				"package ",
+				"Package Control: Install Package"
+			],
+			[
+				"package remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"package in",
+				"Package Control: Install Package"
+			],
+			[
+				"color the",
+				"UI: Select Color Scheme"
+			],
+			[
+				"package",
+				"Package Control: Install Package"
+			],
+			[
+				"color",
+				"UI: Select Color Scheme"
+			],
+			[
+				"cpakge remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"customi",
+				"UI: Customize Color Scheme"
+			],
+			[
+				"cpakage remo",
+				"Package Control: Remove Package"
+			],
+			[
+				"theme",
+				"UI: Select Color Scheme"
+			],
+			[
+				"custom",
+				"UI: Customize Color Scheme"
+			],
+			[
+				"color theme",
+				"UI: Customize Color Scheme"
+			],
+			[
+				"packa",
+				"Package Control: Install Package"
+			],
+			[
+				"custo",
+				"UI: Customize Theme"
+			],
+			[
+				"git diff",
+				"git: diff"
+			],
+			[
+				"git stat",
+				"git: status"
+			],
+			[
+				"git log",
+				"git: log"
+			],
+			[
+				"package remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"package ins",
+				"Package Control: Install Package"
+			],
+			[
+				"package install",
+				"Package Control: Install Package"
+			],
+			[
+				"pretty json",
+				"Pretty JSON: Format JSON"
+			],
+			[
+				"ansi",
+				"Set Syntax: ANSI"
+			],
+			[
+				"packge insta",
+				"Package Control: Install Package"
+			],
+			[
+				"json",
+				"Set Syntax: JSON"
+			],
+			[
+				"white",
+				"Trim Trailing White Space"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/brun0/Desktop/personal/gbackup"
+	],
+	"file_history":
+	[
+		"/home/brun0/Dropbox/status/personal.todo",
+		"/tmp/a/x/u/x/z/x/DB_Stalker_backup_02_22_2025.sql",
+		"/tmp/a/x/u/x/z/upl (1).php",
+		"/tmp/a/x/docker-compose.yml",
+		"/tmp/a/laras-lash-beauty/php/admin.php",
+		"/tmp/a/docker-compose.yml",
+		"/tmp/a/laras-lash-beauty/php/config.php",
+		"/home/brun0/Desktop/personal/series/main2.py",
+		"/home/brun0/Desktop/personal/series/main.py",
+		"/home/brun0/.zshrc",
+		"/home/brun0/Dropbox/status/work/2026/tt.todo",
+		"/home/brun0/.config/sublime-text/Packages/PlainTasks/messages/Tutorial.todo",
+		"/home/brun0/Dropbox/status/work/2026/work.todo",
+		"/tmp/a/Argon2Cracker/Argon2Cracker.py",
+		"/home/brun0/Desktop/personal/luz/CLAUDE.md",
+		"/home/brun0/Desktop/personal/luz/notas.md",
+		"/home/brun0/Desktop/personal/luz/notas",
+		"/tmp/a/server.py",
+		"/tmp/l/hash",
+		"/home/brun0/Desktop/personal/gbackup/internal/network/tpswitch.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/network/network.go",
+		"/home/brun0/Desktop/personal/gbackup/cmd/gbackup/main.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/run/run.go",
+		"/home/brun0/Desktop/personal/gbackup/TODO.md",
+		"/home/brun0/Desktop/personal/gbackup/Makefile",
+		"/home/brun0/Desktop/personal/gbackup/internal/network/openwrt.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/utils/removefile.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/setup/setup.go",
+		"/home/brun0/Desktop/personal/gbackup/config.toml",
+		"/home/brun0/Desktop/personal/gbackup/internal/nas/nas.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/nas/keeplasttwo_test.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/targets/targets.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/network/a.c",
+		"/home/brun0/Desktop/personal/gbackup/internal/utils/downloadfile.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/utils/folderdiff.go",
+		"/home/brun0/Desktop/personal/gbackup/internal/forward/forward.go",
+		"/usr/local/go/src/net/http/request.go",
+		"/home/brun0/Desktop/personal/gbackup/backup-tplinkswitch-2026-09-23.cfg",
+		"/home/brun0/Desktop/personal/NutGMonitor/internal/email/email.go",
+		"/home/brun0/Desktop/personal/NutGMonitor/cmd/nutgmonitor/main.go",
+		"/home/brun0/Desktop/personal/NutGMonitor/internal/ups/logs/",
+		"/home/brun0/Desktop/personal/NutGMonitor/README.md",
+		"/home/brun0/Desktop/personal/NutGMonitor/internal/ups/test.sql",
+		"/home/brun0/Desktop/personal/NutGMonitor/internal/ups/test.c",
+		"/home/brun0/Desktop/personal/NutGMonitor/internal/alertmanager/alertmanager.go",
+		"/tmp/claude-1000/-tmp/1341bf99-345f-4835-adc1-7608413f91e4/scratchpad/nginx-fix.txt",
+		"/home/brun0/.ssh/config",
+		"/home/brun0/Dropbox/status/personal.txt",
+		"/home/brun0/Desktop/personal/Agile/zeus-pentest/zeus/access_to_portal.txt",
+		"/home/brun0/Desktop/personal/invoices/script.gs",
+		"/home/brun0/Desktop/personal/Agile/zeus-pentest/system-prompt.md",
+		"/home/brun0/Downloads/x_abe70931-6dfa-45c0-91db-d85eee0a146f.csv",
+		"/home/brun0/Desktop/personal/Agile/zeus-pentest/CLAUDE.md",
+		"/home/brun0/Desktop/personal/Agile/zeus/access_to_portal.txt",
+		"/home/brun0/Desktop/personal/Agile/zeus/OpenFi/README.md",
+		"/home/brun0/.tmux.conf",
+		"/tmp/contacts-upload-example.csv",
+		"/home/brun0/.var/app/org.telegram.desktop/data/TelegramDesktop/tdata/temp_data/spear101.md",
+		"/home/brun0/Downloads/working(2).txt",
+		"/home/brun0/Desktop/tools/vast/src/loader.b64",
+		"/home/brun0/.var/app/org.telegram.desktop/data/TelegramDesktop/tdata/temp_data/PFG_1st_wave_planning.md",
+		"/home/brun0/Desktop/personal/index/geta.bat",
+		"/home/brun0/Dropbox/status/work/2026/projects.todo",
+		"/tmp/c/log20160317",
+		"/tmp/c/log20161230",
+		"/tmp/c/log20250331",
+		"/tmp/c/log20240227",
+		"/tmp/c/log20170206",
+		"/tmp/c/log20240927",
+		"/tmp/settings.yaml",
+		"/tmp/database.sql",
+		"/home/brun0/Desktop/personal/mythic/logihttpx.json",
+		"/home/brun0/Desktop/personal/mythic/vx",
+		"/tmp/a/logihttpx.json",
+		"/tmp/a/logihttpx.txt",
+		"/home/brun0/Downloads/t.txt",
+		"/tmp/a/t.b64",
+		"/tmp/pt.md",
+		"/tmp/home-assistant_2026-07-20T09-15-37.853Z.log",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/mysql.sql",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/mysql.sql-auth.json",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/proftpdpasswd",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/shell",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/domainkeys/public/ibet.pt",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cl.selector/htaccess_cache",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cl.selector/defaults.cfg",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/logs/user_task_runner.log",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/logs/vc_1555506762.17383_git_create.log",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/logs/vc_1556012356.53601_git_create.log",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/logs/vc_1558958484.10574_git_create.log",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/nvdata/CSSS_cpanel_domains",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/nvdata/defaultdir",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/nvdata/showhiddenfiles",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/contactinfo",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/email_accounts.json",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.cpanel/email_accounts_count",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.softaculous/user.php",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.spamassassin/user_prefs",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/.ssh/known_hosts",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/@pwcache/loba",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/@pwcache/lobasite",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/@pwcache/noreply",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/@pwcache/site",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/passwd",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/_privs.json",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/quota",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/ibet.pt/shadow",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/test.ibet.pt/@pwcache/site",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/etc/test.ibet.pt/passwd",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/logs/ibet.pt-Feb-2021/ibet.pt-Feb-2021",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/mail/.noreply@ibet_pt/new/1559054833.M446348P24564.cp124.webserver.pt,S=2316,W=2388",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/mail/.noreply@ibet_pt/new/1559060548.M617090P18197.cp124.webserver.pt,S=2347,W=2419",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/mail/.noreply@ibet_pt/new/1559062102.M520548P20521.cp124.webserver.pt,S=2368,W=2440",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/mail/.noreply@ibet_pt/new/1559062288.M958395P25533.cp124.webserver.pt,S=2446,W=2522",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/mail/ibet.pt/noreply/new/1559054705.M253199P24564.cp124.webserver.pt,S=2318,W=2390",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/mail/ibet.pt/noreply/new/1559062288.M958395P25533.cp124.webserver.pt,S=2446,W=2522",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/.git/.htaccess",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/.git/config",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/html/projects.php",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/ibet.pt/lobasite/.ftpquota",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-admin/user/admin.php",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-admin/admin.php",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-admin/index.php",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-content/index.php",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-content/uploads/wpallimport/files/ibet_users_teste.txt",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-content/uploads/wpallimport/uploads/415c6f757be6ed9ba890e8bb7942455d/ibet_users_teste.txt",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-content/uploads/wp-cerber-JG9UVWTNOIRH57Y3B1/.htaccess",
+		"/home/brun0/Desktop/work/projects/ibet/purpleteam1/lootfromkali/a/backup-2.19.2021_16-50-49_ibetpt/homedir/public_html/wp-content/uploads/fgd2wpp.log"
+	],
+	"find":
+	{
+		"height": 32.0
+	},
+	"find_in_files":
+	{
+		"height": 134.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"password",
+			"2",
+			"2026",
+			"2",
+			"bold",
+			"   ",
+			"open",
+			"3",
+			" |",
+			"keeplasttwo",
+			"lasttwo",
+			"remove",
+			"openwrt",
+			"POST",
+			"ERROR",
+			"[error]",
+			"openwrt",
+			"error,",
+			"error, string",
+			"error",
+			"PBS_SECRET",
+			"todo",
+			"please check"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"scrollbar_highlights": true,
+		"show_context": true,
+		"use_buffer2": true,
+		"use_gitignore": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "gbackup.sublime-project",
+					"selected": true,
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 45,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"lsp_uri": "file:///home/brun0/Desktop/personal/gbackup/gbackup.sublime-project",
+							"syntax": "Packages/JSON/JSON.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"stack_multiselect": false,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 32.0
+	},
+	"input":
+	{
+		"height": 56.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.LSP Log Panel":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"output.SFTP":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"output.Terminus":
+	{
+		"height": 160.0,
+		"history":
+		[
+		]
+	},
+	"output.diagnostics":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"output.find_results":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"output.mdpopups":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"output.show_commit_info":
+	{
+		"height": 160.0,
+		"history":
+		[
+		]
+	},
+	"pinned_build_system": "",
+	"project": "gbackup.sublime-project",
+	"replace":
+	{
+		"height": 60.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"per",
+				"personal.todo"
+			],
+			[
+				"main",
+				"main.py"
+			],
+			[
+				"cla",
+				"CLAUDE.md"
+			],
+			[
+				"make",
+				"Makefile"
+			],
+			[
+				"conf",
+				"config.toml"
+			],
+			[
+				"c",
+				"config.toml"
+			],
+			[
+				"setup",
+				"internal/setup/setup.go"
+			],
+			[
+				"tp",
+				"internal/network/tpswitch.go"
+			],
+			[
+				"net",
+				"internal/network/network.go"
+			],
+			[
+				"open",
+				"internal/network/openwrt.go"
+			],
+			[
+				"run",
+				"internal/run/run.go"
+			],
+			[
+				"tod",
+				"TODO.md"
+			],
+			[
+				"todo",
+				"TODO.md"
+			],
+			[
+				"da",
+				"internal/utils/downloadfile.go"
+			],
+			[
+				"",
+				"internal/network/network.go"
+			],
+			[
+				"util",
+				"internal/utils/folderdiff.go"
+			],
+			[
+				"netw",
+				"internal/network/network.go"
+			],
+			[
+				"ne",
+				"internal/network/network.go"
+			],
+			[
+				"n",
+				"internal/network/network.go"
+			],
+			[
+				"read",
+				"README.md"
+			],
+			[
+				"confi",
+				"config.toml"
+			],
+			[
+				"con",
+				"config.toml"
+			],
+			[
+				"zi",
+				"internal/loops/zigbee.go"
+			],
+			[
+				"zigbe",
+				"internal/loops/zigbee.go"
+			],
+			[
+				"data",
+				"internal/database/database.go"
+			],
+			[
+				"database",
+				"internal/database/database.go"
+			],
+			[
+				"52",
+				"52023.sh"
+			],
+			[
+				"50",
+				"50640.py"
+			],
+			[
+				"493",
+				"49385.py"
+			],
+			[
+				"409",
+				"4096.php"
+			],
+			[
+				"45196",
+				"45196.rb"
+			],
+			[
+				"17276",
+				"17276.txt"
+			],
+			[
+				"40",
+				"40438.txt"
+			],
+			[
+				"47",
+				"exploitdb/47799.py"
+			],
+			[
+				"49",
+				"exploitdb/49362.py"
+			],
+			[
+				"exploit",
+				"exploits/Limesurvey-RCE/exploit.py"
+			],
+			[
+				"ex",
+				"exploits/exp.py"
+			],
+			[
+				"exp",
+				"exploits/exp.py"
+			],
+			[
+				"cv",
+				"cve.py"
+			],
+			[
+				"a.",
+				"a.py"
+			],
+			[
+				"pas",
+				"passwords.out"
+			],
+			[
+				"se",
+				"users.out"
+			],
+			[
+				"cre",
+				"creds.out"
+			],
+			[
+				"user",
+				"users.out"
+			],
+			[
+				"ns",
+				"loot/nsrev_shadow-DC01-CA.asp"
+			],
+			[
+				"bruno",
+				"exploits/bruno.py"
+			],
+			[
+				"users",
+				"users.out"
+			],
+			[
+				"a.py",
+				"exploits/a.py"
+			],
+			[
+				"adduse",
+				"a/adduser.c"
+			],
+			[
+				"rce.",
+				"exploits/rce.py"
+			],
+			[
+				"userne",
+				"exploits/userenum.py"
+			],
+			[
+				"u.o",
+				"u.out"
+			],
+			[
+				"ker",
+				"kerberoastables.txt"
+			],
+			[
+				"bbb",
+				"bbb.py"
+			],
+			[
+				"sql",
+				"loot/sqlconf.php"
+			],
+			[
+				"16",
+				"1652766150.sql"
+			],
+			[
+				"ups.go",
+				"internal/ups/ups.go"
+			],
+			[
+				"cbri",
+				"network/smb_socks_with_cbrilha.out"
+			],
+			[
+				"iribeiro",
+				"network/smb_socks_with_iribeiro.out"
+			],
+			[
+				"NaoDefFTP.txt",
+				"loot/172.17.210.16/NaoDefFTP.txt"
+			],
+			[
+				"naodefAvisoLiq.txt",
+				"loot/172.17.210.16/naodefAvisoLiq.txt"
+			],
+			[
+				"Dri201810IBE Inicial.txt",
+				"loot/172.17.210.16/Dri201810IBE Inicial.txt"
+			],
+			[
+				"DMRIBE122020.txt",
+				"loot/172.17.210.16/DMRIBE122020.txt"
+			],
+			[
+				"MySoftMais_Config.xml",
+				"loot/172.17.210.16/MySoftMais_Config.xml"
+			],
+			[
+				"MAcessos_Comercial.txt",
+				"loot/172.17.210.16/MAcessos_Comercial.txt"
+			],
+			[
+				"readme",
+				"loot/172.17.210.16/ReadMe.txt"
+			],
+			[
+				"computers",
+				"ldapdomaindump/computers.out"
+			],
+			[
+				"web",
+				"webcradle"
+			],
+			[
+				"rev",
+				"rev.ps1"
+			],
+			[
+				"la_",
+				"network/la_tv.out"
+			],
+			[
+				"la_tv",
+				"network/la_tv.out"
+			],
+			[
+				"rela",
+				"relayking-scan.txt"
+			],
+			[
+				"all",
+				"network/all.out"
+			],
+			[
+				"cert",
+				"certipy/out"
+			],
+			[
+				"pass",
+				"ldapdomaindump/pass"
+			],
+			[
+				"a",
+				"ldapdomaindump/a"
+			],
+			[
+				"re",
+				"network/relayablesmb.txt"
+			],
+			[
+				"sq",
+				"share/sql.txt"
+			],
+			[
+				"db.o",
+				"db.out"
+			],
+			[
+				"u",
+				"users.out"
+			],
+			[
+				"us",
+				"users.out"
+			],
+			[
+				"res",
+				"share/results.txt"
+			],
+			[
+				"out",
+				"out.txt"
+			],
+			[
+				"event",
+				"loot/smb/freeswitch/etc/freeswitch/autoload_configs/event_socket.conf.xml"
+			],
+			[
+				"xml_rc",
+				"loot/smb/freeswitch/etc/freeswitch/autoload_configs/xml_rpc.conf.xml"
+			],
+			[
+				"req",
+				"req"
+			],
+			[
+				"ro",
+				"exploits/rogue.php"
+			],
+			[
+				"id",
+				"id_rsa"
+			],
+			[
+				"she",
+				"shell"
+			],
+			[
+				"gite",
+				"exploits/gitea.py"
+			],
+			[
+				"grafa",
+				"loot/grafana.ini"
+			],
+			[
+				"utils",
+				"utils.c"
+			],
+			[
+				"module",
+				"exploits/RedisModules-ExecuteCommand/src/module.c"
+			],
+			[
+				"au",
+				"authorized_keys"
+			],
+			[
+				"b",
+				"exploits/b.py"
+			],
+			[
+				"wor",
+				"wordlist.out"
+			],
+			[
+				"x.",
+				"x.hash"
+			],
+			[
+				"shell",
+				"shell.aspx"
+			],
+			[
+				"h",
+				"hosts.out"
+			],
+			[
+				"ad",
+				"ADThingsToSee.md"
+			],
+			[
+				"pc",
+				"pcs.txt"
+			],
+			[
+				"windows",
+				"WindowsThingsToSee.md"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+		"lsp_show_inlay_hints": true
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 197.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
