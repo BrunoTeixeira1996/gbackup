@@ -40,12 +40,26 @@
 	"buffers":
 	[
 		{
-			"file": "gbackup.sublime-project",
-			"file_size": 45,
-			"file_write_time": 134369595940036463,
+			"file": "Makefile",
+			"file_size": 912,
+			"file_write_time": 134347184245939986,
 			"settings":
 			{
-				"buffer_size": 45,
+				"buffer_size": 912,
+				"line_ending": "Unix"
+			},
+			"undo_stack":
+			[
+			]
+		},
+		{
+			"file": "internal/run/run.go",
+			"file_size": 4951,
+			"file_write_time": 134347181682352446,
+			"settings":
+			{
+				"buffer_size": 4939,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		}
@@ -198,7 +212,9 @@
 	},
 	"expanded_folders":
 	[
-		"/home/brun0/Desktop/personal/gbackup"
+		"/home/brun0/Desktop/personal/gbackup",
+		"/home/brun0/Desktop/personal/gbackup/internal",
+		"/home/brun0/Desktop/personal/gbackup/internal/run"
 	],
 	"file_history":
 	[
@@ -333,7 +349,7 @@
 	],
 	"find":
 	{
-		"height": 32.0
+		"height": 44.0
 	},
 	"find_in_files":
 	{
@@ -394,12 +410,44 @@
 			[
 				{
 					"buffer": 0,
-					"file": "gbackup.sublime-project",
+					"file": "Makefile",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 912,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								225,
+								225
+							]
+						],
+						"settings":
+						{
+							"lsp_uri": "file:///home/brun0/Desktop/personal/gbackup/Makefile",
+							"syntax": "Packages/Makefile/Makefile.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"stack_multiselect": false,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "internal/run/run.go",
 					"selected": true,
 					"semi_transient": true,
 					"settings":
 					{
-						"buffer_size": 45,
+						"buffer_size": 4939,
 						"regions":
 						{
 						},
@@ -412,13 +460,31 @@
 						],
 						"settings":
 						{
-							"lsp_uri": "file:///home/brun0/Desktop/personal/gbackup/gbackup.sublime-project",
-							"syntax": "Packages/JSON/JSON.sublime-syntax",
+							"auto_complete_triggers":
+							[
+								{
+									"characters": "<",
+									"selector": "text.html, text.xml"
+								},
+								{
+									"rhs_empty": true,
+									"selector": "punctuation.accessor"
+								},
+								{
+									"characters": ".",
+									"selector": "meta.tag, source - comment - string.quoted.double.block - string.quoted.single.block - string.unquoted.heredoc",
+									"server": "LSP-gopls"
+								}
+							],
+							"lsp_active": true,
+							"lsp_uri": "file:///home/brun0/Desktop/personal/gbackup/internal/run/run.go",
+							"show_definitions": false,
+							"syntax": "Packages/Go/Go.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2346.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -522,6 +588,10 @@
 		"selected_items":
 		[
 			[
+				"make",
+				"Makefile"
+			],
+			[
 				"per",
 				"personal.todo"
 			],
@@ -532,10 +602,6 @@
 			[
 				"cla",
 				"CLAUDE.md"
-			],
-			[
-				"make",
-				"Makefile"
 			],
 			[
 				"conf",
@@ -938,6 +1004,10 @@
 		"last_filter": "",
 		"selected_items":
 		[
+			[
+				"",
+				"~/Desktop/personal/ghome/ghome.sublime-project"
+			]
 		],
 		"width": 380.0
 	},
